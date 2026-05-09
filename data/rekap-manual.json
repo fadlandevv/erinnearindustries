@@ -1,0 +1,47 @@
+[
+  {
+    "id": "1778334895269",
+    "date": "2026-05-09",
+    "source": "marketplace",
+    "platform": "WhatsApp",
+    "amount": 19000000,
+    "filledBy": "superadmin",
+    "createdAt": "2026-05-09T13:54:55.269Z"
+  },
+  {
+    "id": "1778334852170",
+    "date": "2026-05-06",
+    "source": "marketplace",
+    "platform": "Offline",
+    "amount": 1800000,
+    "filledBy": "superadmin",
+    "createdAt": "2026-05-09T13:54:12.170Z"
+  },
+  {
+    "id": "1778334824086",
+    "date": "2026-05-03",
+    "source": "offline",
+    "platform": "WA",
+    "amount": 1800000,
+    "note": "Testing",
+    "filledBy": "superadmin",
+    "createdAt": "2026-05-09T13:53:44.087Z"
+  },
+  {
+    "id": "1778332175385",
+    "date": "2026-06-01",
+    "source": "offline",
+    "platform": "wa",
+    "amount": 1800000,
+    "createdAt": "2026-05-09T13:09:35.386Z"
+  },
+  {
+    "id": "1778331195918",
+    "date": "2026-05-09",
+    "source": "offline",
+    "platform": "WA",
+    "amount": 15000000,
+    "note": "oke",
+    "createdAt": "2026-05-09T12:53:15.918Z"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1",
+    "image": "/showcase/item-1.webp",
+    "title": "Koleksi Produk",
+    "desc": "Temukan koleksi pakaian premium kami — dari casual wear hingga formal attire yang dirancang untuk gaya hidup modern.",
+    "buttonText": "Lihat Produk",
+    "buttonHref": "/product"
+  },
+  {
+    "id": "2",
+    "image": "/showcase/item-2.jpg",
+    "title": "Layanan Kami",
+    "desc": "Dari brand identity hingga e-commerce setup — kami menyediakan layanan lengkap untuk membangun kehadiran brand Anda.",
+    "buttonText": "Lihat Layanan",
+    "buttonHref": "/service"
+  }
+]

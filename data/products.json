@@ -1,0 +1,217 @@
+[
+  {
+    "id": "1",
+    "tag": "New Arrival",
+    "title": "Baisc Tshirt",
+    "price": "IDR 99.000,-",
+    "bg": "#0d0d0d",
+    "colors": [
+      "#0d0d0d",
+      "#f5f2ec",
+      "#1a3a5c",
+      "#4a5568"
+    ],
+    "description": "Kemeja klasik yang dibuat dari kain Oxford 100% katun premium. Dirancang untuk keeleganan sehari-hari dengan siluet relaxed-fit yang cocok dipakai formal maupun kasual.",
+    "material": [
+      "100% Cotton Oxford",
+      "100% Cotton Oxford",
+      "100% Cotton Oxford",
+      "100% Cotton Oxford",
+      "100% Cotton Oxford",
+      "100% Cotton Oxford",
+      "100% Cotton Oxford",
+      "100% Cotton Oxford",
+      "100% Cotton Oxford",
+      "100% Cotton Oxford"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "image": "/products/1/main.jpg",
+    "images": [
+      "/products/1/detail-0.jpg",
+      "",
+      "",
+      ""
+    ],
+    "priceUSD": 6,
+    "updatedAt": "2026-05-09T05:49:25.400Z"
+  },
+  {
+    "id": "2",
+    "tag": "Best Seller",
+    "title": "Slim Chino Pants",
+    "price": "Rp 99.000,-",
+    "bg": "#8a9e8a",
+    "colors": [
+      "#8a9e8a",
+      "#c4a882",
+      "#2d3748",
+      "#f5f2ec"
+    ],
+    "description": "Celana chino slim fit yang nyaman dan stylish. Bahan stretch ringan memungkinkan gerak bebas sepanjang hari, cocok untuk kantor maupun acara santai.",
+    "material": "98% Cotton, 2% Elastane",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "image": "/products/2/main.jpg",
+    "images": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "priceUSD": 24
+  },
+  {
+    "id": "3",
+    "tag": "Limited",
+    "title": "Premium Wool Blazer",
+    "price": "Rp 89.000",
+    "bg": "#c5bde8",
+    "colors": [
+      "#c5bde8",
+      "#2d3748",
+      "#0d0d0d"
+    ],
+    "description": "Blazer wol premium dengan potongan tailored yang elegan. Dibuat dari wol berkualitas tinggi yang memberikan kehangatan optimal sekaligus tampilan yang sophisticated.",
+    "material": "80% Wool, 20% Polyester",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "image": "/products/3/main.jpg",
+    "images": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "priceUSD": 75
+  },
+  {
+    "id": "4",
+    "tag": "New Arrival",
+    "title": "Casual Linen Shirt",
+    "price": "Rp 320.000",
+    "bg": "#f2e5e5",
+    "colors": [
+      "#e8c8c8",
+      "#4a7c59",
+      "#c8a882",
+      "#0d0d0d"
+    ],
+    "description": "Kemeja linen kasual yang ringan dan breathable, sempurna untuk cuaca tropis. Tekstur alami linen memberikan tampilan effortlessly stylish untuk aktivitas sehari-hari.",
+    "material": "100% Premium Linen",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "priceUSD": 20
+  },
+  {
+    "id": "5",
+    "tag": "Best Seller",
+    "title": "Tailored Trousers",
+    "price": "Rp 420.000",
+    "bg": "#e5eef2",
+    "colors": [
+      "#c5d5e0",
+      "#2d3748",
+      "#0d0d0d",
+      "#8b6914"
+    ],
+    "description": "Celana tailored dengan potongan presisi yang memberikan siluet profesional. Bahan berkualitas tinggi yang tahan lama dan mudah dirawat, ideal untuk lingkungan kerja.",
+    "material": "65% Polyester, 35% Rayon",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "priceUSD": 26
+  },
+  {
+    "id": "6",
+    "tag": "Sale",
+    "title": "Logo Cap Collection",
+    "price": "Rp 150.000",
+    "bg": "#f2f0e5",
+    "colors": [
+      "#ede8d8",
+      "#0d0d0d",
+      "#8b6914"
+    ],
+    "description": "Koleksi topi dengan logo Erinnear yang ikonik. Dibuat dari bahan kanvas premium dengan bordir detail yang rapi. Tersedia dalam pilihan warna netral yang mudah dipadukan.",
+    "material": "100% Cotton Canvas",
+    "sizes": [
+      "One Size"
+    ],
+    "priceUSD": 9
+  },
+  {
+    "id": "1778137318314",
+    "tag": "Best Seller",
+    "title": "Testing",
+    "price": "55000",
+    "bg": "#d88e18",
+    "colors": [
+      "#d88e18",
+      "#0d0d0d",
+      "#f5f2ec"
+    ],
+    "description": "Ini Testing",
+    "material": "Cotton Combed",
+    "sizes": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "image": "/products/1778137318314/main.jpeg",
+    "images": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "priceUSD": 3.5
+  },
+  {
+    "id": "1778227615400",
+    "tag": "Limited",
+    "title": "Premium Wool Blazer (Copy)",
+    "price": "Rp 89.000",
+    "bg": "#c5bde8",
+    "colors": [
+      "#c5bde8",
+      "#2d3748",
+      "#0d0d0d"
+    ],
+    "description": "Blazer wol premium dengan potongan tailored yang elegan. Dibuat dari wol berkualitas tinggi yang memberikan kehangatan optimal sekaligus tampilan yang sophisticated.",
+    "material": "80% Wool, 20% Polyester",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "priceUSD": 75
+  }
+]

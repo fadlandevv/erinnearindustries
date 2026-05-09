@@ -1,0 +1,9 @@
+[
+  {
+    "id": "default-superadmin",
+    "username": "superadmin",
+    "passwordHash": "571c515bc5b790593d3a5a8628a215c8:bdc926d62db5db6859fc0f990a76b445616f08f223170b0443552475f1e108dcbf74aa239c1904d1c53ba4f681bb9621715bd1f3731dbb3456e8bfa48c2a69af",
+    "roleId": "super-admin",
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  }
+]

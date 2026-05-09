@@ -1,0 +1,83 @@
+[
+  {
+    "id": "EI-1778298337548",
+    "createdAt": "2026-05-09T03:45:37.890Z",
+    "status": "pending",
+    "customer": {
+      "name": "Fadlan Hidayatulloh",
+      "email": "fadlanhidayatulloh@gmail.com",
+      "phone": "081294696476",
+      "address": "Jl. Jeruk 6 Blok L4 no.17/18 Sukatani, Tapos, Depok (16454)",
+      "city": "Depok",
+      "postalCode": "16454",
+      "notes": ""
+    },
+    "items": [
+      {
+        "productId": "1",
+        "title": "Classic Oxford Shirt",
+        "price": "IDR 99.000,-",
+        "unitPrice": 99000,
+        "size": "M",
+        "quantity": 3,
+        "bg": "#0d0d0d"
+      },
+      {
+        "productId": "1",
+        "title": "Classic Oxford Shirt",
+        "price": "IDR 99.000,-",
+        "unitPrice": 99000,
+        "size": "XL",
+        "quantity": 1,
+        "bg": "#0d0d0d"
+      },
+      {
+        "productId": "1",
+        "title": "Classic Oxford Shirt",
+        "price": "IDR 99.000,-",
+        "unitPrice": 99000,
+        "size": "XXL",
+        "quantity": 1,
+        "bg": "#0d0d0d"
+      },
+      {
+        "productId": "1",
+        "title": "Classic Oxford Shirt",
+        "price": "IDR 99.000,-",
+        "unitPrice": 99000,
+        "size": "L",
+        "quantity": 1,
+        "bg": "#0d0d0d"
+      }
+    ],
+    "totalPrice": 594000,
+    "snapToken": "cc55ab23-75f8-40ca-b176-12d5e97914d2"
+  },
+  {
+    "id": "EI-1778209334856",
+    "createdAt": "2026-05-08T03:02:15.243Z",
+    "status": "pending",
+    "customer": {
+      "name": "Fadlan Hidayatulloh",
+      "email": "fadlanhidayatulloh@gmail.com",
+      "phone": "101390190139",
+      "address": "13112312",
+      "city": "121232112",
+      "postalCode": "12313212",
+      "notes": "12123123"
+    },
+    "items": [
+      {
+        "productId": "1",
+        "title": "Classic Oxford Shirt",
+        "price": "Rp 450.000",
+        "unitPrice": 450000,
+        "size": "S",
+        "quantity": 15,
+        "bg": "#f2ede5"
+      }
+    ],
+    "totalPrice": 6750000,
+    "snapToken": "1eba7882-0ae8-440a-bc79-2ca5b2506ad2"
+  }
+]

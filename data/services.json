@@ -1,0 +1,98 @@
+[
+  {
+    "id": "1",
+    "icon": "✦",
+    "title": "Brand Identity",
+    "desc": "Strategic brand positioning, visual identity systems, and editorial art direction for modern clothing labels.",
+    "tag": "Most Popular",
+    "longDesc": "Your brand is more than a logo — it's the entire sensory experience your audience has with your label. We build brand identity systems from the ground up: from naming and positioning strategy to full visual language including typography, color palette, iconography, and tone of voice. Every element is crafted to feel cohesive, premium, and unmistakably yours.",
+    "features": [
+      "Brand strategy & positioning workshop",
+      "Logo design (primary, secondary, monogram)",
+      "Full color palette & typography system",
+      "Brand guidelines document",
+      "Stationery & packaging mockups",
+      "Art direction for editorial shoots"
+    ]
+  },
+  {
+    "id": "2",
+    "icon": "◈",
+    "title": "Product Showcase",
+    "desc": "Highlight key product lines, mood imagery, and fabric details with beautiful, conversion-driven layouts.",
+    "tag": null,
+    "longDesc": "Turn browsers into buyers with product presentation that sells. We design showcase pages optimized for both aesthetics and conversion — highlighting fabric textures, colorways, size fit, and the lifestyle behind each piece. Whether it's a seasonal lookbook or a permanent catalog, we make every product feel worth owning.",
+    "features": [
+      "Product page design & layout",
+      "Lookbook & collection gallery",
+      "Fabric & detail close-up layouts",
+      "Size guide & fit information design",
+      "Mood board & lifestyle context",
+      "Mobile-optimized presentation"
+    ]
+  },
+  {
+    "id": "3",
+    "icon": "◎",
+    "title": "Company Profile",
+    "desc": "Introduce your team, values, and partner networks with a polished corporate profile and case study.",
+    "tag": null,
+    "longDesc": "First impressions matter — especially in B2B and wholesale contexts. We design comprehensive company profiles that communicate your heritage, craftsmanship, production capabilities, and team expertise. The result is a professional document or digital experience that opens doors with retailers, investors, and partners.",
+    "features": [
+      "Company story & vision narrative",
+      "Team & leadership presentation",
+      "Production capabilities overview",
+      "Partner & client portfolio section",
+      "Case studies & success stories",
+      "Print-ready & digital formats"
+    ]
+  },
+  {
+    "id": "4",
+    "icon": "⊕",
+    "title": "E-Commerce Setup",
+    "desc": "Online store design and development — built to convert browsers into loyal buyers.",
+    "tag": null,
+    "longDesc": "We design and build e-commerce experiences that reflect your brand's premium positioning while being effortless to navigate and buy from. From product filtering to checkout flow, every interaction is intentional. We integrate payment gateways, manage inventory architecture, and ensure your store is fast, secure, and ready to scale.",
+    "features": [
+      "Custom storefront design",
+      "Product catalog & category structure",
+      "Cart & checkout flow optimization",
+      "Payment gateway integration",
+      "Order management system",
+      "SEO & performance optimization"
+    ]
+  },
+  {
+    "id": "5",
+    "icon": "◐",
+    "title": "Social Media Kit",
+    "desc": "Content templates and visual systems for Instagram, TikTok, and beyond — keeping your brand consistent.",
+    "tag": null,
+    "longDesc": "Consistency across channels builds trust. We create ready-to-use social media kit that aligns with your brand identity — so every post, story, and reel looks like it belongs together. Your team gets editable templates they can update without design skills, keeping your feed professional and on-brand every day.",
+    "features": [
+      "Feed post templates (square & portrait)",
+      "Instagram & TikTok story templates",
+      "Highlight cover designs",
+      "Reel intro & outro frames",
+      "Caption tone-of-voice guide",
+      "Editable Figma / Canva files"
+    ]
+  },
+  {
+    "id": "6",
+    "icon": "⊞",
+    "title": "Uniform Program",
+    "desc": "Custom B2B corporate clothing solutions from concept to bulk production for teams and businesses.",
+    "tag": "B2B",
+    "longDesc": "Dress your team in clothing that reflects your company's values and culture. Our end-to-end uniform program covers everything from initial concept sketches and fabric sourcing to sampling, approval, and bulk production. We work with hotels, restaurants, retail chains, and corporate offices to deliver uniforms that are both functional and brand-forward.",
+    "features": [
+      "Design consultation & concept sketches",
+      "Fabric sourcing & material selection",
+      "Sample production & fitting review",
+      "Branding (embroidery, print, labels)",
+      "Bulk order production & QC",
+      "Delivery & reorder management"
+    ]
+  }
+]

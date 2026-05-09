@@ -1,0 +1,42 @@
+[
+  {
+    "id": "super-admin",
+    "name": "Super Admin",
+    "permissions": [
+      "dashboard",
+      "products",
+      "services",
+      "content",
+      "showcase",
+      "gallery",
+      "orders",
+      "rekap",
+      "members",
+      "roles"
+    ],
+    "locked": true
+  },
+  {
+    "id": "admin",
+    "name": "Admin",
+    "permissions": [
+      "dashboard",
+      "products",
+      "services",
+      "content",
+      "gallery",
+      "orders",
+      "rekap"
+    ],
+    "locked": false
+  },
+  {
+    "id": "1778301786552",
+    "name": "Internship",
+    "permissions": [
+      "products",
+      "content"
+    ],
+    "locked": false
+  }
+]

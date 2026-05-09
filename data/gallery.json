@@ -1,0 +1,32 @@
+[
+  {
+    "id": "1",
+    "image": "/gallery/slot-1.jpg",
+    "label": "Koleksi Terbaru",
+    "sublabel": "Spring / Summer 2025"
+  },
+  {
+    "id": "2",
+    "image": "/gallery/slot-2.jpg",
+    "label": "Behind The Brand",
+    "sublabel": "Our Story"
+  },
+  {
+    "id": "3",
+    "image": "/gallery/slot-3.jpg",
+    "label": "Capsule Collectionkhjijnkjvhj",
+    "sublabel": "Flagship Piece"
+  },
+  {
+    "id": "4",
+    "image": "/gallery/slot-4.webp",
+    "label": "Editorial Shoot",
+    "sublabel": "Lookbook 2025"
+  },
+  {
+    "id": "5",
+    "image": "/gallery/slot-5.webp",
+    "label": "Uniform Program",
+    "sublabel": "Corporate B2B"
+  }
+]
