@@ -5,20 +5,27 @@ const MIDTRANS_DOMAINS = [
   'https://api.midtrans.com',
 ].join(' ')
 
+const VERCEL_DOMAINS = 'https://vercel.live https://*.vercel.live https://*.pusher.com wss://*.pusher.com'
+
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${MIDTRANS_DOMAINS}`,
-  `style-src 'self' 'unsafe-inline' ${MIDTRANS_DOMAINS}`,
+  `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${MIDTRANS_DOMAINS} ${VERCEL_DOMAINS}`,
+  `style-src 'self' 'unsafe-inline' ${MIDTRANS_DOMAINS} ${VERCEL_DOMAINS}`,
   `img-src 'self' data: blob: https:`,
-  `font-src 'self' data:`,
-  `connect-src 'self' ${MIDTRANS_DOMAINS}`,
-  `frame-src 'self' ${MIDTRANS_DOMAINS}`,
+  `font-src 'self' data: https:`,
+  `connect-src 'self' ${MIDTRANS_DOMAINS} ${VERCEL_DOMAINS}`,
+  `frame-src 'self' ${MIDTRANS_DOMAINS} ${VERCEL_DOMAINS}`,
   `worker-src 'self' blob:`,
 ].join('; ')
 
 const nextConfig = {
   reactStrictMode: true,
   devIndicators: false,
+  experimental: {
+    outputFileTracingIncludes: {
+      '/**': ['./data/**'],
+    },
+  },
   async headers() {
     return [
       {

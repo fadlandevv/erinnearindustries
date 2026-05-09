@@ -2,7 +2,7 @@
   {
     "id": "default-superadmin",
     "username": "superadmin",
-    "passwordHash": "571c515bc5b790593d3a5a8628a215c8:bdc926d62db5db6859fc0f990a76b445616f08f223170b0443552475f1e108dcbf74aa239c1904d1c53ba4f681bb9621715bd1f3731dbb3456e8bfa48c2a69af",
+    "passwordHash": "7cdf7306323949a2a300152443c699d1:59aca123631f5c5949bbd5c835f20a74fea3288665fdb11d8122ba70010a04b3be79c7e1cbdcc2923a52495643d919815dd88c94e8974682f3e24754ed3b122e",
     "roleId": "super-admin",
     "createdAt": "2026-01-01T00:00:00.000Z"
   }

@@ -18,12 +18,17 @@ function getAbsolute(iso: string): string {
 }
 
 export default function RelativeTime({ iso }: { iso: string }) {
-  const [relative, setRelative] = useState(() => getRelative(iso))
+  const [mounted, setMounted] = useState(false)
+  const [relative, setRelative] = useState('')
 
   useEffect(() => {
+    setMounted(true)
+    setRelative(getRelative(iso))
     const interval = setInterval(() => setRelative(getRelative(iso)), 30_000)
     return () => clearInterval(interval)
   }, [iso])
+
+  if (!mounted) return <span style={{ fontSize: '0.8rem', color: '#aaa' }}>—</span>
 
   return (
     <span title={getAbsolute(iso)} style={{ cursor: 'default' }}>

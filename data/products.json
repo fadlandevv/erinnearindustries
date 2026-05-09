@@ -164,36 +164,6 @@
     "priceUSD": 9
   },
   {
-    "id": "1778137318314",
-    "tag": "Best Seller",
-    "title": "Testing",
-    "price": "55000",
-    "bg": "#d88e18",
-    "colors": [
-      "#d88e18",
-      "#0d0d0d",
-      "#f5f2ec"
-    ],
-    "description": "Ini Testing",
-    "material": "Cotton Combed",
-    "sizes": [
-      "XS",
-      "S",
-      "M",
-      "L",
-      "XL",
-      "XXL"
-    ],
-    "image": "/products/1778137318314/main.jpeg",
-    "images": [
-      "",
-      "",
-      "",
-      ""
-    ],
-    "priceUSD": 3.5
-  },
-  {
     "id": "1778227615400",
     "tag": "Limited",
     "title": "Premium Wool Blazer (Copy)",
