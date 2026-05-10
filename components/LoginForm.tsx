@@ -42,6 +42,10 @@ export default function LoginForm() {
         Belum punya akun?{' '}
         <Link href="/register">Daftar sekarang</Link>
       </p>
+      <p className="auth-switch" style={{ marginTop: '0.5rem' }}>
+        Lupa password?{' '}
+        <Link href="/forgot-password">Hubungi admin</Link>
+      </p>
     </form>
   )
 }

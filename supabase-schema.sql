@@ -115,3 +115,11 @@ create table if not exists admin_access_log (
 );
 
 create index if not exists admin_access_log_created_at_idx on admin_access_log (created_at desc);
+
+create table if not exists password_reset_tokens (
+  token text primary key,
+  user_email text not null,
+  expires_at timestamptz not null,
+  used boolean default false,
+  created_at timestamptz default now()
+);

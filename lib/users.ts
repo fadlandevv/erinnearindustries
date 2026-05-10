@@ -52,3 +52,25 @@ export function verifyPassword(password: string, stored: string): boolean {
   const derived = scryptSync(password, salt, 64)
   return timingSafeEqual(hashBuffer, derived)
 }
+
+export async function createResetToken(email: string): Promise<string> {
+  const token = randomBytes(32).toString('hex')
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+  await db.from('password_reset_tokens').insert({
+    token, user_email: email, expires_at: expiresAt, used: false,
+  })
+  return token
+}
+
+export async function validateAndConsumeResetToken(token: string): Promise<string | null> {
+  const { data } = await db
+    .from('password_reset_tokens')
+    .select('*')
+    .eq('token', token)
+    .eq('used', false)
+    .gt('expires_at', new Date().toISOString())
+    .maybeSingle()
+  if (!data) return null
+  await db.from('password_reset_tokens').update({ used: true }).eq('token', token)
+  return data.user_email as string
+}

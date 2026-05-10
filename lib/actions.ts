@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache'
 import { getProducts, saveProducts, getServices, saveServices, getGallery, saveGallery, getShowcase, saveShowcase, saveContent, type ContentData } from './data'
 import { saveOrder, getOrdersByEmail, deleteOrder, updateOrderStatus, type OrderItem, type Order } from './orders'
 import { createSnapToken } from './midtrans'
-import { getUserByEmail, saveUser, updateUser, deleteUser, hashPassword, verifyPassword } from './users'
+import { getUserByEmail, saveUser, updateUser, deleteUser, hashPassword, verifyPassword, createResetToken, validateAndConsumeResetToken } from './users'
 import {
   getAdminByUsername, getAdminById, saveAdmin, deleteAdmin as _deleteAdmin,
   getRoles, getRoleById, saveRole, deleteRole as _deleteRole,
@@ -433,6 +433,35 @@ export async function saveContentAction(_prev: unknown, formData: FormData): Pro
 export async function deleteMemberAction(id: string) {
   await deleteUser(id)
   revalidatePath('/admin/members')
+}
+
+export async function generateResetLinkAction(
+  email: string
+): Promise<{ link?: string; error?: string }> {
+  const jar = await cookies()
+  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+  const user = await getUserByEmail(email)
+  if (!user) return { error: 'User tidak ditemukan.' }
+  const token = await createResetToken(email)
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  return { link: `${base}/reset-password?token=${token}` }
+}
+
+export async function resetPasswordAction(
+  _prev: { error?: string; success?: boolean },
+  formData: FormData
+): Promise<{ error?: string; success?: boolean }> {
+  const token    = formData.get('token') as string
+  const password = formData.get('password') as string
+  const confirm  = formData.get('confirm') as string
+  if (password !== confirm)     return { error: 'Konfirmasi password tidak cocok.' }
+  if (password.length < 6)      return { error: 'Password minimal 6 karakter.' }
+  const email = await validateAndConsumeResetToken(token)
+  if (!email)                   return { error: 'Link tidak valid atau sudah kedaluwarsa.' }
+  const user = await getUserByEmail(email)
+  if (!user)                    return { error: 'Akun tidak ditemukan.' }
+  await updateUser({ ...user, passwordHash: hashPassword(password) })
+  return { success: true }
 }
 
 export async function createRoleAction(

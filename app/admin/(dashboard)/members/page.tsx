@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getUsers } from '@/lib/users'
 import { getOrdersByEmail } from '@/lib/orders'
 import DeleteMemberBtn from './DeleteMemberBtn'
+import ResetLinkBtn from './ResetLinkBtn'
 
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString('id-ID', {
@@ -87,7 +88,7 @@ export default async function MembersPage() {
                         {formatDateTime(user.createdAt)}
                       </td>
                       <td>
-                        <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'wrap' }}>
                           <Link
                             href={`/admin/members/${user.id}`}
                             className="btn-admin-secondary"
@@ -95,6 +96,7 @@ export default async function MembersPage() {
                           >
                             Detail
                           </Link>
+                          <ResetLinkBtn email={user.email} />
                           <DeleteMemberBtn id={user.id} name={user.name} />
                         </div>
                       </td>
