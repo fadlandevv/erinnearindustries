@@ -20,20 +20,18 @@ export default function ProductDetail({
   )
   const [materialOpen, setMaterialOpen] = useState(false)
   const [showUSD, setShowUSD] = useState(false)
-  const [activeImg, setActiveImg] = useState<string | null>(null)
   const { addToCart } = useCart()
   const { t } = useLanguage()
   const pd = t.productDetail
 
-  const displayImg = product.image ?? null
-  const shownImg = activeImg ?? displayImg
+  // Pool of all images: main first, then detail images
+  const allImages = [
+    product.image,
+    ...(product.images?.filter((s) => s && s.trim() !== '') ?? []),
+  ].filter(Boolean) as string[]
 
-  // Normalize to exactly 4 slots
-  const detailSlots: (string | null)[] = Array.from({ length: 4 }, (_, i) => {
-    const v = product.images?.[i]
-    return v && v.trim() !== '' ? v : null
-  })
-  const hasAnyDetail = detailSlots.some(Boolean)
+  const [mainIdx, setMainIdx] = useState(0)
+  const mainImg = allImages[mainIdx] ?? null
 
   const handleAddToCart = () => {
     if (!selectedSize) {
@@ -64,9 +62,10 @@ export default function ProductDetail({
             className="product-gallery-main"
             style={{ background: product.bg }}
           >
-            {shownImg ? (
+            {mainImg ? (
               <img
-                src={shownImg}
+                key={mainImg}
+                src={mainImg}
                 alt={product.title}
                 className="product-gallery-img"
               />
@@ -81,23 +80,19 @@ export default function ProductDetail({
             )}
           </div>
 
-          {/* Detail photo strip — always 4 slots */}
-          {(hasAnyDetail || displayImg) && (
+          {/* Thumbnail strip — all images, click to swap with main */}
+          {allImages.length > 1 && (
             <div className="product-gallery-details">
-              {detailSlots.map((img, i) =>
-                img ? (
-                  <button
-                    key={i}
-                    className={`product-gallery-detail-thumb${activeImg === img ? ' product-gallery-detail-thumb--active' : ''}`}
-                    onClick={() => setActiveImg(activeImg === img ? null : img)}
-                    aria-label={`Detail photo ${i + 1}`}
-                  >
-                    <img src={img} alt={`${product.title} detail ${i + 1}`} />
-                  </button>
-                ) : (
-                  <div key={i} className="product-gallery-detail-empty" />
-                )
-              )}
+              {allImages.map((img, i) => (
+                <button
+                  key={img}
+                  className={`product-gallery-detail-thumb${i === mainIdx ? ' product-gallery-detail-thumb--active' : ''}`}
+                  onClick={() => setMainIdx(i)}
+                  aria-label={`Photo ${i + 1}`}
+                >
+                  <img src={img} alt={`${product.title} ${i + 1}`} />
+                </button>
+              ))}
             </div>
           )}
         </div>

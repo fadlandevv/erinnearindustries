@@ -868,7 +868,7 @@ p:last-child { margin-bottom: 0; }
 }
 
 .product-gallery-main {
-  aspect-ratio: 3/4;
+  aspect-ratio: 1/1;
   border-radius: 28px;
   position: relative;
   overflow: hidden;
@@ -889,7 +889,7 @@ p:last-child { margin-bottom: 0; }
 
 .product-gallery-details {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
   gap: 0.5rem;
   flex-shrink: 0;
 }
@@ -1134,7 +1134,7 @@ p:last-child { margin-bottom: 0; }
 @media (max-width: 860px) {
   .product-detail-grid { grid-template-columns: 1fr; gap: 2rem; align-items: start; }
   .product-detail-visual { aspect-ratio: 4/3; }
-  .product-gallery-main { aspect-ratio: 4/3; }
+  .product-gallery-main { aspect-ratio: 1/1; }
 }
 
 /* Mobile */
