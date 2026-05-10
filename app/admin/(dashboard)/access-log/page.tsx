@@ -7,10 +7,10 @@ const ACTION_LABEL: Record<AccessAction, string> = {
   login_failed: 'Login Gagal',
 }
 
-const ACTION_STYLE: Record<AccessAction, string> = {
-  login:        'admin-badge-green',
-  logout:       'admin-badge-gray',
-  login_failed: 'admin-badge-red',
+const ACTION_BADGE: Record<AccessAction, string> = {
+  login:        'admin-badge admin-badge-green',
+  logout:       'admin-badge admin-badge-gray',
+  login_failed: 'admin-badge admin-badge-red',
 }
 
 function formatDate(iso: string) {
@@ -28,13 +28,13 @@ export default async function AccessLogPage() {
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Access Log</h1>
-          <p className="admin-page-sub">Riwayat 200 aktivitas login & logout admin terbaru.</p>
+          <p className="admin-page-subtitle">Riwayat 200 aktivitas login & logout admin terbaru.</p>
         </div>
       </div>
 
-      <div className="admin-card">
+      <div className="admin-table-wrap">
         {logs.length === 0 ? (
-          <p style={{ color: '#aaa', padding: '2rem', textAlign: 'center' }}>Belum ada log.</p>
+          <p className="admin-empty">Belum ada log aktivitas.</p>
         ) : (
           <table className="admin-table">
             <thead>
@@ -53,7 +53,7 @@ export default async function AccessLogPage() {
                   </td>
                   <td style={{ fontWeight: 600 }}>{entry.username}</td>
                   <td>
-                    <span className={`admin-badge ${ACTION_STYLE[entry.action]}`}>
+                    <span className={ACTION_BADGE[entry.action]}>
                       {ACTION_LABEL[entry.action]}
                     </span>
                   </td>

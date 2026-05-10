@@ -402,6 +402,17 @@
   display: inline-block; padding: 0.2rem 0.65rem; border-radius: 999px;
   font-size: 0.68rem; font-weight: 600; background: #f4f4f4; color: #555;
 }
+.admin-badge-green { background: #dcfce7; color: #15803d; }
+.admin-badge-red   { background: #fee2e2; color: #b91c1c; }
+.admin-badge-gray  { background: #f3f4f6; color: #6b7280; }
+
+.admin-alert {
+  padding: 0.75rem 1rem; border-radius: 10px;
+  font-size: 0.875rem; font-weight: 500; margin-bottom: 1.5rem;
+}
+.admin-alert-success { background: #dcfce7; color: #15803d; }
+.admin-alert-error   { background: #fee2e2; color: #b91c1c; }
+
 .admin-color-swatch {
   width: 22px; height: 22px; border-radius: 6px;
   display: inline-block; border: 1px solid rgba(0,0,0,0.1);
