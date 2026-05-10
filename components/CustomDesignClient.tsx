@@ -17,12 +17,12 @@ const SHIRT_COLORS = [
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL']
 
 const BAHAN_OPTIONS = [
-  'Cotton Combed 30s',
-  'Cotton Combed 24s',
-  'Cotton Bamboo',
-  'Drifit Polyester',
-  'Linen',
-  'Fleece',
+  { label: 'Cotton Combed 30s', price: 45000 },
+  { label: 'Cotton Combed 24s', price: 55000 },
+  { label: 'Cotton Bamboo',     price: 65000 },
+  { label: 'Drifit Polyester',  price: 50000 },
+  { label: 'Linen',             price: 70000 },
+  { label: 'Fleece',            price: 80000 },
 ]
 
 const SABLON_OPTIONS = [
@@ -84,16 +84,18 @@ function formatRp(n: number) {
 }
 
 const EMPTY_FORM = {
-  shirtColor:    '#FFFFFF',
-  selectedSize:  null as string | null,
-  bahan:         '',
-  bahanCustom:   '',
-  jumlah:        12,
-  sablonDepan:   null as SablonOpt,
-  sablonBelakang: null as SablonOpt,
-  note:          '',
-  frontDesign:   null as string | null,
-  backDesign:    null as string | null,
+  shirtColor:      '#FFFFFF',
+  selectedSize:    null as string | null,
+  bahan:           '',
+  bahanPrice:      0,
+  bahanCustom:     '',
+  bahanCustomPrice: 0,
+  jumlah:          12,
+  sablonDepan:     null as SablonOpt,
+  sablonBelakang:  null as SablonOpt,
+  note:            '',
+  frontDesign:     null as string | null,
+  backDesign:      null as string | null,
 }
 
 export default function CustomDesignClient() {
@@ -123,7 +125,9 @@ export default function CustomDesignClient() {
   const finalBahan   = form.bahan === 'Lainnya' ? form.bahanCustom : form.bahan
   const activeDesign = activeSide === 'front' ? form.frontDesign : form.backDesign
 
+  const bahanPriceVal = form.bahan === 'Lainnya' ? form.bahanCustomPrice : form.bahanPrice
   const autoHarga =
+    bahanPriceVal +
     (form.sablonDepan    ? form.sablonDepan.price    : 0) +
     (form.sablonBelakang ? form.sablonBelakang.price : 0)
 
@@ -210,14 +214,26 @@ export default function CustomDesignClient() {
             <div className="custom-control-group">
               <p className="custom-control-label">Jenis Bahan <span className="custom-required">*</span></p>
               <select className="custom-select" value={form.bahan}
-                onChange={e => set('bahan', e.target.value)}>
+                onChange={e => {
+                  const opt = BAHAN_OPTIONS.find(b => b.label === e.target.value)
+                  setForm(f => ({ ...f, bahan: e.target.value, bahanPrice: opt?.price ?? 0 }))
+                }}>
                 <option value="">— Pilih bahan —</option>
-                {BAHAN_OPTIONS.map(b => <option key={b} value={b}>{b}</option>)}
+                {BAHAN_OPTIONS.map(b => <option key={b.label} value={b.label}>{b.label}</option>)}
                 <option value="Lainnya">Lainnya...</option>
               </select>
               {form.bahan === 'Lainnya' && (
-                <input type="text" className="custom-text-input" placeholder="Tulis jenis bahan..."
-                  value={form.bahanCustom} onChange={e => set('bahanCustom', e.target.value)} />
+                <>
+                  <input type="text" className="custom-text-input" placeholder="Tulis jenis bahan..."
+                    value={form.bahanCustom} onChange={e => set('bahanCustom', e.target.value)} />
+                  <div className="custom-price-row">
+                    <span className="custom-price-prefix">Rp</span>
+                    <input type="number" inputMode="numeric" className="custom-text-input custom-text-input--price"
+                      placeholder="Harga baju/pcs" min={0}
+                      value={form.bahanCustomPrice || ''}
+                      onChange={e => set('bahanCustomPrice', parseInt(e.target.value) || 0)} />
+                  </div>
+                </>
               )}
             </div>
 
@@ -313,9 +329,25 @@ export default function CustomDesignClient() {
             )}
 
             {/* Auto price display */}
-            {(form.frontDesign || form.backDesign) && autoHarga > 0 && (
+            {bahanPriceVal > 0 && (
               <div className="custom-price-display">
                 <span className="custom-price-display-label">Harga/pcs</span>
+                <div className="custom-price-breakdown">
+                  <span>Baju ({finalBahan || 'bahan'})</span>
+                  <span>{formatRp(bahanPriceVal)}</span>
+                  {form.sablonDepan && (
+                    <>
+                      <span>Sablon depan ({form.sablonDepan.label})</span>
+                      <span>{formatRp(form.sablonDepan.price)}</span>
+                    </>
+                  )}
+                  {form.sablonBelakang && (
+                    <>
+                      <span>Sablon belakang ({form.sablonBelakang.label})</span>
+                      <span>{formatRp(form.sablonBelakang.price)}</span>
+                    </>
+                  )}
+                </div>
                 <span className="custom-price-display-val">{formatRp(autoHarga)}</span>
                 {form.jumlah > 0 && (
                   <span className="custom-price-display-total">

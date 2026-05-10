@@ -4548,6 +4548,16 @@ details[open] .reseller-faq-q::after { content: '−'; }
   border: 1.5px solid #e8e4dd;
   border-radius: 12px;
 }
+.custom-price-breakdown {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.2rem 0.75rem;
+  font-size: 0.78rem;
+  color: #666;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e8e4dd;
+  margin-bottom: 0.25rem;
+}
 .custom-price-display-label {
   font-size: 0.72rem;
   font-weight: 600;
