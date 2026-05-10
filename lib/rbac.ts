@@ -1,26 +1,32 @@
 import { db } from './db'
 import { scryptSync, randomBytes, timingSafeEqual } from 'crypto'
 import type { Role, AdminAccount, Permission } from './rbac-types'
+import { ALL_PERMISSIONS } from './rbac-types'
 
 export type { Role, AdminAccount, Permission }
 export { ALL_PERMISSIONS, PERMISSION_LABELS } from './rbac-types'
 
 // ── Role CRUD ─────────────────────────────────────────────────
 
+function normalizeRole(row: Record<string, unknown>): Role {
+  const locked = row.locked as boolean ?? false
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    permissions: locked ? ALL_PERMISSIONS : (row.permissions as Permission[] ?? []),
+    locked,
+  }
+}
+
 export async function getRoles(): Promise<Role[]> {
   const { data } = await db.from('roles').select('*').order('name')
-  return (data ?? []).map(row => ({
-    id: row.id,
-    name: row.name,
-    permissions: row.permissions ?? [],
-    locked: row.locked ?? false,
-  }))
+  return (data ?? []).map(normalizeRole)
 }
 
 export async function getRoleById(id: string): Promise<Role | undefined> {
   const { data } = await db.from('roles').select('*').eq('id', id).maybeSingle()
   if (!data) return undefined
-  return { id: data.id, name: data.name, permissions: data.permissions ?? [], locked: data.locked ?? false }
+  return normalizeRole(data)
 }
 
 export async function saveRole(role: Role): Promise<void> {
