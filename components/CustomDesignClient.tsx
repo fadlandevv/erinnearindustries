@@ -25,6 +25,14 @@ const BAHAN_OPTIONS = [
   'Fleece',
 ]
 
+const SABLON_OPTIONS = [
+  { label: 'Logo',            price: 15000 },
+  { label: 'A4 — 21×30 cm',  price: 35000 },
+  { label: 'A3 — 30×42 cm',  price: 50000 },
+]
+
+type SablonOpt = typeof SABLON_OPTIONS[number] | null
+
 type InvoiceItem = {
   rowId: string
   warna: string
@@ -35,6 +43,8 @@ type InvoiceItem = {
   belakang: boolean
   depanPreview?: string
   belakangPreview?: string
+  sablonDepan: SablonOpt
+  sablonBelakang: SablonOpt
   jumlah: number
   hargaPerPcs: number
   catatan?: string
@@ -44,8 +54,8 @@ function ShirtSVG({ color, design, side }: { color: string; design: string | nul
   const isDark = color === '#1a1a1a' || color === '#1e3a5f' || color === '#6b7c3d'
   const stroke = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'
   const hint   = isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.18)'
-  const id = `sc-${side}`
-  const path = 'M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 Q 176,50 150,55 Q 124,50 118,0 Z'
+  const id     = `sc-${side}`
+  const path   = 'M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 Q 176,50 150,55 Q 124,50 118,0 Z'
 
   return (
     <svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg" className="custom-shirt-svg">
@@ -74,26 +84,25 @@ function formatRp(n: number) {
 }
 
 const EMPTY_FORM = {
-  shirtColor:   '#FFFFFF',
-  selectedSize: null as string | null,
-  bahan:        '',
-  bahanCustom:  '',
-  jumlah:       12,
-  hargaPerPcs:  '',
-  note:         '',
-  frontDesign:  null as string | null,
-  backDesign:   null as string | null,
+  shirtColor:    '#FFFFFF',
+  selectedSize:  null as string | null,
+  bahan:         '',
+  bahanCustom:   '',
+  jumlah:        12,
+  sablonDepan:   null as SablonOpt,
+  sablonBelakang: null as SablonOpt,
+  note:          '',
+  frontDesign:   null as string | null,
+  backDesign:    null as string | null,
 }
 
 export default function CustomDesignClient() {
   const { addCustomItem, openCart } = useCart()
 
-  // form state
-  const [form, setForm] = useState({ ...EMPTY_FORM })
+  const [form, setForm]         = useState({ ...EMPTY_FORM })
   const [activeSide, setActiveSide] = useState<Side>('front')
-  const [error, setError] = useState('')
+  const [error, setError]       = useState('')
 
-  // invoice
   const [invoiceId]    = useState(() => generateId(6))
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([])
 
@@ -105,45 +114,46 @@ export default function CustomDesignClient() {
 
   const handleUpload = (side: Side, file: File) => {
     const url = URL.createObjectURL(file)
-    if (side === 'front') set('frontDesign', url)
-    else set('backDesign', url)
+    if (side === 'front')
+      setForm(f => ({ ...f, frontDesign: url, sablonDepan: f.sablonDepan ?? SABLON_OPTIONS[0] }))
+    else
+      setForm(f => ({ ...f, backDesign: url, sablonBelakang: f.sablonBelakang ?? SABLON_OPTIONS[0] }))
   }
 
-  const finalBahan  = form.bahan === 'Lainnya' ? form.bahanCustom : form.bahan
-  const hargaNum    = parseInt(form.hargaPerPcs.replace(/\D/g, '')) || 0
-  const totalEst    = hargaNum * form.jumlah
+  const finalBahan   = form.bahan === 'Lainnya' ? form.bahanCustom : form.bahan
   const activeDesign = activeSide === 'front' ? form.frontDesign : form.backDesign
 
+  const autoHarga =
+    (form.sablonDepan    ? form.sablonDepan.price    : 0) +
+    (form.sablonBelakang ? form.sablonBelakang.price : 0)
+
   const handleAddToInvoice = () => {
-    if (!form.selectedSize)              { setError('Pilih ukuran.'); return }
-    if (!finalBahan)                     { setError('Pilih atau isi jenis bahan.'); return }
-    if (!form.frontDesign && !form.backDesign) { setError('Upload minimal satu desain.'); return }
-    if (form.jumlah < 1)                 { setError('Jumlah minimal 1 pcs.'); return }
+    if (!form.selectedSize)                        { setError('Pilih ukuran.'); return }
+    if (!finalBahan)                               { setError('Pilih atau isi jenis bahan.'); return }
+    if (!form.frontDesign && !form.backDesign)     { setError('Upload minimal satu desain.'); return }
+    if (form.jumlah < 1)                           { setError('Jumlah minimal 1 pcs.'); return }
 
     const warnaNama = SHIRT_COLORS.find(c => c.value === form.shirtColor)?.label ?? form.shirtColor
 
     const item: InvoiceItem = {
-      rowId: generateId(4),
-      warna: form.shirtColor,
+      rowId:    generateId(4),
+      warna:    form.shirtColor,
       warnaNama,
-      size:  form.selectedSize,
-      bahan: finalBahan,
-      depan: !!form.frontDesign,
+      size:     form.selectedSize,
+      bahan:    finalBahan,
+      depan:    !!form.frontDesign,
       belakang: !!form.backDesign,
       depanPreview:    form.frontDesign  ?? undefined,
       belakangPreview: form.backDesign   ?? undefined,
-      jumlah:       form.jumlah,
-      hargaPerPcs:  hargaNum,
-      catatan:      form.note || undefined,
+      sablonDepan:    form.frontDesign  ? form.sablonDepan    : null,
+      sablonBelakang: form.backDesign   ? form.sablonBelakang : null,
+      jumlah:   form.jumlah,
+      hargaPerPcs: autoHarga,
+      catatan:  form.note || undefined,
     }
 
     setInvoiceItems(prev => [...prev, item])
-
-    // reset form, keep color
-    setForm(f => ({
-      ...EMPTY_FORM,
-      shirtColor: f.shirtColor,
-    }))
+    setForm(f => ({ ...EMPTY_FORM, shirtColor: f.shirtColor }))
     setError('')
     setActiveSide('front')
   }
@@ -158,15 +168,15 @@ export default function CustomDesignClient() {
     if (invoiceItems.length === 0) return
     invoiceItems.forEach(item => {
       addCustomItem({
-        warna:      item.warna,
-        warnaNama:  item.warnaNama,
-        bahan:      item.bahan,
-        jumlah:     item.jumlah,
+        warna:       item.warna,
+        warnaNama:   item.warnaNama,
+        bahan:       item.bahan,
+        jumlah:      item.jumlah,
         hargaPerPcs: item.hargaPerPcs,
-        size:       item.size,
-        depan:      item.depan,
-        belakang:   item.belakang,
-        catatan:    item.catatan,
+        size:        item.size,
+        depan:       item.depan,
+        belakang:    item.belakang,
+        catatan:     item.catatan,
       })
     })
     setInvoiceItems([])
@@ -182,10 +192,11 @@ export default function CustomDesignClient() {
           {/* Controls */}
           <div className="custom-controls">
 
+            {/* Warna */}
             <div className="custom-control-group">
               <p className="custom-control-label">Warna Baju</p>
               <div className="custom-color-swatches">
-                {SHIRT_COLORS.map((c) => (
+                {SHIRT_COLORS.map(c => (
                   <button key={c.value} type="button" title={c.label}
                     className={`custom-color-swatch${form.shirtColor === c.value ? ' custom-color-swatch--active' : ''}`}
                     style={{ background: c.value }}
@@ -195,6 +206,7 @@ export default function CustomDesignClient() {
               <p className="custom-color-name">{SHIRT_COLORS.find(c => c.value === form.shirtColor)?.label}</p>
             </div>
 
+            {/* Bahan */}
             <div className="custom-control-group">
               <p className="custom-control-label">Jenis Bahan <span className="custom-required">*</span></p>
               <select className="custom-select" value={form.bahan}
@@ -209,6 +221,7 @@ export default function CustomDesignClient() {
               )}
             </div>
 
+            {/* Ukuran */}
             <div className="custom-control-group">
               <p className="custom-control-label">Ukuran <span className="custom-required">*</span></p>
               <div className="custom-size-grid">
@@ -220,6 +233,7 @@ export default function CustomDesignClient() {
               </div>
             </div>
 
+            {/* Jumlah */}
             <div className="custom-control-group">
               <p className="custom-control-label">Jumlah (pcs) <span className="custom-required">*</span></p>
               <div className="custom-qty-row">
@@ -232,26 +246,7 @@ export default function CustomDesignClient() {
               </div>
             </div>
 
-            <div className="custom-control-group">
-              <p className="custom-control-label">
-                Harga/pcs&nbsp;<span style={{ color: '#aaa', fontWeight: 400, textTransform: 'none' }}>(opsional)</span>
-              </p>
-              <div className="custom-price-row">
-                <span className="custom-price-prefix">Rp</span>
-                <input type="text" inputMode="numeric"
-                  className="custom-text-input custom-text-input--price"
-                  placeholder="cth. 75000"
-                  value={form.hargaPerPcs}
-                  onChange={e => set('hargaPerPcs', e.target.value.replace(/\D/g, ''))} />
-              </div>
-              {hargaNum > 0 && (
-                <p className="custom-price-total">
-                  Subtotal: <strong>{formatRp(totalEst)}</strong>
-                  <span style={{ color: '#bbb' }}> ({form.jumlah} × {formatRp(hargaNum)})</span>
-                </p>
-              )}
-            </div>
-
+            {/* Upload Depan */}
             <div className="custom-control-group">
               <p className="custom-control-label">Desain Depan <span className="custom-required">*</span></p>
               <input ref={frontRef} type="file" accept="image/*" style={{ display: 'none' }}
@@ -263,10 +258,30 @@ export default function CustomDesignClient() {
               </button>
               {form.frontDesign && (
                 <button type="button" className="custom-remove-btn"
-                  onClick={() => set('frontDesign', null)}>Hapus</button>
+                  onClick={() => setForm(f => ({ ...f, frontDesign: null, sablonDepan: null }))}>Hapus</button>
               )}
             </div>
 
+            {/* Ukuran Sablon Depan */}
+            {form.frontDesign && (
+              <div className="custom-control-group custom-sablon-group">
+                <p className="custom-control-label">Ukuran Sablon Depan</p>
+                <select className="custom-select"
+                  value={form.sablonDepan?.label ?? ''}
+                  onChange={e => {
+                    const opt = SABLON_OPTIONS.find(o => o.label === e.target.value)
+                    if (opt) set('sablonDepan', opt)
+                  }}>
+                  {SABLON_OPTIONS.map(opt => (
+                    <option key={opt.label} value={opt.label}>
+                      {opt.label} · {formatRp(opt.price)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Upload Belakang */}
             <div className="custom-control-group">
               <p className="custom-control-label">Desain Belakang</p>
               <input ref={backRef} type="file" accept="image/*" style={{ display: 'none' }}
@@ -278,10 +293,43 @@ export default function CustomDesignClient() {
               </button>
               {form.backDesign && (
                 <button type="button" className="custom-remove-btn"
-                  onClick={() => set('backDesign', null)}>Hapus</button>
+                  onClick={() => setForm(f => ({ ...f, backDesign: null, sablonBelakang: null }))}>Hapus</button>
               )}
             </div>
 
+            {/* Ukuran Sablon Belakang */}
+            {form.backDesign && (
+              <div className="custom-control-group custom-sablon-group">
+                <p className="custom-control-label">Ukuran Sablon Belakang</p>
+                <select className="custom-select"
+                  value={form.sablonBelakang?.label ?? ''}
+                  onChange={e => {
+                    const opt = SABLON_OPTIONS.find(o => o.label === e.target.value)
+                    if (opt) set('sablonBelakang', opt)
+                  }}>
+                  {SABLON_OPTIONS.map(opt => (
+                    <option key={opt.label} value={opt.label}>
+                      {opt.label} · {formatRp(opt.price)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Auto price display */}
+            {(form.frontDesign || form.backDesign) && autoHarga > 0 && (
+              <div className="custom-price-display">
+                <span className="custom-price-display-label">Harga/pcs</span>
+                <span className="custom-price-display-val">{formatRp(autoHarga)}</span>
+                {form.jumlah > 0 && (
+                  <span className="custom-price-display-total">
+                    Subtotal {form.jumlah} pcs → <strong>{formatRp(autoHarga * form.jumlah)}</strong>
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Catatan */}
             <div className="custom-control-group">
               <p className="custom-control-label">
                 Catatan&nbsp;<span style={{ color: '#aaa', fontWeight: 400, textTransform: 'none' }}>(opsional)</span>
@@ -344,8 +392,7 @@ export default function CustomDesignClient() {
               </div>
               <div className="invoice-summary-pills">
                 <span className="invoice-pill">{invoiceItems.length} item</span>
-                <span className="invoice-pill">{grandQty} pcs total</span>
-                {grandTotal > 0 && <span className="invoice-pill invoice-pill--total">{formatRp(grandTotal)}</span>}
+                <span className="invoice-pill">{grandQty} pcs</span>
               </div>
             </div>
 
@@ -356,14 +403,12 @@ export default function CustomDesignClient() {
                   <tr>
                     <th>No.</th>
                     <th>Preview</th>
-                    <th>Warna</th>
-                    <th>Ukuran</th>
-                    <th>Bahan</th>
-                    <th>Desain</th>
+                    <th>Detail</th>
+                    <th>Sablon Depan</th>
+                    <th>Sablon Belakang</th>
                     <th>Jumlah</th>
                     <th>Harga/pcs</th>
                     <th>Subtotal</th>
-                    <th>Catatan</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -374,14 +419,14 @@ export default function CustomDesignClient() {
                       <td>
                         <div className="invoice-preview-thumbs">
                           {item.depanPreview && (
-                            <div className="invoice-thumb-wrap" title="Desain Depan">
+                            <div className="invoice-thumb-wrap" title="Depan">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={item.depanPreview} alt="depan" className="invoice-thumb" />
                               <span className="invoice-thumb-label">D</span>
                             </div>
                           )}
                           {item.belakangPreview && (
-                            <div className="invoice-thumb-wrap" title="Desain Belakang">
+                            <div className="invoice-thumb-wrap" title="Belakang">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={item.belakangPreview} alt="belakang" className="invoice-thumb" />
                               <span className="invoice-thumb-label">B</span>
@@ -390,28 +435,31 @@ export default function CustomDesignClient() {
                         </div>
                       </td>
                       <td>
-                        <div className="invoice-color-cell">
-                          <span className="invoice-color-dot"
-                            style={{ background: item.warna, border: item.warna === '#FFFFFF' ? '1px solid #e0e0e0' : 'none' }} />
-                          {item.warnaNama}
+                        <div className="invoice-detail-cell">
+                          <div className="invoice-color-cell">
+                            <span className="invoice-color-dot"
+                              style={{ background: item.warna, border: item.warna === '#FFFFFF' ? '1px solid #e0e0e0' : 'none' }} />
+                            <strong>{item.warnaNama}</strong>
+                          </div>
+                          <span className="invoice-detail-sub">{item.size} · {item.bahan}</span>
+                          {item.catatan && <span className="invoice-detail-note">{item.catatan}</span>}
                         </div>
                       </td>
-                      <td><span className="invoice-badge">{item.size}</span></td>
-                      <td className="invoice-td-bahan">{item.bahan}</td>
                       <td>
-                        <div className="invoice-desain-flags">
-                          {item.depan && <span className="invoice-flag">Depan</span>}
-                          {item.belakang && <span className="invoice-flag">Belakang</span>}
-                        </div>
+                        {item.sablonDepan
+                          ? <div className="invoice-sablon-cell"><span className="invoice-sablon-size">{item.sablonDepan.label.split('—')[0].trim()}</span><span className="invoice-sablon-price">{formatRp(item.sablonDepan.price)}</span></div>
+                          : <span style={{ color: '#ccc' }}>—</span>}
+                      </td>
+                      <td>
+                        {item.belakang
+                          ? item.sablonBelakang
+                            ? <div className="invoice-sablon-cell"><span className="invoice-sablon-size">{item.sablonBelakang.label.split('—')[0].trim()}</span><span className="invoice-sablon-price">{formatRp(item.sablonBelakang.price)}</span></div>
+                            : <span style={{ color: '#ccc' }}>—</span>
+                          : <span style={{ color: '#ccc' }}>—</span>}
                       </td>
                       <td className="invoice-td-center">{item.jumlah} pcs</td>
-                      <td className="invoice-td-price">
-                        {item.hargaPerPcs > 0 ? formatRp(item.hargaPerPcs) : <span className="invoice-tbd">TBD</span>}
-                      </td>
-                      <td className="invoice-td-price invoice-td-subtotal">
-                        {item.hargaPerPcs > 0 ? formatRp(item.hargaPerPcs * item.jumlah) : <span className="invoice-tbd">TBD</span>}
-                      </td>
-                      <td className="invoice-td-note">{item.catatan || '—'}</td>
+                      <td className="invoice-td-price">{formatRp(item.hargaPerPcs)}</td>
+                      <td className="invoice-td-price invoice-td-subtotal">{formatRp(item.hargaPerPcs * item.jumlah)}</td>
                       <td>
                         <button type="button" className="invoice-remove-btn"
                           onClick={() => removeRow(item.rowId)}>✕</button>
@@ -419,16 +467,18 @@ export default function CustomDesignClient() {
                     </tr>
                   ))}
                 </tbody>
-                {grandTotal > 0 && (
-                  <tfoot>
-                    <tr>
-                      <td colSpan={8} className="invoice-tfoot-label">Total Estimasi</td>
-                      <td className="invoice-tfoot-total">{formatRp(grandTotal)}</td>
-                      <td colSpan={2} />
-                    </tr>
-                  </tfoot>
-                )}
               </table>
+            </div>
+
+            {/* Grand Total */}
+            <div className="invoice-grand-total">
+              <div className="invoice-grand-left">
+                <span>{grandQty} pcs · {invoiceItems.length} item</span>
+              </div>
+              <div className="invoice-grand-right">
+                <span className="invoice-grand-label">Total</span>
+                <span className="invoice-grand-val">{formatRp(grandTotal)}</span>
+              </div>
             </div>
 
             {/* Actions */}

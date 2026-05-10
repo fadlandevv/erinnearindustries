@@ -4494,3 +4494,185 @@ details[open] .reseller-faq-q::after { content: '−'; }
 [data-theme="dark"] .invoice-pill--total { background: #f0ede8; color: #0d0d0d; }
 [data-theme="dark"] .invoice-badge { border-color: rgba(255,255,255,0.15); color: #ccc; }
 [data-theme="dark"] .invoice-thumb-wrap { background: #2a2a2a; }
+
+/* ── Sablon selector (custom page) ── */
+.custom-sablon-group { margin-top: -0.25rem; }
+.custom-sablon-hint {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #f47c2f;
+  margin-top: 0.25rem;
+}
+.custom-sablon-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.custom-sablon-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 0.55rem 0.8rem;
+  border: 1.5px solid #e0ddd8;
+  border-radius: 10px;
+  background: #faf9f7;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  text-align: left;
+}
+.custom-sablon-btn:hover { border-color: #aaa; background: #f5f3ef; }
+.custom-sablon-btn--active {
+  border-color: #f47c2f;
+  background: #fff8f3;
+  box-shadow: 0 0 0 3px rgba(244,124,47,0.12);
+}
+.custom-sablon-size {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #0d0d0d;
+}
+.custom-sablon-price {
+  font-size: 0.72rem;
+  color: #888;
+}
+.custom-sablon-btn--active .custom-sablon-price { color: #f47c2f; }
+
+/* ── Auto price display (custom page) ── */
+.custom-price-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.15rem;
+  background: #faf9f7;
+  border: 1.5px solid #e8e4dd;
+  border-radius: 12px;
+}
+.custom-price-display-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #aaa;
+}
+.custom-price-display-val {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0d0d0d;
+}
+.custom-price-display-tbd {
+  font-size: 0.82rem;
+  color: #bbb;
+  font-style: italic;
+}
+.custom-price-display-total {
+  font-size: 0.82rem;
+  color: #555;
+  margin-top: 0.15rem;
+}
+.custom-price-display-total strong { color: #0d0d0d; }
+
+/* ── Invoice: detail cell ── */
+.invoice-detail-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.invoice-detail-sub {
+  font-size: 0.78rem;
+  color: #888;
+}
+.invoice-detail-note {
+  font-size: 0.72rem;
+  color: #aaa;
+  font-style: italic;
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Invoice: sablon cell ── */
+.invoice-sablon-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.invoice-sablon-size {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #0d0d0d;
+}
+.invoice-sablon-price {
+  font-size: 0.72rem;
+  color: #f47c2f;
+  font-weight: 600;
+}
+
+/* ── Invoice: grand total block ── */
+.invoice-grand-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: #0d0d0d;
+  border-radius: 16px;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+.invoice-grand-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.82rem;
+}
+.invoice-grand-note {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.35);
+  font-style: italic;
+}
+.invoice-grand-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+}
+.invoice-grand-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.45);
+}
+.invoice-grand-val {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+.invoice-grand-tbd {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  font-style: italic;
+}
+
+/* Dark mode additions */
+[data-theme="dark"] .custom-sablon-btn { background: #1e1e1e; border-color: rgba(255,255,255,0.1); }
+[data-theme="dark"] .custom-sablon-btn:hover { background: #2a2a2a; border-color: rgba(255,255,255,0.2); }
+[data-theme="dark"] .custom-sablon-btn--active { background: #2a1800; border-color: #f47c2f; }
+[data-theme="dark"] .custom-sablon-size { color: #f0ede8; }
+[data-theme="dark"] .custom-price-display { background: #1a1a1a; border-color: rgba(255,255,255,0.08); }
+[data-theme="dark"] .custom-price-display-val { color: #f0ede8; }
+[data-theme="dark"] .custom-price-display-total { color: #aaa; }
+[data-theme="dark"] .custom-price-display-total strong { color: #f0ede8; }
+[data-theme="dark"] .invoice-detail-sub { color: #666; }
+[data-theme="dark"] .invoice-sablon-size { color: #f0ede8; }
+[data-theme="dark"] .invoice-grand-total { background: #f0ede8; }
+[data-theme="dark"] .invoice-grand-left { color: rgba(13,13,13,0.5); }
+[data-theme="dark"] .invoice-grand-note { color: rgba(13,13,13,0.4); }
+[data-theme="dark"] .invoice-grand-label { color: rgba(13,13,13,0.45); }
+[data-theme="dark"] .invoice-grand-val { color: #0d0d0d; }
+[data-theme="dark"] .invoice-grand-tbd { color: rgba(13,13,13,0.45); }
