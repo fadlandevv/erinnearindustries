@@ -21,6 +21,8 @@ export default function Navbar({ user }: NavbarProps) {
     { label: t.nav.home, href: '/' },
     { label: t.nav.products, href: '/product' },
     { label: t.nav.services, href: '/service' },
+    { label: t.nav.custom, href: '/custom' },
+    { label: t.nav.reseller, href: '/reseller' },
     { label: t.nav.contact, href: '/contact' },
   ]
 

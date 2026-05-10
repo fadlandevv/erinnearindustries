@@ -5,6 +5,7 @@ export const translations = {
   id: {
     nav: {
       home: 'Beranda', products: 'Produk', services: 'Layanan',
+      custom: 'Custom', reseller: 'Reseller',
       contact: 'Kontak', login: 'Masuk', profile: 'Profil Saya',
       orders: 'Riwayat Pesanan',
     },
@@ -71,6 +72,7 @@ export const translations = {
   en: {
     nav: {
       home: 'Home', products: 'Products', services: 'Services',
+      custom: 'Custom', reseller: 'Reseller',
       contact: 'Contact', login: 'Sign In', profile: 'My Profile',
       orders: 'Order History',
     },
