@@ -56,7 +56,8 @@ async function seed() {
   for (const p of products) {
     await db.from('products').upsert({
       id: p.id, tag: p.tag, title: p.title, price: p.price, bg: p.bg,
-      colors: p.colors ?? null, description: p.description,
+      colors: p.colors ?? null, price_usd: p.priceUSD ?? null,
+      description: p.description,
       material: Array.isArray(p.material) ? p.material : [p.material],
       sizes: p.sizes, image: p.image ?? null, images: p.images ?? null,
     })

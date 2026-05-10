@@ -48,6 +48,7 @@ create table if not exists products (
   sizes text[],
   image text,
   images text[],
+  price_usd numeric,
   created_at timestamptz default now()
 );
 

@@ -71,6 +71,7 @@ function toProduct(row: Record<string, unknown>): Product {
     price: row.price as string,
     bg: (row.bg as string) ?? '#f0ede8',
     colors: (row.colors as string[]) ?? undefined,
+    priceUSD: (row.price_usd as number) ?? undefined,
     description: row.description as string,
     material: (row.material as string[]) ?? [],
     sizes: (row.sizes as string[]) ?? [],
