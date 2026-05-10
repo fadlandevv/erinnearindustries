@@ -15,7 +15,7 @@ import {
 } from './rbac'
 import { saveManualEntry, deleteManualEntry, type RekapSource } from './rekap'
 import { logAdminAccess } from './access-log'
-import { getPricingItems, upsertPricingItem } from './pricing'
+import { getPricingItems, upsertPricingItem, insertPricingItem, deletePricingItem } from './pricing'
 import { generateId } from './utils'
 
 async function saveImage(file: File, productId: string, slot: string): Promise<string> {
@@ -534,11 +534,37 @@ export async function updatePricingAction(
     items.map(item => {
       const raw = formData.get(`price-${item.id}`) as string | null
       const val = parseInt(raw ?? '', 10)
-      if (!isNaN(val) && val > 0) return upsertPricingItem(item.id, val)
+      if (!isNaN(val) && val > 0)
+        return upsertPricingItem({ id: item.id, type: item.type, label: item.label, price: val })
       return Promise.resolve()
     })
   )
   revalidatePath('/admin/pricing')
   revalidatePath('/custom')
   return { ok: true }
+}
+
+export async function addPricingItemAction(
+  _prev: { ok?: boolean; error?: string },
+  formData: FormData
+): Promise<{ ok?: boolean; error?: string }> {
+  const jar = await cookies()
+  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+  const type  = formData.get('type') as 'bahan' | 'sablon'
+  const label = (formData.get('label') as string).trim()
+  const price = parseInt(formData.get('price') as string, 10)
+  if (!label) return { error: 'Label wajib diisi.' }
+  if (isNaN(price) || price < 1000) return { error: 'Harga minimal Rp 1.000.' }
+  await insertPricingItem(type, label, price)
+  revalidatePath('/admin/pricing')
+  revalidatePath('/custom')
+  return { ok: true }
+}
+
+export async function deletePricingItemAction(id: string): Promise<void> {
+  const jar = await cookies()
+  if (!jar.get('admin-token')) return
+  await deletePricingItem(id)
+  revalidatePath('/admin/pricing')
+  revalidatePath('/custom')
 }

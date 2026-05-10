@@ -20,34 +20,68 @@ export const PRICING_DEFAULTS: Omit<PricingItem, 'updatedAt'>[] = [
   { id: 'sablon-a3',    type: 'sablon', label: 'A3 — 30×42 cm',      price: 50000 },
 ]
 
-export async function getPricingItems(): Promise<PricingItem[]> {
-  try {
-    const { data } = await db
-      .from('custom_pricing')
-      .select('*')
-      .order('type', { ascending: false })
-      .order('label')
-    if (!data || data.length === 0) throw new Error('empty')
-    return data.map(row => ({
-      id: row.id,
-      type: row.type as 'bahan' | 'sablon',
-      label: row.label,
-      price: row.price,
-      updatedAt: row.updated_at,
-    }))
-  } catch {
-    return PRICING_DEFAULTS.map(d => ({ ...d, updatedAt: new Date().toISOString() }))
+const DEFAULT_IDS = new Set(PRICING_DEFAULTS.map(d => d.id))
+
+function rowToItem(row: Record<string, unknown>): PricingItem {
+  return {
+    id: row.id as string,
+    type: row.type as 'bahan' | 'sablon',
+    label: row.label as string,
+    price: row.price as number,
+    updatedAt: row.updated_at as string,
   }
 }
 
-export async function upsertPricingItem(id: string, price: number): Promise<void> {
-  const def = PRICING_DEFAULTS.find(d => d.id === id)
-  if (!def) return
+export async function getPricingItems(): Promise<PricingItem[]> {
+  try {
+    const { data } = await db.from('custom_pricing').select('*')
+    const dbMap = new Map((data ?? []).map(row => [row.id as string, rowToItem(row)]))
+
+    // Defaults first (with DB-overridden prices), then custom items
+    const result: PricingItem[] = PRICING_DEFAULTS.map(def =>
+      dbMap.has(def.id)
+        ? dbMap.get(def.id)!
+        : { ...def, updatedAt: '' }
+    )
+
+    for (const [id, item] of dbMap) {
+      if (!DEFAULT_IDS.has(id)) result.push(item)
+    }
+
+    return result
+  } catch {
+    return PRICING_DEFAULTS.map(d => ({ ...d, updatedAt: '' }))
+  }
+}
+
+export async function upsertPricingItem(
+  item: Pick<PricingItem, 'id' | 'type' | 'label' | 'price'>
+): Promise<void> {
   await db.from('custom_pricing').upsert({
+    id: item.id,
+    type: item.type,
+    label: item.label,
+    price: item.price,
+    updated_at: new Date().toISOString(),
+  })
+}
+
+export async function insertPricingItem(
+  type: 'bahan' | 'sablon',
+  label: string,
+  price: number
+): Promise<void> {
+  const id = `${type}-custom-${Date.now()}`
+  await db.from('custom_pricing').insert({
     id,
-    type: def.type,
-    label: def.label,
+    type,
+    label,
     price,
     updated_at: new Date().toISOString(),
   })
+}
+
+export async function deletePricingItem(id: string): Promise<void> {
+  if (DEFAULT_IDS.has(id)) return // never delete defaults
+  await db.from('custom_pricing').delete().eq('id', id)
 }
