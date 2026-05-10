@@ -45,16 +45,39 @@ export default function CartDrawer() {
             <ul className="cart-list">
               {items.map((item) => (
                 <li key={`${item.product.id}-${item.size}`} className="cart-item">
-                  <div
-                    className="cart-item-visual"
-                    style={{ background: item.product.bg }}
-                  />
+                  {item.customSpec ? (
+                    <div
+                      className="cart-item-visual cart-item-visual--custom"
+                      style={{ background: item.customSpec.warna }}
+                    >
+                      <span style={{ fontSize: '1rem' }}>✦</span>
+                    </div>
+                  ) : (
+                    <div
+                      className="cart-item-visual"
+                      style={{ background: item.product.bg }}
+                    />
+                  )}
                   <div className="cart-item-info">
                     <span className="cart-item-name">{item.product.title}</span>
-                    <div className="cart-item-meta">
-                      <span className="cart-item-size">{item.size}</span>
-                      <span className="cart-item-price">{item.product.price}</span>
-                    </div>
+                    {item.customSpec ? (
+                      <div className="cart-custom-spec">
+                        <span>{item.customSpec.warnaNama} · {item.customSpec.size} · {item.customSpec.bahan}</span>
+                        <span>
+                          {item.customSpec.depan && '● Depan'}
+                          {item.customSpec.depan && item.customSpec.belakang && ' + '}
+                          {item.customSpec.belakang && '● Belakang'}
+                        </span>
+                        <span className="cart-item-price">
+                          {formatRupiah(item.customSpec.hargaPerPcs)}/pcs × {item.quantity} pcs
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="cart-item-meta">
+                        <span className="cart-item-size">{item.size}</span>
+                        <span className="cart-item-price">{item.product.price}</span>
+                      </div>
+                    )}
                     <div className="cart-item-controls">
                       <div className="cart-qty">
                         <button

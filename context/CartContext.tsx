@@ -3,15 +3,29 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Product } from '@/lib/data'
 
+export type CustomSpec = {
+  warna: string
+  warnaNama: string
+  bahan: string
+  jumlah: number
+  hargaPerPcs: number
+  size: string
+  depan: boolean
+  belakang: boolean
+  catatan?: string
+}
+
 export type CartItem = {
   product: Product
   size: string
   quantity: number
+  customSpec?: CustomSpec
 }
 
 type CartCtx = {
   items: CartItem[]
   addToCart: (product: Product, size: string) => void
+  addCustomItem: (spec: CustomSpec) => void
   removeFromCart: (productId: string, size: string) => void
   updateQuantity: (productId: string, size: string, qty: number) => void
   clearCart: () => void
@@ -60,6 +74,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setIsOpen(true)
   }
 
+  const addCustomItem = (spec: CustomSpec) => {
+    const virtualProduct: Product = {
+      id: `custom-${Date.now()}`,
+      title: 'Custom Design',
+      tag: 'Custom Order',
+      price: `Rp ${spec.hargaPerPcs.toLocaleString('id-ID')}`,
+      bg: spec.warna,
+      description: `Bahan: ${spec.bahan} | Warna: ${spec.warnaNama} | ${spec.depan ? 'Desain Depan ✓' : ''}${spec.depan && spec.belakang ? ' + ' : ''}${spec.belakang ? 'Desain Belakang ✓' : ''}`,
+      material: [spec.bahan],
+      sizes: [spec.size],
+    }
+    setItems((prev) => [...prev, { product: virtualProduct, size: spec.size, quantity: spec.jumlah, customSpec: spec }])
+    setIsOpen(true)
+  }
+
   const removeFromCart = (productId: string, size: string) => {
     setItems((prev) =>
       prev.filter((i) => !(i.product.id === productId && i.size === size))
@@ -87,6 +116,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       value={{
         items,
         addToCart,
+        addCustomItem,
         removeFromCart,
         updateQuantity,
         clearCart,
