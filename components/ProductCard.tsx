@@ -18,15 +18,15 @@ export default function ProductCard({ product: p }: { product: Product }) {
         <div className="product-card-title-row">
           <h4>{p.title}</h4>
           {p.priceUSD != null && (
-            <select
-              className="card-currency-select"
-              value={showUSD ? 'USD' : 'IDR'}
-              onChange={(e) => setShowUSD(e.target.value === 'USD')}
-              onClick={(e) => e.stopPropagation()}
+            <button
+              className="card-currency-toggle"
+              onClick={(e) => { e.preventDefault(); setShowUSD((v) => !v) }}
+              type="button"
             >
-              <option value="IDR">IDR</option>
-              <option value="USD">USD</option>
-            </select>
+              <span className={showUSD ? '' : 'card-currency-toggle--active'}>IDR</span>
+              <span className="card-currency-toggle-sep" />
+              <span className={showUSD ? 'card-currency-toggle--active' : ''}>USD</span>
+            </button>
           )}
         </div>
         <p>{showUSD && p.priceUSD != null ? `$${p.priceUSD.toFixed(2)}` : p.price}</p>
