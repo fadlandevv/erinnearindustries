@@ -29,6 +29,13 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    group: 'Custom Order',
+    icon: '✦',
+    items: [
+      { label: 'Pricing', href: '/admin/pricing', icon: '◈', permission: 'pricing' },
+    ],
+  },
+  {
     group: 'Transaksi',
     icon: '◷',
     items: [
@@ -47,7 +54,8 @@ const NAV_GROUPS: NavGroup[] = [
     group: 'Sistem',
     icon: '⊞',
     items: [
-      { label: 'Role Access', href: '/admin/roles', icon: '⊞', permission: 'roles' },
+      { label: 'Role Access', href: '/admin/roles',      icon: '⊞', permission: 'roles'      },
+      { label: 'Access Log',  href: '/admin/access-log', icon: '◉', permission: 'access_log' },
     ],
   },
 ]

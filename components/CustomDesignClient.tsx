@@ -16,22 +16,9 @@ const SHIRT_COLORS = [
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL']
 
-const BAHAN_OPTIONS = [
-  { label: 'Cotton Combed 30s', price: 45000 },
-  { label: 'Cotton Combed 24s', price: 55000 },
-  { label: 'Cotton Bamboo',     price: 65000 },
-  { label: 'Drifit Polyester',  price: 50000 },
-  { label: 'Linen',             price: 70000 },
-  { label: 'Fleece',            price: 80000 },
-]
+type PriceOption = { label: string; price: number }
 
-const SABLON_OPTIONS = [
-  { label: 'Logo',            price: 15000 },
-  { label: 'A4 — 21×30 cm',  price: 35000 },
-  { label: 'A3 — 30×42 cm',  price: 50000 },
-]
-
-type SablonOpt = typeof SABLON_OPTIONS[number] | null
+type SablonOpt = PriceOption | null
 
 type InvoiceItem = {
   rowId: string
@@ -98,7 +85,13 @@ const EMPTY_FORM = {
   backDesign:      null as string | null,
 }
 
-export default function CustomDesignClient() {
+export default function CustomDesignClient({
+  bahanOptions,
+  sablonOptions,
+}: {
+  bahanOptions: PriceOption[]
+  sablonOptions: PriceOption[]
+}) {
   const { addCustomItem, openCart } = useCart()
 
   const [form, setForm]         = useState({ ...EMPTY_FORM })
@@ -117,9 +110,9 @@ export default function CustomDesignClient() {
   const handleUpload = (side: Side, file: File) => {
     const url = URL.createObjectURL(file)
     if (side === 'front')
-      setForm(f => ({ ...f, frontDesign: url, sablonDepan: f.sablonDepan ?? SABLON_OPTIONS[0] }))
+      setForm(f => ({ ...f, frontDesign: url, sablonDepan: f.sablonDepan ?? sablonOptions[0] ?? null }))
     else
-      setForm(f => ({ ...f, backDesign: url, sablonBelakang: f.sablonBelakang ?? SABLON_OPTIONS[0] }))
+      setForm(f => ({ ...f, backDesign: url, sablonBelakang: f.sablonBelakang ?? sablonOptions[0] ?? null }))
   }
 
   const finalBahan   = form.bahan === 'Lainnya' ? form.bahanCustom : form.bahan
@@ -215,11 +208,11 @@ export default function CustomDesignClient() {
               <p className="custom-control-label">Jenis Bahan <span className="custom-required">*</span></p>
               <select className="custom-select" value={form.bahan}
                 onChange={e => {
-                  const opt = BAHAN_OPTIONS.find(b => b.label === e.target.value)
+                  const opt = bahanOptions.find(b => b.label === e.target.value)
                   setForm(f => ({ ...f, bahan: e.target.value, bahanPrice: opt?.price ?? 0 }))
                 }}>
                 <option value="">— Pilih bahan —</option>
-                {BAHAN_OPTIONS.map(b => <option key={b.label} value={b.label}>{b.label}</option>)}
+                {bahanOptions.map(b => <option key={b.label} value={b.label}>{b.label}</option>)}
                 <option value="Lainnya">Lainnya...</option>
               </select>
               {form.bahan === 'Lainnya' && (
@@ -285,10 +278,10 @@ export default function CustomDesignClient() {
                 <select className="custom-select"
                   value={form.sablonDepan?.label ?? ''}
                   onChange={e => {
-                    const opt = SABLON_OPTIONS.find(o => o.label === e.target.value)
+                    const opt = sablonOptions.find(o => o.label === e.target.value)
                     if (opt) set('sablonDepan', opt)
                   }}>
-                  {SABLON_OPTIONS.map(opt => (
+                  {sablonOptions.map(opt => (
                     <option key={opt.label} value={opt.label}>{opt.label}</option>
                   ))}
                 </select>
@@ -318,10 +311,10 @@ export default function CustomDesignClient() {
                 <select className="custom-select"
                   value={form.sablonBelakang?.label ?? ''}
                   onChange={e => {
-                    const opt = SABLON_OPTIONS.find(o => o.label === e.target.value)
+                    const opt = sablonOptions.find(o => o.label === e.target.value)
                     if (opt) set('sablonBelakang', opt)
                   }}>
-                  {SABLON_OPTIONS.map(opt => (
+                  {sablonOptions.map(opt => (
                     <option key={opt.label} value={opt.label}>{opt.label}</option>
                   ))}
                 </select>

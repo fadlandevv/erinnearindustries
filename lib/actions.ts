@@ -1,7 +1,7 @@
 'use server'
 import fs from 'fs'
 import path from 'path'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { getProducts, saveProducts, getServices, saveServices, getGallery, saveGallery, getShowcase, saveShowcase, saveContent, type ContentData } from './data'
@@ -14,6 +14,8 @@ import {
   hashAdminPassword, verifyAdminPassword, type Permission,
 } from './rbac'
 import { saveManualEntry, deleteManualEntry, type RekapSource } from './rekap'
+import { logAdminAccess } from './access-log'
+import { getPricingItems, upsertPricingItem } from './pricing'
 import { generateId } from './utils'
 
 async function saveImage(file: File, productId: string, slot: string): Promise<string> {
@@ -25,6 +27,11 @@ async function saveImage(file: File, productId: string, slot: string): Promise<s
   return `/products/${productId}/${filename}`
 }
 
+async function getClientIp(): Promise<string> {
+  const h = await headers()
+  return h.get('x-forwarded-for')?.split(',')[0].trim() ?? h.get('x-real-ip') ?? 'unknown'
+}
+
 export async function login(
   _prev: { error?: string },
   formData: FormData
@@ -32,16 +39,29 @@ export async function login(
   const username = (formData.get('username') as string).trim()
   const password = formData.get('password') as string
   const admin = await getAdminByUsername(username)
+  const ip = await getClientIp()
+
   if (!admin || !verifyAdminPassword(password, admin.passwordHash)) {
+    await logAdminAccess({ adminId: admin?.id ?? '', username: username || '?', action: 'login_failed', ip })
     return { error: 'Username atau password salah.' }
   }
+
   const jar = await cookies()
   jar.set('admin-token', admin.id, { httpOnly: true, sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 })
+  await logAdminAccess({ adminId: admin.id, username: admin.username, action: 'login', ip })
   redirect('/admin')
 }
 
 export async function logout() {
   const jar = await cookies()
+  const adminId = jar.get('admin-token')?.value
+  if (adminId) {
+    const admin = await getAdminById(adminId)
+    if (admin) {
+      const ip = await getClientIp()
+      await logAdminAccess({ adminId: admin.id, username: admin.username, action: 'logout', ip })
+    }
+  }
   jar.delete('admin-token')
   redirect('/admin/login')
 }
@@ -501,4 +521,24 @@ export async function addManualEntryAction(
 export async function deleteManualEntryAction(id: string) {
   await deleteManualEntry(id)
   revalidatePath('/admin/rekap')
+}
+
+export async function updatePricingAction(
+  _prev: { ok?: boolean; error?: string },
+  formData: FormData
+): Promise<{ ok?: boolean; error?: string }> {
+  const jar = await cookies()
+  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+  const items = await getPricingItems()
+  await Promise.all(
+    items.map(item => {
+      const raw = formData.get(`price-${item.id}`) as string | null
+      const val = parseInt(raw ?? '', 10)
+      if (!isNaN(val) && val > 0) return upsertPricingItem(item.id, val)
+      return Promise.resolve()
+    })
+  )
+  revalidatePath('/admin/pricing')
+  revalidatePath('/custom')
+  return { ok: true }
 }

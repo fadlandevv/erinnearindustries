@@ -96,3 +96,22 @@ create table if not exists content (
   key text primary key,
   value jsonb not null
 );
+
+create table if not exists custom_pricing (
+  id text primary key,
+  type text not null check (type in ('bahan', 'sablon')),
+  label text not null,
+  price integer not null default 0,
+  updated_at timestamptz default now()
+);
+
+create table if not exists admin_access_log (
+  id text primary key,
+  admin_id text not null default '',
+  username text not null,
+  action text not null check (action in ('login', 'logout', 'login_failed')),
+  ip text not null default 'unknown',
+  created_at timestamptz default now()
+);
+
+create index if not exists admin_access_log_created_at_idx on admin_access_log (created_at desc);
