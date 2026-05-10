@@ -3,9 +3,6 @@ import { useActionState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { updatePricingAction, addPricingItemAction, deletePricingItemAction } from '@/lib/actions'
 import type { PricingItem } from '@/lib/pricing'
-import { PRICING_DEFAULTS } from '@/lib/pricing'
-
-const DEFAULT_IDS = new Set(PRICING_DEFAULTS.map(d => d.id))
 
 function formatRp(n: number) {
   return 'Rp ' + n.toLocaleString('id-ID')
@@ -113,7 +110,7 @@ function PricingSection({
                 </td>
                 <td style={{ color: '#999', fontSize: '0.82rem' }}>{formatRp(item.price)}</td>
                 <td>
-                  {!DEFAULT_IDS.has(item.id) && <DeleteBtn id={item.id} />}
+                  {!item.isDefault && <DeleteBtn id={item.id} />}
                 </td>
               </tr>
             ))}

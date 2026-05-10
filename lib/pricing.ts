@@ -5,10 +5,11 @@ export type PricingItem = {
   type: 'bahan' | 'sablon'
   label: string
   price: number
+  isDefault: boolean
   updatedAt: string
 }
 
-export const PRICING_DEFAULTS: Omit<PricingItem, 'updatedAt'>[] = [
+export const PRICING_DEFAULTS: Omit<PricingItem, 'updatedAt' | 'isDefault'>[] = [
   { id: 'bahan-cc30s',  type: 'bahan',  label: 'Cotton Combed 30s', price: 45000 },
   { id: 'bahan-cc24s',  type: 'bahan',  label: 'Cotton Combed 24s', price: 55000 },
   { id: 'bahan-bamboo', type: 'bahan',  label: 'Cotton Bamboo',      price: 65000 },
@@ -23,11 +24,13 @@ export const PRICING_DEFAULTS: Omit<PricingItem, 'updatedAt'>[] = [
 const DEFAULT_IDS = new Set(PRICING_DEFAULTS.map(d => d.id))
 
 function rowToItem(row: Record<string, unknown>): PricingItem {
+  const id = row.id as string
   return {
-    id: row.id as string,
+    id,
     type: row.type as 'bahan' | 'sablon',
     label: row.label as string,
     price: row.price as number,
+    isDefault: DEFAULT_IDS.has(id),
     updatedAt: row.updated_at as string,
   }
 }
@@ -41,7 +44,7 @@ export async function getPricingItems(): Promise<PricingItem[]> {
     const result: PricingItem[] = PRICING_DEFAULTS.map(def =>
       dbMap.has(def.id)
         ? dbMap.get(def.id)!
-        : { ...def, updatedAt: '' }
+        : { ...def, isDefault: true, updatedAt: '' }
     )
 
     for (const [id, item] of dbMap) {
@@ -50,7 +53,7 @@ export async function getPricingItems(): Promise<PricingItem[]> {
 
     return result
   } catch {
-    return PRICING_DEFAULTS.map(d => ({ ...d, updatedAt: '' }))
+    return PRICING_DEFAULTS.map(d => ({ ...d, isDefault: true, updatedAt: '' }))
   }
 }
 
