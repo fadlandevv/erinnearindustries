@@ -21,10 +21,8 @@ const csp = [
 const nextConfig = {
   reactStrictMode: true,
   devIndicators: false,
-  experimental: {
-    outputFileTracingIncludes: {
-      '/**': ['./data/**'],
-    },
+  outputFileTracingIncludes: {
+    '/**': ['./data/**'],
   },
   async headers() {
     return [
