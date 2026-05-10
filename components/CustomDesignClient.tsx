@@ -273,9 +273,7 @@ export default function CustomDesignClient() {
                     if (opt) set('sablonDepan', opt)
                   }}>
                   {SABLON_OPTIONS.map(opt => (
-                    <option key={opt.label} value={opt.label}>
-                      {opt.label} · {formatRp(opt.price)}
-                    </option>
+                    <option key={opt.label} value={opt.label}>{opt.label}</option>
                   ))}
                 </select>
               </div>
@@ -308,9 +306,7 @@ export default function CustomDesignClient() {
                     if (opt) set('sablonBelakang', opt)
                   }}>
                   {SABLON_OPTIONS.map(opt => (
-                    <option key={opt.label} value={opt.label}>
-                      {opt.label} · {formatRp(opt.price)}
-                    </option>
+                    <option key={opt.label} value={opt.label}>{opt.label}</option>
                   ))}
                 </select>
               </div>
