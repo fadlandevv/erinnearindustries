@@ -108,14 +108,15 @@ export default function ProductDetail({
                 : product.price}
             </p>
             {product.priceUSD != null && (
-              <select
-                className="detail-currency-select"
-                value={showUSD ? 'USD' : 'IDR'}
-                onChange={(e) => setShowUSD(e.target.value === 'USD')}
+              <button
+                className="detail-currency-toggle"
+                onClick={() => setShowUSD((v) => !v)}
+                type="button"
               >
-                <option value="IDR">IDR</option>
-                <option value="USD">USD</option>
-              </select>
+                <span className={showUSD ? '' : 'detail-currency-toggle--active'}>IDR</span>
+                <span className="detail-currency-toggle-sep" />
+                <span className={showUSD ? 'detail-currency-toggle--active' : ''}>USD</span>
+              </button>
             )}
           </div>
 
