@@ -4,8 +4,8 @@ import { updateGallerySlot } from '@/lib/actions'
 
 const slotNames = ['Slot A', 'Slot B', 'Slot C', 'Slot D', 'Slot E', 'Slot F']
 
-export default function GalleryAdminPage() {
-  const gallery = getGallery()
+export default async function GalleryAdminPage() {
+  const gallery = await getGallery()
 
   return (
     <>

@@ -3,9 +3,9 @@ import { getProducts, getServices } from '@/lib/data'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-function buildSystem() {
-  const products = getProducts()
-  const services = getServices()
+async function buildSystem() {
+  const products = await getProducts()
+  const services = await getServices()
 
   const productList = products
     .map((p) => `  - ${p.title} | Harga: ${p.price} | Ukuran: ${p.sizes.join(', ')}`)
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     const stream = await client.messages.stream({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 512,
-      system: buildSystem(),
+      system: await buildSystem(),
       messages,
     })
 

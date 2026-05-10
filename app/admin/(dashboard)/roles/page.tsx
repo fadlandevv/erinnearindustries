@@ -1,9 +1,9 @@
 import { getRoles, getAdmins } from '@/lib/rbac'
 import RolesClient from './RolesClient'
 
-export default function RolesPage() {
-  const roles = getRoles()
-  const admins = getAdmins()
+export default async function RolesPage() {
+  const roles = await getRoles()
+  const admins = await getAdmins()
 
   return (
     <>

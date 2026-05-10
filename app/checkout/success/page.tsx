@@ -9,7 +9,7 @@ export default async function SuccessPage({
   searchParams: Promise<{ order_id?: string }>
 }) {
   const { order_id } = await searchParams
-  const order = order_id ? getOrderById(order_id) : undefined
+  const order = order_id ? await getOrderById(order_id) : undefined
 
   return (
     <section className="checkout-result-section">

@@ -3,8 +3,8 @@ import { getProducts } from '@/lib/data'
 import { deleteProduct, duplicateProduct } from '@/lib/actions'
 import RelativeTime from '@/components/RelativeTime'
 
-export default function AdminProductsPage() {
-  const products = getProducts()
+export default async function AdminProductsPage() {
+  const products = await getProducts()
 
   return (
     <>

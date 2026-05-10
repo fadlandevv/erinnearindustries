@@ -4,7 +4,7 @@ import { getProductById, getProducts } from '@/lib/data'
 import ProductDetail from '@/components/ProductDetail'
 
 export async function generateStaticParams() {
-  return getProducts().map((p) => ({ id: p.id }))
+  return (await getProducts()).map((p) => ({ id: p.id }))
 }
 
 export async function generateMetadata({
@@ -13,7 +13,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const { id } = await params
-  const product = getProductById(id)
+  const product = await getProductById(id)
   if (!product) return {}
   return {
     title: `${product.title} — Erinnear Industries`,
@@ -27,10 +27,10 @@ export default async function ProductDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const product = getProductById(id)
+  const product = await getProductById(id)
   if (!product) notFound()
 
-  const related = getProducts()
+  const related = (await getProducts())
     .filter((p) => p.id !== id)
     .slice(0, 3)
 

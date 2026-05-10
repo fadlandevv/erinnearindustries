@@ -1,74 +1,67 @@
-import fs from 'fs'
-import path from 'path'
+import { db } from './db'
 import { scryptSync, randomBytes, timingSafeEqual } from 'crypto'
 import type { Role, AdminAccount, Permission } from './rbac-types'
 
 export type { Role, AdminAccount, Permission }
 export { ALL_PERMISSIONS, PERMISSION_LABELS } from './rbac-types'
 
-const DATA_DIR = path.join(process.cwd(), 'data')
-
 // ── Role CRUD ─────────────────────────────────────────────────
-function readRoles(): Role[] {
-  try { return JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'roles.json'), 'utf-8')) }
-  catch { return [] }
+
+export async function getRoles(): Promise<Role[]> {
+  const { data } = await db.from('roles').select('*').order('name')
+  return (data ?? []).map(row => ({
+    id: row.id,
+    name: row.name,
+    permissions: row.permissions ?? [],
+    locked: row.locked ?? false,
+  }))
 }
 
-function writeRoles(roles: Role[]) {
-  fs.writeFileSync(path.join(DATA_DIR, 'roles.json'), JSON.stringify(roles, null, 2))
+export async function getRoleById(id: string): Promise<Role | undefined> {
+  const { data } = await db.from('roles').select('*').eq('id', id).maybeSingle()
+  if (!data) return undefined
+  return { id: data.id, name: data.name, permissions: data.permissions ?? [], locked: data.locked ?? false }
 }
 
-export function getRoles(): Role[] { return readRoles() }
-
-export function getRoleById(id: string): Role | undefined {
-  return readRoles().find(r => r.id === id)
+export async function saveRole(role: Role): Promise<void> {
+  await db.from('roles').upsert({ id: role.id, name: role.name, permissions: role.permissions, locked: role.locked ?? false })
 }
 
-export function saveRole(role: Role) {
-  const roles = readRoles()
-  const idx = roles.findIndex(r => r.id === role.id)
-  if (idx >= 0) roles[idx] = role
-  else roles.push(role)
-  writeRoles(roles)
-}
-
-export function deleteRole(id: string) {
-  writeRoles(readRoles().filter(r => r.id !== id))
+export async function deleteRole(id: string): Promise<void> {
+  await db.from('roles').delete().eq('id', id)
 }
 
 // ── Admin CRUD ────────────────────────────────────────────────
-function readAdmins(): AdminAccount[] {
-  try { return JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'admins.json'), 'utf-8')) }
-  catch { return [] }
+
+function toAdmin(row: Record<string, string>): AdminAccount {
+  return { id: row.id, username: row.username, passwordHash: row.password_hash, roleId: row.role_id, createdAt: row.created_at }
 }
 
-function writeAdmins(admins: AdminAccount[]) {
-  fs.writeFileSync(path.join(DATA_DIR, 'admins.json'), JSON.stringify(admins, null, 2))
+export async function getAdmins(): Promise<AdminAccount[]> {
+  const { data } = await db.from('admins').select('*').order('created_at')
+  return (data ?? []).map(toAdmin)
 }
 
-export function getAdmins(): AdminAccount[] { return readAdmins() }
-
-export function getAdminById(id: string): AdminAccount | undefined {
-  return readAdmins().find(a => a.id === id)
+export async function getAdminById(id: string): Promise<AdminAccount | undefined> {
+  const { data } = await db.from('admins').select('*').eq('id', id).maybeSingle()
+  return data ? toAdmin(data) : undefined
 }
 
-export function getAdminByUsername(username: string): AdminAccount | undefined {
-  return readAdmins().find(a => a.username.toLowerCase() === username.toLowerCase())
+export async function getAdminByUsername(username: string): Promise<AdminAccount | undefined> {
+  const { data } = await db.from('admins').select('*').ilike('username', username).maybeSingle()
+  return data ? toAdmin(data) : undefined
 }
 
-export function saveAdmin(admin: AdminAccount) {
-  const admins = readAdmins()
-  const idx = admins.findIndex(a => a.id === admin.id)
-  if (idx >= 0) admins[idx] = admin
-  else admins.push(admin)
-  writeAdmins(admins)
+export async function saveAdmin(admin: AdminAccount): Promise<void> {
+  await db.from('admins').upsert({ id: admin.id, username: admin.username, password_hash: admin.passwordHash, role_id: admin.roleId, created_at: admin.createdAt })
 }
 
-export function deleteAdmin(id: string) {
-  writeAdmins(readAdmins().filter(a => a.id !== id))
+export async function deleteAdmin(id: string): Promise<void> {
+  await db.from('admins').delete().eq('id', id)
 }
 
 // ── Password ──────────────────────────────────────────────────
+
 export function hashAdminPassword(password: string): string {
   const salt = randomBytes(16).toString('hex')
   const derived = scryptSync(password, salt, 64)

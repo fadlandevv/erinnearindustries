@@ -1,8 +1,8 @@
 import { getContent } from '@/lib/data'
 import ContentEditor from './ContentEditor'
 
-export default function ContentPage() {
-  const content = getContent()
+export default async function ContentPage() {
+  const content = await getContent()
   return (
     <>
       <div className="admin-page-header">

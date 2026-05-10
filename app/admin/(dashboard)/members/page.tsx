@@ -10,9 +10,13 @@ function formatDateTime(iso: string) {
   })
 }
 
-export default function MembersPage() {
-  const users = getUsers().sort(
+export default async function MembersPage() {
+  const users = (await getUsers()).sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
+
+  const orderCounts = await Promise.all(
+    users.map(u => getOrdersByEmail(u.email).then(o => o.length))
   )
 
   const now = new Date()
@@ -60,9 +64,7 @@ export default function MembersPage() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user, idx) => {
-                  const orders = getOrdersByEmail(user.email)
-                  return (
+                {users.map((user, idx) => (
                     <tr key={user.id}>
                       <td style={{ color: '#aaa', fontSize: '0.8rem' }}>{idx + 1}</td>
                       <td>
@@ -79,7 +81,7 @@ export default function MembersPage() {
                       </td>
                       <td style={{ color: '#666', fontSize: '0.875rem' }}>{user.email}</td>
                       <td style={{ textAlign: 'center' }}>
-                        <span className="admin-badge">{orders.length} pesanan</span>
+                        <span className="admin-badge">{orderCounts[idx]} pesanan</span>
                       </td>
                       <td style={{ fontSize: '0.8rem', color: '#888', whiteSpace: 'nowrap' }}>
                         {formatDateTime(user.createdAt)}
@@ -98,7 +100,7 @@ export default function MembersPage() {
                       </td>
                     </tr>
                   )
-                })}
+                )}
               </tbody>
             </table>
           </div>

@@ -1,14 +1,13 @@
-import fs from 'fs'
-import path from 'path'
+import { db } from './db'
 import { getOrders } from './orders'
 
 export type RekapSource = 'marketplace' | 'offline'
 
 export type ManualEntry = {
   id: string
-  date: string        // "YYYY-MM-DD"
+  date: string
   source: RekapSource
-  platform: string    // e.g. "Tokopedia", "Shopee", "Toko"
+  platform: string
   amount: number
   note?: string
   filledBy?: string
@@ -26,25 +25,37 @@ export type PeriodRow = {
   webOrders: number
 }
 
-const FILE = path.join(process.cwd(), 'data', 'rekap-manual.json')
-
-// Only count orders that have been confirmed as revenue
 const PAID_STATUSES = new Set(['paid', 'processing', 'shipped', 'delivered'])
 
-export function getManualEntries(): ManualEntry[] {
-  try { return JSON.parse(fs.readFileSync(FILE, 'utf-8')) }
-  catch { return [] }
+export async function getManualEntries(): Promise<ManualEntry[]> {
+  const { data } = await db.from('rekap_manual').select('*').order('created_at', { ascending: false })
+  return (data ?? []).map(row => ({
+    id: row.id,
+    date: row.date,
+    source: row.source as RekapSource,
+    platform: row.platform,
+    amount: row.amount,
+    note: row.note ?? undefined,
+    filledBy: row.filled_by ?? undefined,
+    createdAt: row.created_at,
+  }))
 }
 
-export function saveManualEntry(entry: ManualEntry) {
-  const all = getManualEntries()
-  const i = all.findIndex(e => e.id === entry.id)
-  if (i >= 0) all[i] = entry; else all.unshift(entry)
-  fs.writeFileSync(FILE, JSON.stringify(all, null, 2))
+export async function saveManualEntry(entry: ManualEntry): Promise<void> {
+  await db.from('rekap_manual').upsert({
+    id: entry.id,
+    date: entry.date,
+    source: entry.source,
+    platform: entry.platform,
+    amount: entry.amount,
+    note: entry.note ?? null,
+    filled_by: entry.filledBy ?? null,
+    created_at: entry.createdAt,
+  })
 }
 
-export function deleteManualEntry(id: string) {
-  fs.writeFileSync(FILE, JSON.stringify(getManualEntries().filter(e => e.id !== id), null, 2))
+export async function deleteManualEntry(id: string): Promise<void> {
+  await db.from('rekap_manual').delete().eq('id', id)
 }
 
 // ── Date helpers ────────────────────────────────────────────────────
@@ -71,9 +82,9 @@ function fmtDate(d: Date) {
 
 // ── Compute all three periods ─────────────────────────────────────
 
-export function computeRekap() {
-  const orders = getOrders().filter(o => PAID_STATUSES.has(o.status))
-  const manual = getManualEntries()
+export async function computeRekap() {
+  const orders = (await getOrders()).filter(o => PAID_STATUSES.has(o.status))
+  const manual = await getManualEntries()
   const now = new Date()
 
   function emptyRow(key: string, label: string, subLabel?: string): PeriodRow {
@@ -96,14 +107,14 @@ export function computeRekap() {
 
   for (const o of orders) {
     const { y, w } = isoWeek(new Date(o.createdAt))
-    const key = `${y}-W${String(w).padStart(2, '00')}`
+    const key = `${y}-W${String(w).padStart(2, '0')}`
     const row = weekMap.get(key)
     if (row) { row.web += o.totalPrice; row.total += o.totalPrice; row.webOrders++ }
   }
 
   for (const e of manual) {
     const { y, w } = isoWeek(new Date(e.date))
-    const key = `${y}-W${String(w).padStart(2, '00')}`
+    const key = `${y}-W${String(w).padStart(2, '0')}`
     const row = weekMap.get(key)
     if (row) { row[e.source] += e.amount; row.total += e.amount }
   }
@@ -118,19 +129,19 @@ export function computeRekap() {
 
   for (const o of orders) {
     const d = new Date(o.createdAt)
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '00')}`
     const row = monthMap.get(key)
     if (row) { row.web += o.totalPrice; row.total += o.totalPrice; row.webOrders++ }
   }
 
   for (const e of manual) {
     const d = new Date(e.date)
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '00')}`
     const row = monthMap.get(key)
     if (row) { row[e.source] += e.amount; row.total += e.amount }
   }
 
-  // ── Yearly: all years present in data ─────────────────────────
+  // ── Yearly ────────────────────────────────────────────────────
   const allYears = new Set<number>([now.getFullYear()])
   orders.forEach(o => allYears.add(new Date(o.createdAt).getFullYear()))
   manual.forEach(e => allYears.add(new Date(e.date).getFullYear()))

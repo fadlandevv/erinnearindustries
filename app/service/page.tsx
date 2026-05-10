@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Full-service clothing and brand presentation.',
 }
 
-export default function ServicePage() {
-  const services = getServices()
+export default async function ServicePage() {
+  const services = await getServices()
   return <ServicePageClient services={services} />
 }

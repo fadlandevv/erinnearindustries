@@ -10,8 +10,8 @@ export const dynamic = 'force-dynamic'
 export default async function OrdersPage() {
   const jar = await cookies()
   const email = jar.get('user-session')?.value ?? ''
-  const user = getUserByEmail(email)
-  const orders = getOrdersByEmail(email)
+  const user = await getUserByEmail(email)
+  const orders = await getOrdersByEmail(email)
 
   return (
     <section className="orders-section">

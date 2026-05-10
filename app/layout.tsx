@@ -19,9 +19,9 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const jar = await cookies()
   const email = jar.get('user-session')?.value
-  const user = email ? getUserByEmail(email) : null
+  const user = email ? await getUserByEmail(email) : null
   const userInfo = user ? { name: user.name } : null
-  const content = getContent()
+  const content = await getContent()
 
   return (
     <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>

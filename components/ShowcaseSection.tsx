@@ -2,8 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getShowcase } from '@/lib/data'
 
-export default function ShowcaseSection() {
-  const items = getShowcase()
+export default async function ShowcaseSection() {
+  const items = await getShowcase()
 
   return (
     <section className="showcase-section">

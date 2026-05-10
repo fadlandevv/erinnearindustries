@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Explore our premium clothing collections.',
 }
 
-export default function ProductPage() {
-  const products = getProducts()
+export default async function ProductPage() {
+  const products = await getProducts()
   return <ProductsClient products={products} />
 }

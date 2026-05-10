@@ -7,10 +7,10 @@ import AdminSidebar from '@/components/AdminSidebar'
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const jar = await cookies()
   const adminId = jar.get('admin-token')?.value
-  const admin = adminId ? getAdminById(adminId) : null
+  const admin = adminId ? await getAdminById(adminId) : null
   if (!admin) redirect('/admin/login')
 
-  const role = getRoleById(admin.roleId)
+  const role = await getRoleById(admin.roleId)
   const permissions = role?.permissions ?? []
 
   return (

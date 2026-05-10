@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import { getGallery } from '@/lib/data'
 
-export default function GallerySection() {
-  const items = getGallery()
+export default async function GallerySection() {
+  const items = await getGallery()
   const [s1, s2, s3, s4, s5] = items
 
   return (

@@ -2,8 +2,8 @@ import Link from 'next/link'
 import { getServices } from '@/lib/data'
 import { deleteService } from '@/lib/actions'
 
-export default function AdminServicesPage() {
-  const services = getServices()
+export default async function AdminServicesPage() {
+  const services = await getServices()
 
   return (
     <>

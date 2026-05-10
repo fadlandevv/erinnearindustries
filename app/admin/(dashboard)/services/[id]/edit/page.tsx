@@ -11,7 +11,7 @@ export default async function EditServicePage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const service = getServiceById(id)
+  const service = await getServiceById(id)
   if (!service) notFound()
 
   const updateAction = updateService.bind(null, service.id)

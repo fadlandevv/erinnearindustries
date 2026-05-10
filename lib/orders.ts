@@ -1,5 +1,4 @@
-import fs from 'fs'
-import path from 'path'
+import { db } from './db'
 
 export type OrderItem = {
   productId: string
@@ -31,41 +30,51 @@ export type Order = {
   snapToken: string
 }
 
-const FILE = path.join(process.cwd(), 'data', 'orders.json')
-
-export function getOrders(): Order[] {
-  try {
-    return JSON.parse(fs.readFileSync(FILE, 'utf-8'))
-  } catch {
-    return []
+function toOrder(row: Record<string, unknown>): Order {
+  return {
+    id: row.id as string,
+    createdAt: row.created_at as string,
+    status: row.status as Order['status'],
+    customer: row.customer as OrderCustomer,
+    items: row.items as OrderItem[],
+    totalPrice: row.total_price as number,
+    snapToken: (row.snap_token as string) ?? '',
   }
 }
 
-export function getOrderById(id: string): Order | undefined {
-  return getOrders().find((o) => o.id === id)
+export async function getOrders(): Promise<Order[]> {
+  const { data } = await db.from('orders').select('*').order('created_at', { ascending: false })
+  return (data ?? []).map(toOrder)
 }
 
-export function saveOrder(order: Order) {
-  const orders = getOrders()
-  const idx = orders.findIndex((o) => o.id === order.id)
-  if (idx >= 0) orders[idx] = order
-  else orders.unshift(order)
-  fs.writeFileSync(FILE, JSON.stringify(orders, null, 2))
+export async function getOrderById(id: string): Promise<Order | undefined> {
+  const { data } = await db.from('orders').select('*').eq('id', id).maybeSingle()
+  return data ? toOrder(data) : undefined
 }
 
-export function updateOrderStatus(id: string, status: Order['status']) {
-  const orders = getOrders().map((o) =>
-    o.id === id ? { ...o, status } : o
-  )
-  fs.writeFileSync(FILE, JSON.stringify(orders, null, 2))
+export async function saveOrder(order: Order): Promise<void> {
+  await db.from('orders').upsert({
+    id: order.id,
+    created_at: order.createdAt,
+    status: order.status,
+    customer: order.customer,
+    items: order.items,
+    total_price: order.totalPrice,
+    snap_token: order.snapToken,
+  })
 }
 
-export function getOrdersByEmail(email: string): Order[] {
-  return getOrders().filter(
-    (o) => o.customer.email.toLowerCase() === email.toLowerCase()
-  )
+export async function updateOrderStatus(id: string, status: Order['status']): Promise<void> {
+  await db.from('orders').update({ status }).eq('id', id)
 }
 
-export function deleteOrder(id: string) {
-  fs.writeFileSync(FILE, JSON.stringify(getOrders().filter((o) => o.id !== id), null, 2))
+export async function getOrdersByEmail(email: string): Promise<Order[]> {
+  const { data } = await db.from('orders').select('*')
+    .ilike('customer->>email', email)
+    .order('created_at', { ascending: false })
+  return (data ?? []).map(toOrder)
+}
+
+export async function deleteOrder(id: string): Promise<void> {
+  await db.from('orders').delete().eq('id', id)
 }

@@ -5,9 +5,9 @@ import FeatureGrid from '@/components/FeatureGrid'
 import Service from '@/components/Service'
 import { getProducts, getServices } from '@/lib/data'
 
-export default function HomePage() {
-  const products = getProducts().slice(0, 3)
-  const services = getServices().slice(0, 3)
+export default async function HomePage() {
+  const products = (await getProducts()).slice(0, 3)
+  const services = (await getServices()).slice(0, 3)
 
   return (
     <>

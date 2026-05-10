@@ -1,5 +1,4 @@
-import fs from 'fs'
-import path from 'path'
+import { db } from './db'
 import { scryptSync, randomBytes, timingSafeEqual } from 'crypto'
 
 export type User = {
@@ -10,38 +9,35 @@ export type User = {
   createdAt: string
 }
 
-const FILE = path.join(process.cwd(), 'data', 'users.json')
-
-export function getUsers(): User[] {
-  try {
-    return JSON.parse(fs.readFileSync(FILE, 'utf-8'))
-  } catch {
-    return []
-  }
+function toUser(row: Record<string, string>): User {
+  return { id: row.id, name: row.name, email: row.email, passwordHash: row.password_hash, createdAt: row.created_at }
 }
 
-export function getUserById(id: string): User | undefined {
-  return getUsers().find((u) => u.id === id)
+export async function getUsers(): Promise<User[]> {
+  const { data } = await db.from('users').select('*').order('created_at', { ascending: false })
+  return (data ?? []).map(toUser)
 }
 
-export function getUserByEmail(email: string): User | undefined {
-  return getUsers().find((u) => u.email.toLowerCase() === email.toLowerCase())
+export async function getUserById(id: string): Promise<User | undefined> {
+  const { data } = await db.from('users').select('*').eq('id', id).maybeSingle()
+  return data ? toUser(data) : undefined
 }
 
-export function saveUser(user: User) {
-  const users = getUsers()
-  users.push(user)
-  fs.writeFileSync(FILE, JSON.stringify(users, null, 2))
+export async function getUserByEmail(email: string): Promise<User | undefined> {
+  const { data } = await db.from('users').select('*').ilike('email', email).maybeSingle()
+  return data ? toUser(data) : undefined
 }
 
-export function updateUser(updated: User) {
-  const users = getUsers().map((u) => (u.id === updated.id ? updated : u))
-  fs.writeFileSync(FILE, JSON.stringify(users, null, 2))
+export async function saveUser(user: User): Promise<void> {
+  await db.from('users').upsert({ id: user.id, name: user.name, email: user.email, password_hash: user.passwordHash, created_at: user.createdAt })
 }
 
-export function deleteUser(id: string) {
-  const users = getUsers().filter((u) => u.id !== id)
-  fs.writeFileSync(FILE, JSON.stringify(users, null, 2))
+export async function updateUser(user: User): Promise<void> {
+  await db.from('users').update({ name: user.name, email: user.email, password_hash: user.passwordHash }).eq('id', user.id)
+}
+
+export async function deleteUser(id: string): Promise<void> {
+  await db.from('users').delete().eq('id', id)
 }
 
 export function hashPassword(password: string): string {

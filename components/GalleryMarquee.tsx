@@ -14,8 +14,8 @@ const PLACEHOLDER_GRADIENTS = [
   'linear-gradient(135deg, #161614 0%, #0d0d0d 100%)',
 ]
 
-export default function GalleryMarquee() {
-  const items = getGallery()
+export default async function GalleryMarquee() {
+  const items = await getGallery()
 
   return (
     <section className="gbn-section">

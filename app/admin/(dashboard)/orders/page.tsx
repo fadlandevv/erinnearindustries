@@ -2,10 +2,10 @@ import { getOrders } from '@/lib/orders'
 import { getUsers } from '@/lib/users'
 import OrdersClient from './OrdersClient'
 
-export default function OrdersPage() {
-  const orders = getOrders()
+export default async function OrdersPage() {
+  const orders = await getOrders()
   const userMap = Object.fromEntries(
-    getUsers().map(u => [u.email.toLowerCase(), u.id])
+    (await getUsers()).map(u => [u.email.toLowerCase(), u.id])
   )
 
   const stats = {

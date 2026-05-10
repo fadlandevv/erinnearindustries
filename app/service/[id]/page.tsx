@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { getServiceById, getServices } from '@/lib/data'
 
 export async function generateStaticParams() {
-  return getServices().map((s) => ({ id: s.id }))
+  return (await getServices()).map((s) => ({ id: s.id }))
 }
 
 export async function generateMetadata({
@@ -13,7 +13,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const { id } = await params
-  const service = getServiceById(id)
+  const service = await getServiceById(id)
   if (!service) return {}
   return {
     title: `${service.title} — Erinnear Industries`,
@@ -27,10 +27,10 @@ export default async function ServiceDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const service = getServiceById(id)
+  const service = await getServiceById(id)
   if (!service) notFound()
 
-  const allServices = getServices().filter((s) => s.id !== service.id)
+  const allServices = (await getServices()).filter((s) => s.id !== service.id)
 
   return (
     <>

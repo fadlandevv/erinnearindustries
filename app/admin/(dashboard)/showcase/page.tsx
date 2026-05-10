@@ -2,8 +2,8 @@ import Image from 'next/image'
 import { getShowcase } from '@/lib/data'
 import { updateShowcaseItem } from '@/lib/actions'
 
-export default function ShowcaseAdminPage() {
-  const items = getShowcase()
+export default async function ShowcaseAdminPage() {
+  const items = await getShowcase()
 
   return (
     <>

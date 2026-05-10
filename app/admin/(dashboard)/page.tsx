@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { getProducts, getServices } from '@/lib/data'
 
-export default function AdminDashboard() {
-  const products = getProducts()
-  const services = getServices()
+export default async function AdminDashboard() {
+  const products = await getProducts()
+  const services = await getServices()
 
   return (
     <>

@@ -31,10 +31,10 @@ const STATUS_COLOR: Record<string, string> = {
 
 export default async function MemberDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const user = getUserById(id)
+  const user = await getUserById(id)
   if (!user) notFound()
 
-  const orders = getOrdersByEmail(user.email).sort(
+  const orders = (await getOrdersByEmail(user.email)).sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
 

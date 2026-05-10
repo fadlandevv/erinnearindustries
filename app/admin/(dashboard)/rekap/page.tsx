@@ -13,10 +13,10 @@ export default async function RekapPage({
 
   const jar = await cookies()
   const adminId = jar.get('admin-token')?.value
-  const admin = adminId ? getAdminById(adminId) : null
+  const admin = adminId ? await getAdminById(adminId) : null
 
-  const data = computeRekap()
-  const entries = getManualEntries()
+  const data = await computeRekap()
+  const entries = await getManualEntries()
 
   return (
     <>
