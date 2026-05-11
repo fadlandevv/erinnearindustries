@@ -1,9 +1,16 @@
-import type { Metadata } from 'next'
+'use client'
+import { useState } from 'react'
 import Link from 'next/link'
 
-export const metadata: Metadata = { title: 'Lupa Password — Erinnear Industries' }
+const ADMIN_WA = '6281283615836'
 
 export default function ForgotPasswordPage() {
+  const [email, setEmail] = useState('')
+
+  const waUrl = `https://wa.me/${ADMIN_WA}?text=${encodeURIComponent(
+    `Halo, saya lupa password akun Erinnear Industries.\nEmail saya: ${email || '[email kamu]'}`
+  )}`
+
   return (
     <section className="auth-section">
       <div className="auth-card">
@@ -12,18 +19,30 @@ export default function ForgotPasswordPage() {
           Erinnear Industries
         </div>
         <h1 className="auth-title">Lupa Password?</h1>
-        <p className="auth-sub" style={{ marginBottom: '1.5rem' }}>
-          Reset password dilakukan oleh admin. Hubungi kami dan sebutkan email akunmu — kami akan kirimkan link reset.
+        <p className="auth-sub">
+          Masukkan emailmu, lalu hubungi admin via WhatsApp — kami akan kirimkan link reset.
         </p>
 
+        <div className="auth-form-group" style={{ marginTop: '1.25rem' }}>
+          <label htmlFor="email">Email Akun</label>
+          <input
+            id="email"
+            type="email"
+            className="auth-input"
+            placeholder="kamu@email.com"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
+        </div>
+
         <a
-          href="https://wa.me/6281283615836?text=Halo%2C+saya+lupa+password+akun+Erinnear+Industries.+Email+saya%3A+"
+          href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="auth-btn"
-          style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem' }}
+          style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '0.75rem' }}
         >
-          Hubungi via WhatsApp
+          Hubungi Admin via WhatsApp
         </a>
 
         <p className="auth-switch" style={{ marginTop: '1rem' }}>
