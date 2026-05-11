@@ -2,6 +2,7 @@
 import { useActionState } from 'react'
 import Link from 'next/link'
 import { registerUser } from '@/lib/actions'
+import PasswordInput from '@/components/PasswordInput'
 
 export default function RegisterForm() {
   const [state, action, pending] = useActionState(registerUser, {})
@@ -30,9 +31,9 @@ export default function RegisterForm() {
 
       <div className="auth-form-group">
         <label htmlFor="password">Password</label>
-        <input
-          id="password" name="password" type="password" required
-          placeholder="Minimal 6 karakter" className="auth-input"
+        <PasswordInput
+          id="password" name="password" required
+          placeholder="Minimal 6 karakter"
           autoComplete="new-password"
         />
       </div>

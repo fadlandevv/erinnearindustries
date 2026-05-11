@@ -1,6 +1,7 @@
 'use client'
 import { useActionState } from 'react'
 import { login } from '@/lib/actions'
+import PasswordInput from '@/components/PasswordInput'
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(login, {})
@@ -32,11 +33,10 @@ export default function LoginPage() {
           </div>
           <div className="admin-form-group">
             <label htmlFor="password">Password</label>
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
-              className="admin-form-input"
+              inputClassName="admin-form-input"
               placeholder="Password"
               autoComplete="current-password"
               required

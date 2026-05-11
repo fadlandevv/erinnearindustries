@@ -3,6 +3,7 @@ import { useActionState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { resetPasswordAction } from '@/lib/actions'
+import PasswordInput from '@/components/PasswordInput'
 
 export default function ResetForm() {
   const token = useSearchParams().get('token') ?? ''
@@ -39,18 +40,18 @@ export default function ResetForm() {
 
       <div className="auth-form-group">
         <label htmlFor="password">Password Baru</label>
-        <input
-          id="password" name="password" type="password" required minLength={6}
-          placeholder="Minimal 6 karakter" className="auth-input"
+        <PasswordInput
+          id="password" name="password" required minLength={6}
+          placeholder="Minimal 6 karakter"
           autoComplete="new-password"
         />
       </div>
 
       <div className="auth-form-group">
         <label htmlFor="confirm">Konfirmasi Password</label>
-        <input
-          id="confirm" name="confirm" type="password" required minLength={6}
-          placeholder="Ulangi password baru" className="auth-input"
+        <PasswordInput
+          id="confirm" name="confirm" required minLength={6}
+          placeholder="Ulangi password baru"
           autoComplete="new-password"
         />
       </div>

@@ -4686,3 +4686,16 @@ details[open] .reseller-faq-q::after { content: '−'; }
 [data-theme="dark"] .invoice-grand-label { color: rgba(13,13,13,0.45); }
 [data-theme="dark"] .invoice-grand-val { color: #0d0d0d; }
 [data-theme="dark"] .invoice-grand-tbd { color: rgba(13,13,13,0.45); }
+
+/* Password input with eye toggle */
+.password-input-wrap { position: relative; }
+.password-input-wrap .auth-input,
+.password-input-wrap .profile-input { padding-right: 2.5rem; }
+.password-eye-btn {
+  position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; color: #aaa; padding: 0;
+  display: flex; align-items: center; line-height: 1;
+}
+.password-eye-btn:hover { color: #555; }
+[data-theme="dark"] .password-eye-btn { color: #555; }
+[data-theme="dark"] .password-eye-btn:hover { color: #aaa; }

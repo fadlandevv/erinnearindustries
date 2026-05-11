@@ -1,6 +1,7 @@
 'use client'
 import { useActionState } from 'react'
 import { updateProfile, changePassword } from '@/lib/actions'
+import PasswordInput from '@/components/PasswordInput'
 
 function SuccessBanner({ msg }: { msg: string }) {
   return <div className="profile-success">{msg}</div>
@@ -42,16 +43,16 @@ export default function ProfileForm({ currentName }: { currentName: string }) {
         <form action={passAction} className="profile-form">
           <div className="profile-form-group">
             <label htmlFor="pf-old">Password Lama</label>
-            <input
-              id="pf-old" name="oldPassword" type="password" required
-              placeholder="••••••••" className="profile-input"
+            <PasswordInput
+              id="pf-old" name="oldPassword" required
+              placeholder="••••••••" inputClassName="profile-input"
             />
           </div>
           <div className="profile-form-group">
             <label htmlFor="pf-new">Password Baru</label>
-            <input
-              id="pf-new" name="newPassword" type="password" required
-              placeholder="Minimal 6 karakter" className="profile-input"
+            <PasswordInput
+              id="pf-new" name="newPassword" required
+              placeholder="Minimal 6 karakter" inputClassName="profile-input"
             />
           </div>
           <button type="submit" className="profile-save-btn" disabled={passPending}>

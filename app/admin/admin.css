@@ -1001,3 +1001,13 @@
 /* Gallery */
 [data-theme="dark"] .admin-gallery-card { background: #141414; border-color: #1e1e1e; }
 [data-theme="dark"] .admin-gallery-file-input { color: #888; }
+
+/* Password input with eye toggle */
+.password-input-wrap { position: relative; }
+.password-input-wrap .admin-form-input { padding-right: 2.5rem; }
+.password-eye-btn {
+  position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; color: #666; padding: 0;
+  display: flex; align-items: center; line-height: 1;
+}
+.password-eye-btn:hover { color: #bbb; }

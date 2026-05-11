@@ -3,6 +3,7 @@ import { useActionState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { loginUser } from '@/lib/actions'
+import PasswordInput from '@/components/PasswordInput'
 
 export default function LoginForm() {
   const [state, action, pending] = useActionState(loginUser, {})
@@ -26,9 +27,9 @@ export default function LoginForm() {
 
       <div className="auth-form-group">
         <label htmlFor="password">Password</label>
-        <input
-          id="password" name="password" type="password" required
-          placeholder="••••••••" className="auth-input"
+        <PasswordInput
+          id="password" name="password" required
+          placeholder="••••••••"
           autoComplete="current-password"
         />
       </div>
