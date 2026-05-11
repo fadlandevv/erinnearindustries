@@ -1,0 +1,24 @@
+import type { Metadata } from 'next'
+import { getProducts } from '@/lib/data'
+import { getStockMap, getStockLog } from '@/lib/warehouse'
+import WarehouseClient from './WarehouseClient'
+
+export const metadata: Metadata = { title: 'Warehouse — Erinnear CMS' }
+
+export default async function WarehousePage() {
+  const [products, stockMap, logs] = await Promise.all([
+    getProducts(),
+    getStockMap(),
+    getStockLog(),
+  ])
+
+  return (
+    <div className="admin-page">
+      <div className="admin-page-header">
+        <h1 className="admin-page-title">Warehouse</h1>
+        <p className="admin-page-subtitle">Monitor dan kelola stok barang katalog</p>
+      </div>
+      <WarehouseClient products={products} stockMap={stockMap} logs={logs} />
+    </div>
+  )
+}

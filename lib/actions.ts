@@ -13,6 +13,7 @@ import {
   getRoles, getRoleById, saveRole, deleteRole as _deleteRole,
   hashAdminPassword, verifyAdminPassword, type Permission,
 } from './rbac'
+import { adjustStock } from './warehouse'
 import { saveManualEntry, deleteManualEntry, type RekapSource } from './rekap'
 import { logAdminAccess } from './access-log'
 import { getPricingItems, upsertPricingItem, insertPricingItem, deletePricingItem } from './pricing'
@@ -596,4 +597,23 @@ export async function deletePricingItemAction(id: string): Promise<void> {
   await deletePricingItem(id)
   revalidatePath('/admin/pricing')
   revalidatePath('/custom')
+}
+
+export async function adjustStockAction(input: {
+  productId: string
+  productTitle: string
+  size: string
+  type: 'restock' | 'keluar' | 'koreksi'
+  amount: number
+  note: string
+}): Promise<{ error?: string }> {
+  const jar = await cookies()
+  const adminId = jar.get('admin-token')?.value
+  if (!adminId) return { error: 'Unauthorized' }
+  const admin = await getAdminById(adminId)
+  if (!admin) return { error: 'Unauthorized' }
+  return adjustStock(
+    input.productId, input.productTitle, input.size,
+    input.type, input.amount, input.note, admin.username,
+  )
 }

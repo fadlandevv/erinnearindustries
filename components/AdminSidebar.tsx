@@ -36,6 +36,13 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    group: 'Inventori',
+    icon: '▦',
+    items: [
+      { label: 'Warehouse', href: '/admin/warehouse', icon: '▦', permission: 'warehouse' },
+    ],
+  },
+  {
     group: 'Transaksi',
     icon: '◷',
     items: [
