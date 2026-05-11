@@ -17,7 +17,7 @@ export default function ForgotPasswordPage() {
         </p>
 
         <a
-          href="https://wa.me/6281234567890?text=Halo%2C+saya+lupa+password+akun+Erinnear+Industries.+Email+saya%3A+"
+          href="https://wa.me/6281283615836?text=Halo%2C+saya+lupa+password+akun+Erinnear+Industries.+Email+saya%3A+"
           target="_blank"
           rel="noopener noreferrer"
           className="auth-btn"
