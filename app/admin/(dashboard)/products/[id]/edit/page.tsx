@@ -36,17 +36,10 @@ export default async function EditProductPage({
             <div className="admin-product-info">
               <p className="admin-form-section-title">Informasi Produk</p>
 
-              <div className="admin-form-grid">
-                <div className="admin-form-group">
-                  <label htmlFor="title">Nama Produk *</label>
-                  <input id="title" name="title" type="text" className="admin-form-input"
-                    defaultValue={product.title} required />
-                </div>
-                <div className="admin-form-group">
-                  <label htmlFor="price">Harga *</label>
-                  <input id="price" name="price" type="text" className="admin-form-input"
-                    defaultValue={product.price} required />
-                </div>
+              <div className="admin-form-group">
+                <label htmlFor="title">Nama Produk *</label>
+                <input id="title" name="title" type="text" className="admin-form-input"
+                  defaultValue={product.title} required />
               </div>
 
               <div className="admin-form-grid">

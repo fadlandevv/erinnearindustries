@@ -87,7 +87,7 @@ export async function createProduct(formData: FormData) {
     id,
     tag: formData.get('tag') as string,
     title: formData.get('title') as string,
-    price: formData.get('price') as string,
+    price: '—',
     bg: colors[0] ?? '#f0ede8',
     colors: colors.length > 0 ? colors : undefined,
     description: formData.get('description') as string,
@@ -125,7 +125,7 @@ export async function updateProduct(id: string, formData: FormData) {
       ...p,
       tag: formData.get('tag') as string,
       title: formData.get('title') as string,
-      price: formData.get('price') as string,
+      price: p.price,
       bg: colors[0] ?? p.bg,
       colors: colors.length > 0 ? colors : p.colors,
       description: formData.get('description') as string,
@@ -616,4 +616,18 @@ export async function adjustStockAction(input: {
     input.productId, input.productTitle, input.size,
     input.type, input.amount, input.note, admin.username,
   )
+}
+
+export async function updateProductPriceAction(
+  productId: string,
+  price: string,
+): Promise<{ error?: string }> {
+  const jar = await cookies()
+  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+  const products = await getProducts()
+  const updated = products.map(p => p.id === productId ? { ...p, price } : p)
+  await saveProducts(updated)
+  revalidatePath('/product')
+  revalidatePath(`/product/${productId}`)
+  return {}
 }

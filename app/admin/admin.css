@@ -1093,3 +1093,21 @@
 [data-theme="dark"] .wh-edit-btn { background: #1a1a1a; border-color: #2a2a2a; color: #aaa; }
 [data-theme="dark"] .wh-edit-btn:hover { background: #222; color: #e8e8e8; }
 [data-theme="dark"] .wh-form-row td { background: #111 !important; }
+
+/* Warehouse — price column additions */
+.wh-product-name-wrap { display: flex; align-items: center; gap: 0.4rem; }
+.wh-price-edit-btn {
+  font-size: 0.75rem; padding: 0.1rem 0.35rem;
+  border: 1px solid #d1d5db; border-radius: 4px;
+  background: #fff; cursor: pointer; color: #888;
+  transition: background 0.12s, color 0.12s;
+  flex-shrink: 0;
+}
+.wh-price-edit-btn:hover, .wh-price-edit-btn.active { background: #f3f4f6; color: #111; }
+.wh-price-cell { white-space: nowrap; }
+.wh-price-val { font-weight: 600; font-size: 0.875rem; }
+.wh-price-unset { color: #bbb; font-size: 0.8rem; font-style: italic; }
+.wh-edit-btn.active { background: #f3f4f6; color: #111; border-color: #9ca3af; }
+
+[data-theme="dark"] .wh-price-edit-btn { background: #1a1a1a; border-color: #2a2a2a; color: #666; }
+[data-theme="dark"] .wh-price-edit-btn:hover, [data-theme="dark"] .wh-price-edit-btn.active { background: #222; color: #ccc; }
