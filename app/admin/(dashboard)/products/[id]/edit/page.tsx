@@ -109,28 +109,17 @@ export default async function EditProductPage({
         <form action={photosAction} encType="multipart/form-data">
           <p className="admin-form-section-title">Foto Produk</p>
 
-          <div className="admin-form-group">
-            <ImageUploadField
-              name="image"
-              label="Foto Utama"
-              current={product.image}
-              hint="Ditampilkan di kartu produk & halaman detail"
-            />
-          </div>
-
-          <div className="admin-form-group">
-            <label className="admin-form-label-text">Foto Detail (maks. 4)</label>
-            <p className="admin-form-hint">Galeri di halaman detail produk</p>
-            <div className="admin-detail-photos-grid admin-detail-photos-grid--2col">
-              {[0, 1, 2, 3].map(i => (
-                <ImageUploadField
-                  key={i}
-                  name={`detail-${i}`}
-                  label={`Detail ${i + 1}`}
-                  current={product.images?.[i] || undefined}
-                />
-              ))}
-            </div>
+          <p className="admin-form-hint" style={{ marginBottom: '0.75rem' }}>Foto pertama jadi foto utama produk</p>
+          <div className="admin-photos-5col">
+            <ImageUploadField name="image" label="1 — Utama" current={product.image} />
+            {[0, 1, 2, 3].map(i => (
+              <ImageUploadField
+                key={i}
+                name={`detail-${i}`}
+                label={`${i + 2}`}
+                current={product.images?.[i] || undefined}
+              />
+            ))}
           </div>
 
           <div className="admin-form-divider" />
