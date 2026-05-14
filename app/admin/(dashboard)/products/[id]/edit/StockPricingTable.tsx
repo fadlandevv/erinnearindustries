@@ -1,5 +1,5 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { Fragment, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { upsertSizeEntryAction } from '@/lib/actions'
 import type { SizeEntry } from '@/lib/warehouse'
@@ -43,17 +43,18 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
     if (isNaN(quantity) || quantity < 0) { setError('Stok tidak valid.'); return }
     setError('')
     startTransition(async () => {
-      const res = await upsertSizeEntryAction({
-        productId,
-        productTitle,
-        size,
-        quantity,
-        harga: parseRp(harga),
-        hpp: parseRp(hpp),
-      })
-      if (res?.error) { setError(res.error); return }
-      setActiveSize(null)
-      router.refresh()
+      try {
+        const res = await upsertSizeEntryAction({
+          productId, productTitle, size, quantity,
+          harga: parseRp(harga),
+          hpp: parseRp(hpp),
+        })
+        if (res?.error) { setError(res.error); return }
+        setActiveSize(null)
+        router.refresh()
+      } catch {
+        setError('Terjadi kesalahan. Pastikan tabel sudah dibuat di Supabase.')
+      }
     })
   }
 
@@ -73,7 +74,7 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
           <thead>
             <tr>
               <th style={{ width: 90 }}>Ukuran</th>
-              <th style={{ width: 100 }}>Stok</th>
+              <th style={{ width: 110 }}>Stok</th>
               <th style={{ width: 140 }}>Harga Jual</th>
               <th style={{ width: 140 }}>HPP</th>
               <th style={{ width: 90 }}>Aksi</th>
@@ -81,8 +82,8 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
           </thead>
           <tbody>
             {entries.map(entry => (
-              <>
-                <tr key={entry.size}>
+              <Fragment key={entry.size}>
+                <tr>
                   <td>
                     {entry.size !== '-'
                       ? <span className="wh-size-chip">{entry.size}</span>
@@ -103,6 +104,7 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
                   </td>
                   <td>
                     <button
+                      type="button"
                       className={`wh-edit-btn${activeSize === entry.size ? ' active' : ''}`}
                       onClick={() => openEdit(entry)}
                     >
@@ -112,7 +114,7 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
                 </tr>
 
                 {activeSize === entry.size && (
-                  <tr key={`${entry.size}-form`} className="wh-form-row">
+                  <tr className="wh-form-row">
                     <td colSpan={5}>
                       <div className="wh-inline-form">
                         <div className="wh-form-row-inner">
@@ -150,6 +152,7 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
                           <div className="wh-form-group wh-form-group-btn">
                             <label>&nbsp;</label>
                             <button
+                              type="button"
                               className="btn-admin-primary"
                               style={{ whiteSpace: 'nowrap' }}
                               disabled={isPending}
@@ -164,7 +167,7 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
                     </td>
                   </tr>
                 )}
-              </>
+              </Fragment>
             ))}
           </tbody>
         </table>

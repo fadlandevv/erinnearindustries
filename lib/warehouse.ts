@@ -59,10 +59,11 @@ export async function upsertSizeEntry(
   const currentQty: number = current?.quantity ?? 0
   const delta = quantity - currentQty
 
-  await db.from('warehouse_stock').upsert(
+  const { error: upsertErr } = await db.from('warehouse_stock').upsert(
     { product_id: productId, size, quantity, harga, hpp, updated_at: new Date().toISOString() },
     { onConflict: 'product_id,size' },
   )
+  if (upsertErr) return { error: upsertErr.message }
 
   if (delta !== 0) {
     await db.from('warehouse_log').insert({
@@ -124,10 +125,11 @@ export async function adjustStock(
 
   if (newQty < 0) return { error: 'Stok tidak bisa negatif.' }
 
-  await db.from('warehouse_stock').upsert(
+  const { error: upsertErr } = await db.from('warehouse_stock').upsert(
     { product_id: productId, size, quantity: newQty, updated_at: new Date().toISOString() },
     { onConflict: 'product_id,size' },
   )
+  if (upsertErr) return { error: upsertErr.message }
 
   await db.from('warehouse_log').insert({
     product_id: productId,

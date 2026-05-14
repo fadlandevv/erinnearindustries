@@ -15,10 +15,7 @@ export default async function EditProductPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const [product, sizeEntries] = await Promise.all([
-    getProductById(id),
-    getProductSizeEntries(id, []),
-  ])
+  const product = await getProductById(id)
   if (!product) notFound()
 
   const entries = await getProductSizeEntries(id, product.sizes)
