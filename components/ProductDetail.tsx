@@ -18,7 +18,6 @@ export default function ProductDetail({
   const [selectedColor, setSelectedColor] = useState<string | null>(
     product.colors?.[0] ?? null
   )
-  const [materialOpen, setMaterialOpen] = useState(false)
   const [showUSD, setShowUSD] = useState(false)
   const { addToCart } = useCart()
   const { t } = useLanguage()
@@ -123,37 +122,6 @@ export default function ProductDetail({
           <div className="product-detail-divider" />
 
           <p className="product-detail-desc">{product.description}</p>
-
-          {(() => {
-            const points = Array.isArray(product.material)
-              ? product.material
-              : [product.material]
-            return (
-              <>
-                <button
-                  className={`product-detail-meta${materialOpen ? ' product-detail-meta--open' : ''}`}
-                  onClick={() => setMaterialOpen((o) => !o)}
-                >
-                  <span>{pd.material}</span>
-                  <span className="product-detail-meta-right">
-                    {!materialOpen && (
-                      <span className="product-detail-meta-value">{points[0]}{points.length > 1 ? ` +${points.length - 1}` : ''}</span>
-                    )}
-                    <svg className="product-detail-meta-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </span>
-                </button>
-                {materialOpen && (
-                  <div className="product-detail-meta-body">
-                    <ul className="product-material-list">
-                      {points.map((p, i) => <li key={i}>{p}</li>)}
-                    </ul>
-                  </div>
-                )}
-              </>
-            )
-          })()}
 
           <div className="product-detail-divider" />
 
