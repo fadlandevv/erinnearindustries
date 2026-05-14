@@ -92,6 +92,7 @@ export async function createProduct(formData: FormData) {
     colors: colors.length > 0 ? colors : undefined,
     description: formData.get('description') as string,
     material: (formData.get('material') as string).split('\n').map((s) => s.trim()).filter(Boolean),
+    sizechart: (formData.get('sizechart') as string | null)?.trim() || undefined,
     sizes: formData.getAll('sizes') as string[],
     ...(image ? { image } : {}),
     ...(images.some(Boolean) ? { images } : {}),
@@ -647,6 +648,7 @@ export async function updateProductInfo(id: string, formData: FormData) {
       colors: colors.length > 0 ? colors : p.colors,
       description: formData.get('description') as string,
       material: (formData.get('material') as string).split('\n').map(s => s.trim()).filter(Boolean),
+      sizechart: (formData.get('sizechart') as string | null)?.trim() || undefined,
       sizes: formData.getAll('sizes') as string[],
       updatedAt: new Date().toISOString(),
     } : p

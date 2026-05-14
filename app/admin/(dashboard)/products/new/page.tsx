@@ -20,8 +20,10 @@ export default function NewProductPage() {
         <form action={createProduct} encType="multipart/form-data">
           <div className="admin-product-layout">
 
-            {/* ── Kiri: Informasi Produk ── */}
+            {/* ── Kiri ── */}
             <div className="admin-product-info">
+
+              {/* Section: Informasi Produk */}
               <p className="admin-form-section-title">Informasi Produk</p>
 
               <div className="admin-form-group">
@@ -30,31 +32,11 @@ export default function NewProductPage() {
                   placeholder="cth. Classic Oxford Shirt" required />
               </div>
 
-              <div className="admin-form-grid">
-                <div className="admin-form-group">
-                  <label htmlFor="tag">Tag *</label>
-                  <select id="tag" name="tag" className="admin-form-select" required>
-                    {tagOptions.map((t) => <option key={t} value={t}>{t}</option>)}
-                  </select>
-                </div>
-                <div className="admin-form-group">
-                  <label htmlFor="material">Material *</label>
-                  <textarea
-                    id="material"
-                    name="material"
-                    className="admin-form-textarea"
-                    rows={3}
-                    placeholder={"cth.\n100% Cotton Oxford\nBreathable & Lightweight"}
-                    required
-                  />
-                  <p className="admin-form-hint">Satu baris = satu poin material</p>
-                </div>
-              </div>
-
               <div className="admin-form-group">
-                <label htmlFor="description">Deskripsi *</label>
-                <textarea id="description" name="description" className="admin-form-textarea"
-                  placeholder="Deskripsikan produk ini..." required />
+                <label htmlFor="tag">Tag *</label>
+                <select id="tag" name="tag" className="admin-form-select" required>
+                  {tagOptions.map((t) => <option key={t} value={t}>{t}</option>)}
+                </select>
               </div>
 
               <div className="admin-form-group">
@@ -73,7 +55,35 @@ export default function NewProductPage() {
                 <label htmlFor="colors">Pilihan Warna</label>
                 <input id="colors" name="colors" type="text" className="admin-form-input"
                   placeholder="cth. #0d0d0d, #f5f2ec, #1a3a5c" />
-                <p className="admin-form-hint">Hex warna dipisah koma — tampil sebagai swatch di kartu produk</p>
+                <p className="admin-form-hint">Hex warna dipisah koma</p>
+              </div>
+
+              {/* Section: Detail Produk */}
+              <div className="admin-form-divider" />
+              <p className="admin-form-section-title">Detail Produk</p>
+
+              <div className="admin-form-group">
+                <label htmlFor="material">Material *</label>
+                <textarea
+                  id="material" name="material" className="admin-form-textarea" rows={3}
+                  placeholder={"cth.\n100% Cotton Oxford\nBreathable & Lightweight"}
+                  required
+                />
+                <p className="admin-form-hint">Satu baris = satu poin material</p>
+              </div>
+
+              <div className="admin-form-group">
+                <label htmlFor="sizechart">Size Chart</label>
+                <textarea
+                  id="sizechart" name="sizechart" className="admin-form-textarea" rows={4}
+                  placeholder={"cth.\nS  — Dada 96cm, Panjang 70cm\nM  — Dada 100cm, Panjang 72cm\nL  — Dada 104cm, Panjang 74cm\nXL — Dada 108cm, Panjang 76cm"}
+                />
+              </div>
+
+              <div className="admin-form-group">
+                <label htmlFor="description">Detail Produk *</label>
+                <textarea id="description" name="description" className="admin-form-textarea"
+                  placeholder="Deskripsikan produk ini..." required />
               </div>
             </div>
 

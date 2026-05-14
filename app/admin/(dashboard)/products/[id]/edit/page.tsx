@@ -32,9 +32,10 @@ export default async function EditProductPage({
         <Link href="/admin/products" className="btn-admin-secondary">← Kembali</Link>
       </div>
 
-      {/* ── Section 1: Informasi Produk ── */}
+      {/* ── Section 1: Informasi + Detail Produk ── */}
       <div className="admin-form-card">
         <form action={infoAction}>
+
           <p className="admin-form-section-title">Informasi Produk</p>
 
           <div className="admin-form-group">
@@ -43,29 +44,11 @@ export default async function EditProductPage({
               defaultValue={product.title} required />
           </div>
 
-          <div className="admin-form-grid">
-            <div className="admin-form-group">
-              <label htmlFor="tag">Tag *</label>
-              <select id="tag" name="tag" className="admin-form-select" defaultValue={product.tag} required>
-                {tagOptions.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
-            </div>
-            <div className="admin-form-group">
-              <label htmlFor="material">Material *</label>
-              <textarea
-                id="material" name="material" className="admin-form-textarea" rows={3}
-                defaultValue={Array.isArray(product.material) ? product.material.join('\n') : product.material}
-                placeholder={'cth.\n100% Cotton Oxford\nBreathable & Lightweight'}
-                required
-              />
-              <p className="admin-form-hint">Satu baris = satu poin material</p>
-            </div>
-          </div>
-
           <div className="admin-form-group">
-            <label htmlFor="description">Deskripsi *</label>
-            <textarea id="description" name="description" className="admin-form-textarea"
-              defaultValue={product.description} required />
+            <label htmlFor="tag">Tag *</label>
+            <select id="tag" name="tag" className="admin-form-select" defaultValue={product.tag} required>
+              {tagOptions.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
           </div>
 
           <div className="admin-form-group">
@@ -90,8 +73,37 @@ export default async function EditProductPage({
           </div>
 
           <div className="admin-form-divider" />
+          <p className="admin-form-section-title">Detail Produk</p>
+
+          <div className="admin-form-group">
+            <label htmlFor="material">Material *</label>
+            <textarea
+              id="material" name="material" className="admin-form-textarea" rows={3}
+              defaultValue={Array.isArray(product.material) ? product.material.join('\n') : product.material}
+              placeholder={'cth.\n100% Cotton Oxford\nBreathable & Lightweight'}
+              required
+            />
+            <p className="admin-form-hint">Satu baris = satu poin material</p>
+          </div>
+
+          <div className="admin-form-group">
+            <label htmlFor="sizechart">Size Chart</label>
+            <textarea
+              id="sizechart" name="sizechart" className="admin-form-textarea" rows={4}
+              defaultValue={product.sizechart ?? ''}
+              placeholder={'cth.\nS  — Dada 96cm, Panjang 70cm\nM  — Dada 100cm, Panjang 72cm\nL  — Dada 104cm, Panjang 74cm\nXL — Dada 108cm, Panjang 76cm'}
+            />
+          </div>
+
+          <div className="admin-form-group">
+            <label htmlFor="description">Detail Produk *</label>
+            <textarea id="description" name="description" className="admin-form-textarea"
+              defaultValue={product.description} required />
+          </div>
+
+          <div className="admin-form-divider" />
           <div className="admin-form-actions">
-            <button type="submit" className="btn-admin-primary">Simpan Info</button>
+            <button type="submit" className="btn-admin-primary">Simpan</button>
             <Link href="/admin/products" className="btn-admin-secondary">Batal</Link>
           </div>
         </form>
