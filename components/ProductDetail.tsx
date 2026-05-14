@@ -6,6 +6,18 @@ import { useCart } from '@/context/CartContext'
 import { useLanguage } from '@/context/LanguageContext'
 import ProductCard from './ProductCard'
 
+type SizeChartRow = { panjang: number; lebar: number }
+
+function parseSizechartRows(raw: string | undefined): [string, SizeChartRow][] {
+  if (!raw) return []
+  try {
+    const chart = JSON.parse(raw) as Record<string, SizeChartRow>
+    return Object.entries(chart).filter(([, v]) => v?.panjang || v?.lebar)
+  } catch {
+    return []
+  }
+}
+
 export default function ProductDetail({
   product,
   related,
@@ -209,36 +221,29 @@ export default function ProductDetail({
                   </ul>
                 </div>
               )}
-              {product.sizechart && (() => {
-                type Row = { panjang: number; lebar: number }
-                let chart: Record<string, Row> = {}
-                try { chart = JSON.parse(product.sizechart) } catch { return null }
-                const rows = Object.entries(chart).filter(([, v]) => v.panjang || v.lebar)
-                if (rows.length === 0) return null
-                return (
-                  <div className="pd-detail-col">
-                    <p className="pd-detail-sub">Size Chart</p>
-                    <table className="pd-sizechart-table">
-                      <thead>
-                        <tr>
-                          <th>Size</th>
-                          <th>Panjang</th>
-                          <th>Lebar</th>
+              {parseSizechartRows(product.sizechart).length > 0 && (
+                <div className="pd-detail-col">
+                  <p className="pd-detail-sub">Size Chart</p>
+                  <table className="pd-sizechart-table">
+                    <thead>
+                      <tr>
+                        <th>Size</th>
+                        <th>Panjang</th>
+                        <th>Lebar</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {parseSizechartRows(product.sizechart).map(([size, v]) => (
+                        <tr key={size}>
+                          <td>{size}</td>
+                          <td>{v.panjang} cm</td>
+                          <td>{v.lebar} cm</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {rows.map(([size, v]) => (
-                          <tr key={size}>
-                            <td>{size}</td>
-                            <td>{v.panjang} cm</td>
-                            <td>{v.lebar} cm</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )
-              })()}
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
         </div>
