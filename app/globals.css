@@ -1154,9 +1154,11 @@ p:last-child { margin-bottom: 0; }
 }
 
 .related-section {
-  padding-top: 4rem;
-  border-top: 1px solid #f0f0f0;
-  margin-top: 1rem;
+  background: #f8f7f5;
+  border: 1px solid #ede9e3;
+  border-radius: 24px;
+  padding: 2rem 2.5rem 2.5rem;
+  margin-top: 2rem;
 }
 .related-title {
   font-size: clamp(1.25rem, 2.5vw, 1.75rem);
@@ -3457,7 +3459,7 @@ p:last-child { margin-bottom: 0; }
 [data-theme="dark"] .pd-detail-sub { color: #555; }
 [data-theme="dark"] .pd-detail-material-list li { color: #aaa; }
 [data-theme="dark"] .pd-detail-sizechart { color: #aaa; }
-[data-theme="dark"] .related-section { border-top-color: #1e1e1e; }
+[data-theme="dark"] .related-section { background: #111; border-color: #1e1e1e; }
 [data-theme="dark"] .related-title { color: #f0ede8; }
 [data-theme="dark"] .product-detail-name { color: #f0ede8; }
 [data-theme="dark"] .product-detail-info { background: #111; border-color: #1e1e1e; }
