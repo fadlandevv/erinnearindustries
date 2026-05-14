@@ -1,5 +1,12 @@
 import { db } from './db'
 
+export type SizeEntry = {
+  size: string
+  quantity: number
+  harga: number | null
+  hpp: number | null
+}
+
 export type StockLogEntry = {
   id: string
   productId: string
@@ -11,6 +18,66 @@ export type StockLogEntry = {
   note: string
   adminUsername: string
   createdAt: string
+}
+
+export async function getProductSizeEntries(productId: string, sizes: string[]): Promise<SizeEntry[]> {
+  try {
+    const { data } = await db
+      .from('warehouse_stock')
+      .select('size,quantity,harga,hpp')
+      .eq('product_id', productId)
+    const map: Record<string, { quantity: number; harga: number | null; hpp: number | null }> = {}
+    for (const row of data ?? []) {
+      map[row.size] = { quantity: row.quantity, harga: row.harga ?? null, hpp: row.hpp ?? null }
+    }
+    const effectiveSizes = sizes.length > 0 ? sizes : ['-']
+    return effectiveSizes.map(size => ({
+      size,
+      quantity: map[size]?.quantity ?? 0,
+      harga: map[size]?.harga ?? null,
+      hpp: map[size]?.hpp ?? null,
+    }))
+  } catch { return (sizes.length > 0 ? sizes : ['-']).map(size => ({ size, quantity: 0, harga: null, hpp: null })) }
+}
+
+export async function upsertSizeEntry(
+  productId: string,
+  productTitle: string,
+  size: string,
+  quantity: number,
+  harga: number | null,
+  hpp: number | null,
+  adminUsername: string,
+): Promise<{ error?: string }> {
+  const { data: current } = await db
+    .from('warehouse_stock')
+    .select('quantity')
+    .eq('product_id', productId)
+    .eq('size', size)
+    .maybeSingle()
+
+  const currentQty: number = current?.quantity ?? 0
+  const delta = quantity - currentQty
+
+  await db.from('warehouse_stock').upsert(
+    { product_id: productId, size, quantity, harga, hpp, updated_at: new Date().toISOString() },
+    { onConflict: 'product_id,size' },
+  )
+
+  if (delta !== 0) {
+    await db.from('warehouse_log').insert({
+      product_id: productId,
+      product_title: productTitle,
+      size,
+      quantity_change: delta,
+      quantity_after: quantity,
+      type: 'koreksi',
+      note: 'Diperbarui dari halaman produk',
+      admin_username: adminUsername,
+    })
+  }
+
+  return {}
 }
 
 export async function getStockMap(): Promise<Record<string, number>> {
