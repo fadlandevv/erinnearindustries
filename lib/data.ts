@@ -95,13 +95,14 @@ export async function getProductById(id: string): Promise<Product | undefined> {
 
 export async function saveProducts(products: Product[]): Promise<void> {
   for (const p of products) {
-    await db.from('products').upsert({
+    const { error } = await db.from('products').upsert({
       id: p.id, tag: p.tag, title: p.title, price: p.price, bg: p.bg,
       colors: p.colors ?? null, description: p.description,
       material: Array.isArray(p.material) ? p.material : [p.material],
       sizes: p.sizes, sizechart: p.sizechart ?? null,
       image: p.image ?? null, images: p.images ?? null,
     })
+    if (error) throw new Error(error.message)
   }
 }
 

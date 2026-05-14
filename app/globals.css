@@ -940,7 +940,7 @@ p:last-child { margin-bottom: 0; }
   margin: 0;
   line-height: 1;
 }
-.product-detail-divider { height: 1px; background: #f0f0f0; margin: 1.125rem 0; }
+.product-detail-divider { height: 1px; background: #f0f0f0; margin: 16px 0; }
 .product-detail-desc {
   font-size: 0.9rem;
   color: #555;
