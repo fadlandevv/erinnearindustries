@@ -920,7 +920,7 @@ p:last-child { margin-bottom: 0; }
 .product-detail-info {
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: #f8f7f5;
   border: 1px solid #ede9e3;
   border-radius: 24px;
   padding: 2rem 2.5rem 2.5rem;
