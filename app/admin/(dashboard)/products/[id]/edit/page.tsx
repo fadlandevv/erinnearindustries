@@ -93,12 +93,31 @@ export default async function EditProductPage({
           </div>
 
           <div className="admin-form-group">
-            <label htmlFor="sizechart">Size Chart</label>
-            <textarea
-              id="sizechart" name="sizechart" className="admin-form-textarea" rows={4}
-              defaultValue={product.sizechart ?? ''}
-              placeholder={'cth.\nS  — Dada 96cm, Panjang 70cm\nM  — Dada 100cm, Panjang 72cm\nL  — Dada 104cm, Panjang 74cm\nXL — Dada 108cm, Panjang 76cm'}
-            />
+            <label>Size Chart</label>
+            {(() => {
+              let chart: Record<string, { panjang?: number; lebar?: number }> = {}
+              try { if (product.sizechart) chart = JSON.parse(product.sizechart) } catch {}
+              return (
+                <table className="admin-sizechart-table">
+                  <thead>
+                    <tr>
+                      <th>Ukuran</th>
+                      <th>Panjang (cm)</th>
+                      <th>Lebar (cm)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sizeOptions.map(size => (
+                      <tr key={size}>
+                        <td>{size}</td>
+                        <td><input name={`sc_p_${size}`} type="number" min={0} className="admin-sizechart-input" defaultValue={chart[size]?.panjang ?? ''} placeholder="—" /></td>
+                        <td><input name={`sc_l_${size}`} type="number" min={0} className="admin-sizechart-input" defaultValue={chart[size]?.lebar ?? ''} placeholder="—" /></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )
+            })()}
           </div>
 
           <div className="admin-form-divider" />

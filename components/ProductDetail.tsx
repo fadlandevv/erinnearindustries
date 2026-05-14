@@ -209,12 +209,36 @@ export default function ProductDetail({
                   </ul>
                 </div>
               )}
-              {product.sizechart && (
-                <div className="pd-detail-col">
-                  <p className="pd-detail-sub">Size Chart</p>
-                  <p className="pd-detail-sizechart">{product.sizechart}</p>
-                </div>
-              )}
+              {product.sizechart && (() => {
+                type Row = { panjang: number; lebar: number }
+                let chart: Record<string, Row> = {}
+                try { chart = JSON.parse(product.sizechart) } catch { return null }
+                const rows = Object.entries(chart).filter(([, v]) => v.panjang || v.lebar)
+                if (rows.length === 0) return null
+                return (
+                  <div className="pd-detail-col">
+                    <p className="pd-detail-sub">Size Chart</p>
+                    <table className="pd-sizechart-table">
+                      <thead>
+                        <tr>
+                          <th>Size</th>
+                          <th>Panjang</th>
+                          <th>Lebar</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rows.map(([size, v]) => (
+                          <tr key={size}>
+                            <td>{size}</td>
+                            <td>{v.panjang} cm</td>
+                            <td>{v.lebar} cm</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )
+              })()}
             </div>
           )}
         </div>

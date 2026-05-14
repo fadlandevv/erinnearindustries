@@ -19,6 +19,20 @@ import { logAdminAccess } from './access-log'
 import { getPricingItems, upsertPricingItem, insertPricingItem, deletePricingItem } from './pricing'
 import { generateId } from './utils'
 
+const ALL_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size']
+
+function parseSizechart(formData: FormData): string | undefined {
+  const chart: Record<string, { panjang: number; lebar: number }> = {}
+  for (const size of ALL_SIZES) {
+    const p = parseInt(formData.get(`sc_p_${size}`) as string)
+    const l = parseInt(formData.get(`sc_l_${size}`) as string)
+    if (!isNaN(p) || !isNaN(l)) {
+      chart[size] = { panjang: isNaN(p) ? 0 : p, lebar: isNaN(l) ? 0 : l }
+    }
+  }
+  return Object.keys(chart).length > 0 ? JSON.stringify(chart) : undefined
+}
+
 async function saveImage(file: File, productId: string, slot: string): Promise<string> {
   const dir = path.join(process.cwd(), 'public', 'products', productId)
   fs.mkdirSync(dir, { recursive: true })
@@ -92,7 +106,7 @@ export async function createProduct(formData: FormData) {
     colors: colors.length > 0 ? colors : undefined,
     description: formData.get('description') as string,
     material: ((formData.get('material') as string | null) ?? '').split('\n').map((s) => s.trim()).filter(Boolean),
-    sizechart: (formData.get('sizechart') as string | null)?.trim() || undefined,
+    sizechart: parseSizechart(formData),
     sizes: formData.getAll('sizes') as string[],
     ...(image ? { image } : {}),
     ...(images.some(Boolean) ? { images } : {}),
@@ -648,7 +662,7 @@ export async function updateProductInfo(id: string, formData: FormData) {
       colors: colors.length > 0 ? colors : p.colors,
       description: formData.get('description') as string,
       material: ((formData.get('material') as string | null) ?? '').split('\n').map(s => s.trim()).filter(Boolean),
-      sizechart: (formData.get('sizechart') as string | null)?.trim() || undefined,
+      sizechart: parseSizechart(formData),
       sizes: formData.getAll('sizes') as string[],
       updatedAt: new Date().toISOString(),
     } : p
