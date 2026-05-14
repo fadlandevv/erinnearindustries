@@ -1084,6 +1084,67 @@ p:last-child { margin-bottom: 0; }
   font-weight: 500;
 }
 
+/* ── Detail Produk section ── */
+.pd-detail-block {
+  padding-top: 3rem;
+  padding-bottom: 0.5rem;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 1rem;
+}
+.pd-detail-block-title {
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  color: #111;
+}
+.pd-detail-desc {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.75;
+  max-width: 680px;
+  margin-bottom: 1.5rem;
+}
+.pd-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+}
+.pd-detail-col { display: flex; flex-direction: column; gap: 0.5rem; }
+.pd-detail-sub {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #aaa;
+  font-weight: 600;
+}
+.pd-detail-material-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.pd-detail-material-list li {
+  font-size: 0.875rem;
+  color: #555;
+  padding-left: 0.9rem;
+  position: relative;
+}
+.pd-detail-material-list li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: #ccc;
+}
+.pd-detail-sizechart {
+  font-size: 0.875rem;
+  color: #555;
+  white-space: pre-line;
+  line-height: 1.85;
+}
+
 .related-section {
   padding-top: 4rem;
   border-top: 1px solid #f0f0f0;
@@ -3382,6 +3443,12 @@ p:last-child { margin-bottom: 0; }
 [data-theme="dark"] .size-btn { border-color: #2a2a2a; color: #888; background: transparent; }
 [data-theme="dark"] .size-btn:hover { border-color: #f0ede8; color: #f0ede8; }
 [data-theme="dark"] .size-btn-active { background: #f0ede8; border-color: #f0ede8; color: #0d0d0d; }
+[data-theme="dark"] .pd-detail-block { border-top-color: #1e1e1e; }
+[data-theme="dark"] .pd-detail-block-title { color: #f0ede8; }
+[data-theme="dark"] .pd-detail-desc { color: #aaa; }
+[data-theme="dark"] .pd-detail-sub { color: #555; }
+[data-theme="dark"] .pd-detail-material-list li { color: #aaa; }
+[data-theme="dark"] .pd-detail-sizechart { color: #aaa; }
 [data-theme="dark"] .related-section { border-top-color: #1e1e1e; }
 [data-theme="dark"] .related-title { color: #f0ede8; }
 [data-theme="dark"] .product-detail-name { color: #f0ede8; }

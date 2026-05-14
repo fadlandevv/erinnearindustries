@@ -224,6 +224,38 @@ export default function ProductDetail({
         </div>
       </div>
 
+      {/* Detail Produk */}
+      {(product.description || product.sizechart || (Array.isArray(product.material) ? product.material.length > 0 : !!product.material)) && (
+        <div className="pd-detail-block">
+          <h2 className="pd-detail-block-title">Detail Produk</h2>
+
+          {product.description && (
+            <p className="pd-detail-desc">{product.description}</p>
+          )}
+
+          {(product.sizechart || (Array.isArray(product.material) ? product.material.length > 0 : !!product.material)) && (
+            <div className="pd-detail-grid">
+              {(Array.isArray(product.material) ? product.material.length > 0 : !!product.material) && (
+                <div className="pd-detail-col">
+                  <p className="pd-detail-sub">Material</p>
+                  <ul className="pd-detail-material-list">
+                    {(Array.isArray(product.material) ? product.material : [product.material]).map((m, i) => (
+                      <li key={i}>{m}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {product.sizechart && (
+                <div className="pd-detail-col">
+                  <p className="pd-detail-sub">Size Chart</p>
+                  <p className="pd-detail-sizechart">{product.sizechart}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Related products */}
       {related.length > 0 && (
         <div className="related-section">
