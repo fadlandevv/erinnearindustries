@@ -21,7 +21,6 @@ const NAV_GROUPS: NavGroup[] = [
     group: 'Konten',
     icon: '✎',
     items: [
-      { label: 'Products', href: '/admin/products', icon: '◈', permission: 'products' },
       { label: 'Services', href: '/admin/services', icon: '✦', permission: 'services' },
       { label: 'Content',  href: '/admin/content',  icon: '✎', permission: 'content'  },
       { label: 'Showcase', href: '/admin/showcase', icon: '▣', permission: 'showcase' },
@@ -39,6 +38,7 @@ const NAV_GROUPS: NavGroup[] = [
     group: 'Inventori',
     icon: '▦',
     items: [
+      { label: 'Products', href: '/admin/products', icon: '◈', permission: 'products' },
       { label: 'Warehouse', href: '/admin/warehouse', icon: '▦', permission: 'warehouse' },
     ],
   },
