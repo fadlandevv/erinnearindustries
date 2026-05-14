@@ -225,13 +225,9 @@ export default function ProductDetail({
       </div>
 
       {/* Detail Produk */}
-      {(product.description || product.sizechart || (Array.isArray(product.material) ? product.material.length > 0 : !!product.material)) && (
+      {(product.sizechart || (Array.isArray(product.material) ? product.material.length > 0 : !!product.material)) && (
         <div className="pd-detail-block">
           <h2 className="pd-detail-block-title">Detail Produk</h2>
-
-          {product.description && (
-            <p className="pd-detail-desc">{product.description}</p>
-          )}
 
           {(product.sizechart || (Array.isArray(product.material) ? product.material.length > 0 : !!product.material)) && (
             <div className="pd-detail-grid">

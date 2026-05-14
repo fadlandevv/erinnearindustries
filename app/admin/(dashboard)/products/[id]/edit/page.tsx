@@ -72,6 +72,12 @@ export default async function EditProductPage({
             <p className="admin-form-hint">Hex warna dipisah koma</p>
           </div>
 
+          <div className="admin-form-group">
+            <label htmlFor="description">Deskripsi Produk *</label>
+            <textarea id="description" name="description" className="admin-form-textarea"
+              defaultValue={product.description} required />
+          </div>
+
           <div className="admin-form-divider" />
           <p className="admin-form-section-title">Detail Produk</p>
 
@@ -93,12 +99,6 @@ export default async function EditProductPage({
               defaultValue={product.sizechart ?? ''}
               placeholder={'cth.\nS  — Dada 96cm, Panjang 70cm\nM  — Dada 100cm, Panjang 72cm\nL  — Dada 104cm, Panjang 74cm\nXL — Dada 108cm, Panjang 76cm'}
             />
-          </div>
-
-          <div className="admin-form-group">
-            <label htmlFor="description">Detail Produk *</label>
-            <textarea id="description" name="description" className="admin-form-textarea"
-              defaultValue={product.description} required />
           </div>
 
           <div className="admin-form-divider" />

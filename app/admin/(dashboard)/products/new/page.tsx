@@ -58,6 +58,12 @@ export default function NewProductPage() {
                 <p className="admin-form-hint">Hex warna dipisah koma</p>
               </div>
 
+              <div className="admin-form-group">
+                <label htmlFor="description">Deskripsi Produk *</label>
+                <textarea id="description" name="description" className="admin-form-textarea"
+                  placeholder="Deskripsikan produk ini secara singkat..." required />
+              </div>
+
               {/* Section: Detail Produk */}
               <div className="admin-form-divider" />
               <p className="admin-form-section-title">Detail Produk</p>
@@ -78,12 +84,6 @@ export default function NewProductPage() {
                   id="sizechart" name="sizechart" className="admin-form-textarea" rows={4}
                   placeholder={"cth.\nS  — Dada 96cm, Panjang 70cm\nM  — Dada 100cm, Panjang 72cm\nL  — Dada 104cm, Panjang 74cm\nXL — Dada 108cm, Panjang 76cm"}
                 />
-              </div>
-
-              <div className="admin-form-group">
-                <label htmlFor="description">Detail Produk *</label>
-                <textarea id="description" name="description" className="admin-form-textarea"
-                  placeholder="Deskripsikan produk ini..." required />
               </div>
             </div>
 
