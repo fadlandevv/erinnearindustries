@@ -331,7 +331,7 @@ export default function OrdersClient({ orders, userMap, allMessages }: Props) {
                             {order.customer.address}, {order.customer.city} {order.customer.postalCode}
                           </span>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                        <div className="oh-card-foot-right">
                           <strong style={{ fontSize: '0.95rem' }}>
                             Rp {order.totalPrice.toLocaleString('id-ID')}
                           </strong>

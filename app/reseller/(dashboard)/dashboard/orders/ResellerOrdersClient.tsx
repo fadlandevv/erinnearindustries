@@ -248,10 +248,10 @@ export default function ResellerOrdersClient({ orders, initialMessages }: Props)
                   <div style={{ padding: '0.875rem 1.5rem', borderBottom: '1px solid #f4f4f4', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
                     <span style={{ fontSize: '0.65rem', color: '#bbb', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Penerima</span>
                     <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>{order.customerName}</span>
-                    {order.customerPhone && <span style={{ fontSize: '0.78rem', color: '#888' }}>{order.customerPhone}</span>}
-                    {order.customerAddress && <span style={{ fontSize: '0.78rem', color: '#888' }}>{order.customerAddress}</span>}
+                    {order.customerPhone && <span style={{ fontSize: '0.78rem', color: '#888', wordBreak: 'break-word' }}>{order.customerPhone}</span>}
+                    {order.customerAddress && <span style={{ fontSize: '0.78rem', color: '#888', wordBreak: 'break-word' }}>{order.customerAddress}</span>}
                     {order.note && (
-                      <span style={{ fontSize: '0.78rem', color: '#aaa', fontStyle: 'italic', marginTop: '0.15rem' }}>
+                      <span style={{ fontSize: '0.78rem', color: '#aaa', fontStyle: 'italic', marginTop: '0.15rem', wordBreak: 'break-word' }}>
                         Catatan: {order.note}
                       </span>
                     )}
@@ -273,15 +273,17 @@ export default function ResellerOrdersClient({ orders, initialMessages }: Props)
 
                   {/* Footer */}
                   <div className="oh-card-foot">
-                    {order.commission > 0 && (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
-                        <span className="oh-ship-label">Komisi</span>
-                        <strong style={{ fontSize: '0.9rem', color: '#16a34a' }}>{IDR(order.commission)}</strong>
+                    <div className="oh-card-foot-right">
+                      {order.commission > 0 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem', marginRight: 'auto' }}>
+                          <span className="oh-ship-label">Komisi</span>
+                          <strong style={{ fontSize: '0.9rem', color: '#16a34a' }}>{IDR(order.commission)}</strong>
+                        </div>
+                      )}
+                      <div className="oh-total-wrap">
+                        <span className="oh-total-label">Total</span>
+                        <strong className="oh-total-num">{IDR(order.totalPrice)}</strong>
                       </div>
-                    )}
-                    <div className="oh-total-wrap">
-                      <span className="oh-total-label">Total</span>
-                      <strong className="oh-total-num">{IDR(order.totalPrice)}</strong>
                     </div>
                   </div>
 

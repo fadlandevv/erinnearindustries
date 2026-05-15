@@ -2559,6 +2559,10 @@ p:last-child { margin-bottom: 0; }
 }
 .oh-total-label { font-size: 0.65rem; color: #bbb; text-transform: uppercase; letter-spacing: 0.06em; }
 .oh-total-num { font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; }
+.oh-card-foot-right {
+  display: flex; align-items: center; gap: 0.5rem;
+  flex-wrap: wrap; justify-content: flex-end;
+}
 
 /* Order chat icon button (header left) */
 .oh-chat-btn {
@@ -2746,8 +2750,9 @@ p:last-child { margin-bottom: 0; }
   .oh-card-head { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
   .oh-card-head-right { flex-wrap: wrap; gap: 0.5rem; width: 100%; }
   .oh-card-head-right .oh-detail-toggle { margin-left: auto; }
-  .oh-card-foot { flex-direction: column; align-items: flex-start; }
+  .oh-card-foot { flex-direction: column; align-items: stretch; }
   .oh-total-wrap { align-items: flex-start; }
+  .oh-card-foot-right { justify-content: flex-start; }
   .orders-section { padding: 2rem 0 4rem; }
 
   /* Chat layer at top, then icon col + card below */
