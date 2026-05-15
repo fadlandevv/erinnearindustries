@@ -2561,6 +2561,20 @@ p:last-child { margin-bottom: 0; }
 .oh-total-label { font-size: 0.65rem; color: #bbb; text-transform: uppercase; letter-spacing: 0.06em; }
 .oh-total-num { font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; }
 
+/* Order detail toggle */
+.oh-detail-toggle {
+  background: none;
+  border: 1px solid #d8d4cc;
+  border-radius: 8px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+  color: #555;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+.oh-detail-toggle:hover { background: #f5f2ec; border-color: #bbb; }
+
 /* Order discussion / chat */
 .od-chat { border-top: 1px solid #edeae4; margin-top: 1.25rem; padding-top: 1rem; }
 .od-chat-toggle {
