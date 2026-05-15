@@ -72,11 +72,9 @@ export default async function ResellerPage() {
             Bergabunglah dengan 35+ reseller aktif Erinnear Industries dan bangun bisnis fashion-mu sendiri dengan modal minimal dan margin yang menggiurkan.
           </p>
           <div className="reseller-hero-ctas">
-            <a href="#daftar" className="btn-dark">Daftar Sekarang →</a>
-            <a href="#tier" className="btn-outline">Lihat Program</a>
             {isLoggedIn
-              ? <Link href="/reseller/dashboard" className="btn-outline">Masuk ke Dashboard →</Link>
-              : <Link href="/reseller/login" className="btn-outline">Login Reseller</Link>
+              ? <Link href="/reseller/dashboard" className="btn-dark">Masuk ke Dashboard →</Link>
+              : <Link href="/reseller/login" className="btn-dark">Login Reseller</Link>
             }
           </div>
         </div>
