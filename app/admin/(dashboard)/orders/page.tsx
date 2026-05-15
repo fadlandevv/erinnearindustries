@@ -24,7 +24,7 @@ export default async function OrdersPage() {
         </div>
       </div>
 
-      <div className="admin-stats-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+      <div className="admin-stats-grid admin-stats-4col">
         <div className="admin-stat-card">
           <div className="admin-stat-num">{stats.total}</div>
           <div className="admin-stat-label">Total Pesanan</div>

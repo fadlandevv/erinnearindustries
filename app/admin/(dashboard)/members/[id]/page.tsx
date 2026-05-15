@@ -57,7 +57,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
         <Link href="/admin/members" className="btn-admin-secondary">← Kembali</Link>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '1.25rem', alignItems: 'start' }}>
+      <div className="admin-member-layout">
 
         {/* ── Kiri: profil + timeline ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -152,7 +152,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
           {/* Total spent */}
           <div className="admin-form-card">
             <p className="admin-form-section-title" style={{ marginBottom: '0.75rem' }}>Ringkasan</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.75rem' }}>
+            <div className="admin-3col-grid">
               <div style={{ background: 'var(--bg-muted,#f8f6f2)', borderRadius: 10, padding: '0.75rem 1rem' }}>
                 <div style={{ color: '#888', fontSize: '0.75rem', marginBottom: 4 }}>Total Pesanan</div>
                 <div style={{ fontWeight: 700, fontSize: '1.15rem' }}>{orders.length}</div>

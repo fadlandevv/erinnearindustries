@@ -712,6 +712,11 @@
 
   /* ── Grids ── */
   .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .admin-stats-4col { grid-template-columns: repeat(2, 1fr) !important; }
+  .admin-2col-grid { grid-template-columns: 1fr; }
+  .admin-3col-grid { grid-template-columns: repeat(2, 1fr); }
+  .admin-permissions-grid { grid-template-columns: repeat(2, 1fr); }
+  .admin-member-layout { grid-template-columns: 1fr; }
   .admin-quick-links { grid-template-columns: 1fr; }
   .admin-form-grid { grid-template-columns: 1fr; }
   .admin-form-card { padding: 1.5rem; }
@@ -753,6 +758,8 @@
 
   /* Stats 1 col */
   .admin-stats-grid { grid-template-columns: 1fr; }
+  .admin-stats-4col { grid-template-columns: repeat(2, 1fr) !important; }
+  .admin-3col-grid { grid-template-columns: 1fr; }
 
   /* Form actions stack */
   .admin-form-actions { flex-direction: column; }
@@ -792,6 +799,13 @@
   .admin-toast-wrap { bottom: 1rem; right: 1rem; left: 1rem; }
   .admin-toast { min-width: unset; max-width: 100%; }
 }
+
+/* ===== RESPONSIVE GRID UTILITIES ===== */
+.admin-stats-4col { grid-template-columns: repeat(4, 1fr) !important; }
+.admin-2col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.admin-3col-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+.admin-permissions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; padding: 0.25rem 0; }
+.admin-member-layout { display: grid; grid-template-columns: 300px 1fr; gap: 1.25rem; align-items: start; }
 
 /* ===== QUICK LINKS ===== */
 .admin-quick-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }

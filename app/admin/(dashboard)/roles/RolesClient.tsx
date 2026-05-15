@@ -14,7 +14,7 @@ function InlinePermissions({
   readOnly?: boolean
 }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', padding: '0.25rem 0' }}>
+    <div className="admin-permissions-grid">
       {ALL_PERMISSIONS.map(p => (
         <label
           key={p}

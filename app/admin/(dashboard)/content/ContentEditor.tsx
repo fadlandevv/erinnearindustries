@@ -73,7 +73,7 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
     return (
       <div className="admin-form-group" style={{ marginBottom: '1.25rem' }}>
         <label style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>{label}</label>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+        <div className="admin-2col-grid">
           <div>
             <span className="admin-form-hint" style={{ marginBottom: '0.25rem', display: 'block' }}>🇮🇩 Indonesia</span>
             {multiline
@@ -137,12 +137,12 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
                 <p className="admin-form-hint" style={{ marginBottom: '0.75rem', fontWeight: 600 }}>
                   Item #{idx + 1} — Angka: {content.id.stats?.items?.[idx]?.num}
                 </p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                <div className="admin-2col-grid" style={{ marginBottom: '0.75rem' }}>
                   <div className={grp}>
                     <label>Angka</label>
                     <input className={inp} value={content.id.stats?.items?.[idx]?.num ?? ''} onChange={e => { setStatItem('id', idx, 'num', e.target.value); setStatItem('en', idx, 'num', e.target.value) }} />
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                  <div className="admin-2col-grid" style={{ gap: '0.5rem' }}>
                     <div className={grp}>
                       <label>Unit 🇮🇩</label>
                       <input className={inp} value={content.id.stats?.items?.[idx]?.unit ?? ''} onChange={e => setStatItem('id', idx, 'unit', e.target.value)} />
@@ -153,7 +153,7 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
                     </div>
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div className="admin-2col-grid">
                   <div className={grp}>
                     <label>Deskripsi 🇮🇩</label>
                     <textarea className={ta} rows={2} value={content.id.stats?.items?.[idx]?.desc ?? ''} onChange={e => setStatItem('id', idx, 'desc', e.target.value)} />
@@ -212,7 +212,7 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
                 <p className="admin-form-hint" style={{ fontWeight: 600, marginBottom: '0.75rem' }}>
                   Step {content.id.servicePage?.steps?.[idx]?.num ?? idx + 1}
                 </p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                <div className="admin-2col-grid" style={{ marginBottom: '0.75rem' }}>
                   <div className={grp}>
                     <label>Judul 🇮🇩</label>
                     <input className={inp} value={content.id.servicePage?.steps?.[idx]?.title ?? ''} onChange={e => setStepField('id', idx, 'title', e.target.value)} />
@@ -222,7 +222,7 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
                     <input className={inp} value={content.en.servicePage?.steps?.[idx]?.title ?? ''} onChange={e => setStepField('en', idx, 'title', e.target.value)} />
                   </div>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div className="admin-2col-grid">
                   <div className={grp}>
                     <label>Deskripsi 🇮🇩</label>
                     <textarea className={ta} rows={2} value={content.id.servicePage?.steps?.[idx]?.desc ?? ''} onChange={e => setStepField('id', idx, 'desc', e.target.value)} />
