@@ -738,8 +738,12 @@ export async function upsertSizeEntryAction(input: {
   if (!adminId) return { error: 'Unauthorized' }
   const admin = await getAdminById(adminId)
   if (!admin) return { error: 'Unauthorized' }
-  return upsertSizeEntry(
+  const result = await upsertSizeEntry(
     input.productId, input.productTitle, input.size,
     input.quantity, input.harga, input.hpp, admin.username,
   )
+  if (!result.error) {
+    revalidatePath(`/admin/products/${input.productId}/edit`)
+  }
+  return result
 }

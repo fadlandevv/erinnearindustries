@@ -21,23 +21,22 @@ export type StockLogEntry = {
 }
 
 export async function getProductSizeEntries(productId: string, sizes: string[]): Promise<SizeEntry[]> {
-  try {
-    const { data } = await db
-      .from('warehouse_stock')
-      .select('size,quantity,harga,hpp')
-      .eq('product_id', productId)
-    const map: Record<string, { quantity: number; harga: number | null; hpp: number | null }> = {}
-    for (const row of data ?? []) {
-      map[row.size] = { quantity: row.quantity, harga: row.harga ?? null, hpp: row.hpp ?? null }
-    }
-    const effectiveSizes = sizes.length > 0 ? sizes : ['-']
-    return effectiveSizes.map(size => ({
-      size,
-      quantity: map[size]?.quantity ?? 0,
-      harga: map[size]?.harga ?? null,
-      hpp: map[size]?.hpp ?? null,
-    }))
-  } catch { return (sizes.length > 0 ? sizes : ['-']).map(size => ({ size, quantity: 0, harga: null, hpp: null })) }
+  const { data, error } = await db
+    .from('warehouse_stock')
+    .select('size,quantity,harga,hpp')
+    .eq('product_id', productId)
+  if (error) throw new Error(error.message)
+  const map: Record<string, { quantity: number; harga: number | null; hpp: number | null }> = {}
+  for (const row of data ?? []) {
+    map[row.size] = { quantity: row.quantity, harga: row.harga ?? null, hpp: row.hpp ?? null }
+  }
+  const effectiveSizes = sizes.length > 0 ? sizes : ['-']
+  return effectiveSizes.map(size => ({
+    size,
+    quantity: map[size]?.quantity ?? 0,
+    harga: map[size]?.harga ?? null,
+    hpp: map[size]?.hpp ?? null,
+  }))
 }
 
 export async function upsertSizeEntry(
