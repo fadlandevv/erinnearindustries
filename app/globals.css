@@ -2744,10 +2744,32 @@ p:last-child { margin-bottom: 0; }
 .oh-repay-error { font-size: 0.7rem; color: #dc2626; }
 
 @media (max-width: 640px) {
-  .oh-card-head { flex-wrap: wrap; }
+  .oh-card-head { flex-wrap: wrap; gap: 0.5rem; }
+  .oh-card-head-right { flex-wrap: wrap; gap: 0.5rem; }
   .oh-card-foot { flex-direction: column; align-items: flex-start; }
   .oh-total-wrap { align-items: flex-start; }
   .orders-section { padding: 2rem 0 4rem; }
+
+  /* Chat layer: stack below card on mobile instead of side-by-side */
+  .oh-card-wrapper { flex-wrap: wrap; align-items: flex-start; }
+  .oh-chat-icon-col { order: 1; padding-top: 0.65rem; }
+  .oh-card-wrapper .oh-card { order: 2; }
+  .oh-chat-layer {
+    order: 3;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    border-radius: 16px;
+    animation: none;
+  }
+  /* Parent is height:auto on mobile — drop flex:1, use fixed max-height */
+  .od-chat-bare { flex: none; }
+  .od-chat-bare .od-chat-body {
+    flex: none;
+    max-height: 220px;
+    margin-right: 0;
+    padding-right: 0;
+  }
 }
 
 /* ===== CHECKOUT FORM IMPROVEMENTS ===== */
