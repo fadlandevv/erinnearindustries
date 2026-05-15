@@ -45,7 +45,27 @@ export default function OrderCard({ order, messages }: Props) {
 
   return (
     <div className="oh-card-wrapper">
-      {/* Chat panel — left layer */}
+
+      {/* ── Standalone chat icon column ── */}
+      <div className="oh-chat-icon-col">
+        <button
+          type="button"
+          className={`oh-chat-btn${chatOpen ? ' oh-chat-btn--active' : ''}${!open ? ' oh-chat-btn--muted' : ''}`}
+          onClick={toggleChat}
+          disabled={!open}
+          aria-label="Diskusi"
+        >
+          {adminCount > 0 && !chatOpen && <span className="oh-chat-btn-dot" />}
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path
+              d="M2 2.5C2 1.67 2.67 1 3.5 1h8C12.33 1 13 1.67 13 2.5v7c0 .83-.67 1.5-1.5 1.5H5.5L2 13V2.5z"
+              stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
+
+      {/* ── Chat panel ── */}
       {open && chatOpen && (
         <div className="oh-chat-layer">
           <p className="oh-chat-layer-label">Diskusi</p>
@@ -53,33 +73,17 @@ export default function OrderCard({ order, messages }: Props) {
         </div>
       )}
 
-      {/* Main card */}
+      {/* ── Main card ── */}
       <div className="oh-card">
-        {/* Header */}
+
+        {/* Header — always visible */}
         <div className="oh-card-head">
           <div className="oh-card-head-left">
-            <button
-              type="button"
-              className={`oh-chat-btn${chatOpen ? ' oh-chat-btn--active' : ''}${!open ? ' oh-chat-btn--muted' : ''}`}
-              onClick={toggleChat}
-              disabled={!open}
-              aria-label="Diskusi"
-            >
-              {adminCount > 0 && !chatOpen && <span className="oh-chat-btn-dot" />}
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                <path
-                  d="M2 2.5C2 1.67 2.67 1 3.5 1h8C12.33 1 13 1.67 13 2.5v7c0 .83-.67 1.5-1.5 1.5H5.5L2 13V2.5z"
-                  stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-
             <div className="oh-card-head-info">
               <code className="oh-order-id">{order.id.slice(-6).toUpperCase()}</code>
               <span className="oh-order-date">{formatDate(order.createdAt)}</span>
             </div>
           </div>
-
           <div className="oh-card-head-right">
             <span className={`oh-badge ${st.cls}`}>{st.label}</span>
             {order.status === 'pending' && <RepayButton orderId={order.id} />}
@@ -101,9 +105,9 @@ export default function OrderCard({ order, messages }: Props) {
           </div>
         </div>
 
-        {/* Detail body */}
+        {/* Body — fills card height when open */}
         {open && (
-          <>
+          <div className="oh-card-body-fill">
             <div className="oh-items">
               {order.items.map((item, i) => (
                 <div key={i} className="oh-item">
@@ -137,10 +141,10 @@ export default function OrderCard({ order, messages }: Props) {
                 </strong>
               </div>
             </div>
-          </>
+          </div>
         )}
-      </div>
 
+      </div>
     </div>
   )
 }
