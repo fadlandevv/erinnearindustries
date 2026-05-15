@@ -113,6 +113,7 @@ export default function InfoForm({ product, sizechartData }: Props) {
               </tbody>
             </table>
           </div>
+        </div>
 
         <div className="admin-form-divider" />
         <div className="admin-form-actions">

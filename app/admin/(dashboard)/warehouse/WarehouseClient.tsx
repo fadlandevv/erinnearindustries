@@ -286,7 +286,7 @@ export default function WarehouseClient({ products, stockMap, logs }: Props) {
               placeholder="Cari nama produk atau tag..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{ maxWidth: 300 }}
+            />
           </div>
 
           {filtered.length === 0 ? (
