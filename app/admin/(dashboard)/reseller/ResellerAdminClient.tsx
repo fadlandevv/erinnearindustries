@@ -120,11 +120,10 @@ function CreateResellerForm({ onCreated }: { onCreated: () => void }) {
   const [state, action, isPending] = useActionState(createResellerAction, {})
 
   useEffect(() => {
-    if (!state) return
-    if (!state.error) {
+    if (state.ok) {
       toast('Akun reseller berhasil dibuat')
       onCreated()
-    } else {
+    } else if (state.error) {
       toast(state.error, 'error')
     }
   }, [state])
