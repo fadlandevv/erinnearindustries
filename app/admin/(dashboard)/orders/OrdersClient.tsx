@@ -36,6 +36,9 @@ export default function OrdersClient({ orders, userMap }: Props) {
   const [year, setYear]         = useState('all')
   const [month, setMonth]       = useState('all')
   const [sort, setSort]         = useState<'newest' | 'oldest'>('newest')
+  const [source, setSource]     = useState<'all' | 'reseller' | 'customer'>('all')
+
+  const isReseller = (o: Order) => o.customer.email.endsWith('@reseller.internal')
 
   const years = useMemo(() => {
     const ys = new Set(orders.map(o => new Date(o.createdAt).getFullYear()))
@@ -50,6 +53,9 @@ export default function OrdersClient({ orders, userMap }: Props) {
 
   const filtered = useMemo(() => {
     let res = [...orders]
+
+    if (source === 'reseller') res = res.filter(isReseller)
+    if (source === 'customer') res = res.filter(o => !isReseller(o))
 
     if (year !== 'all')
       res = res.filter(o => new Date(o.createdAt).getFullYear() === Number(year))
@@ -71,12 +77,14 @@ export default function OrdersClient({ orders, userMap }: Props) {
     })
 
     return res
-  }, [orders, year, month, sort, search])
+  }, [orders, year, month, sort, search, source])
 
   function handleYearChange(v: string) {
     setYear(v)
     setMonth('all')
   }
+
+  const isFiltering = search || year !== 'all' || month !== 'all' || source !== 'all'
 
   return (
     <>
@@ -93,6 +101,11 @@ export default function OrdersClient({ orders, userMap }: Props) {
           className="admin-search-input"
           style={{ flex: '1 1 200px', minWidth: 0 }}
         />
+        <select value={source} onChange={e => setSource(e.target.value as typeof source)} className="admin-select-inline">
+          <option value="all">Semua Tipe</option>
+          <option value="customer">Customer</option>
+          <option value="reseller">Reseller</option>
+        </select>
         <select value={year} onChange={e => handleYearChange(e.target.value)} className="admin-select-inline">
           <option value="all">Semua Tahun</option>
           {years.map(y => <option key={y} value={y}>{y}</option>)}
@@ -108,7 +121,7 @@ export default function OrdersClient({ orders, userMap }: Props) {
       </div>
 
       {/* Result count */}
-      {(search || year !== 'all' || month !== 'all') && (
+      {isFiltering && (
         <p style={{ fontSize: '0.8rem', color: '#aaa', marginBottom: '0.75rem' }}>
           {filtered.length} dari {orders.length} pesanan
         </p>
