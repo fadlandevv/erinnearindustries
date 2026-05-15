@@ -144,11 +144,15 @@ export default function OrdersClient({ orders, userMap }: Props) {
                     <div style={{ fontWeight: 600, fontSize: '0.875rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {order.customer.name}
                     </div>
-                    {userMap[order.customer.email.toLowerCase()] && (
+                    {order.customer.email.endsWith('@reseller.internal') ? (
+                      <div style={{ fontSize: '0.7rem', color: '#16a34a', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                        ◈ {order.customer.notes?.replace('via reseller: ', '') ?? 'Reseller'}
+                      </div>
+                    ) : userMap[order.customer.email.toLowerCase()] ? (
                       <div style={{ fontSize: '0.72rem', color: '#aaa', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
                         #{userMap[order.customer.email.toLowerCase()].slice(-8).toUpperCase()}
                       </div>
-                    )}
+                    ) : null}
                   </td>
                   <td>
                     <div style={{ fontSize: '0.82rem', color: '#555' }}>

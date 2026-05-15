@@ -3,7 +3,7 @@ import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { getProducts, saveProducts, getServices, saveServices, getGallery, saveGallery, getShowcase, saveShowcase, saveContent, type ContentData } from './data'
-import { saveOrder, getOrdersByEmail, deleteOrder, updateOrderStatus, type OrderItem, type Order } from './orders'
+import { saveOrder, getOrderById, getOrdersByEmail, deleteOrder, updateOrderStatus, type OrderItem, type Order } from './orders'
 import { createSnapToken } from './midtrans'
 import { getUserByEmail, saveUser, updateUser, deleteUser, hashPassword, verifyPassword, createResetToken, validateAndConsumeResetToken } from './users'
 import {
@@ -385,13 +385,35 @@ export async function adminUpdateOrderStatus(orderId: string, status: Order['sta
   revalidatePath('/admin/orders')
 }
 
+function resellerStatusToOrderStatus(s: ResellerOrderStatus): Order['status'] {
+  if (s === 'delivered') return 'paid'
+  if (s === 'cancelled') return 'failed'
+  if (s === 'shipped') return 'shipped'
+  if (s === 'confirmed' || s === 'processing') return 'processing'
+  return 'pending'
+}
+
+function orderStatusToResellerStatus(s: Order['status']): ResellerOrderStatus {
+  if (s === 'paid' || s === 'delivered') return 'delivered'
+  if (s === 'failed' || s === 'expired') return 'cancelled'
+  if (s === 'shipped') return 'shipped'
+  if (s === 'processing') return 'processing'
+  return 'pending'
+}
+
 export async function updateOrderStatusFormAction(formData: FormData) {
   const jar = await cookies()
   if (!jar.get('admin-token')) return
   const orderId = formData.get('orderId') as string
   const status = formData.get('status') as Order['status']
   await updateOrderStatus(orderId, status)
+  // Sync back to reseller_orders if this is a reseller order
+  const order = await getOrderById(orderId)
+  if (order?.customer.email.endsWith('@reseller.internal')) {
+    await updateResellerOrderStatus(orderId, orderStatusToResellerStatus(status))
+  }
   revalidatePath('/admin/orders')
+  revalidatePath('/admin/reseller')
 }
 
 export async function renewSnapToken(orderId: string): Promise<{ snapToken: string } | { error: string }> {
@@ -811,9 +833,11 @@ export async function createResellerOrderAction(
     if (!items.length) return { error: 'Keranjang kosong.' }
 
     const totalPrice = items.reduce((s, i) => s + i.subtotal, 0)
+    const orderId = generateId(10)
+    const createdAt = new Date().toISOString()
 
     await saveResellerOrder({
-      id: generateId(10),
+      id: orderId,
       resellerId: reseller.id,
       resellerUsername: reseller.username,
       customerName,
@@ -824,12 +848,41 @@ export async function createResellerOrderAction(
       commission: 0,
       status: 'pending',
       note: '',
-      createdAt: new Date().toISOString(),
+      createdAt,
+    })
+
+    // Mirror into main orders table so it counts toward revenue and admin status tracking
+    const IDR = (n: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
+    await saveOrder({
+      id: orderId,
+      createdAt,
+      status: 'pending',
+      customer: {
+        name: customerName,
+        email: `reseller:${reseller.username}@reseller.internal`,
+        phone: customerPhone,
+        address: customerAddress,
+        city: '',
+        postalCode: '',
+        notes: `via reseller: ${reseller.username}`,
+      },
+      items: items.map(i => ({
+        productId: i.productId,
+        title: i.title,
+        price: IDR(i.unitPrice),
+        unitPrice: i.unitPrice,
+        size: i.size,
+        quantity: i.qty,
+        bg: '',
+      } satisfies OrderItem)),
+      totalPrice,
+      snapToken: '',
     })
 
     revalidatePath('/reseller/dashboard/orders')
     revalidatePath('/reseller/dashboard')
     revalidatePath('/admin/reseller')
+    revalidatePath('/admin/orders')
     return { ok: true }
   } catch (e) {
     console.error(e)
@@ -893,7 +946,10 @@ export async function updateResellerOrderStatusAction(
   const commission = parseInt(commissionRaw, 10) || 0
 
   await updateResellerOrderStatus(id, status, commission)
+  // Sync status to main orders table
+  await updateOrderStatus(id, resellerStatusToOrderStatus(status))
   revalidatePath('/admin/reseller')
+  revalidatePath('/admin/orders')
   return {}
 }
 
