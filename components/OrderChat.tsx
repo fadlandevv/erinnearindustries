@@ -37,7 +37,7 @@ export default function OrderChat({ orderId, initialMessages, bare = false }: Pr
   const adminCount = initialMessages.filter(m => m.sender === 'admin').length
 
   return (
-    <div className={bare ? undefined : 'od-chat'}>
+    <div className={bare ? 'od-chat-bare' : 'od-chat'}>
       {!bare && (
         <button type="button" className="od-chat-toggle" onClick={() => setOpen(o => !o)}>
           💬 Diskusi

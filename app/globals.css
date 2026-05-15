@@ -2614,6 +2614,19 @@ p:last-child { margin-bottom: 0; }
   padding: 14px 14px 12px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.07);
   animation: oh-slide-in 0.18s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bare chat (inside layer) fills panel height */
+.od-chat-bare {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.od-chat-bare .od-chat-body {
+  flex: 1;
+  max-height: none;
 }
 .oh-chat-layer-label {
   font-size: 0.7rem; font-weight: 600; color: #bbb;
