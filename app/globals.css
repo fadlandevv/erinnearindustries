@@ -2333,7 +2333,8 @@ p:last-child { margin-bottom: 0; }
   border-bottom: 1px solid #f4f4f4;
   gap: 1rem;
 }
-.oh-card-head-left { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; flex: 1; }
+.oh-card-head-left { display: flex; flex-direction: row; align-items: center; gap: 0.65rem; min-width: 0; flex: 1; }
+.oh-card-head-info { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
 .oh-card-head-right {
   display: flex;
   align-items: center;

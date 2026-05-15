@@ -61,8 +61,10 @@ export default function OrderCard({ order, messages }: Props) {
             </svg>
           </button>
 
-          <code className="oh-order-id">{order.id.slice(-6).toUpperCase()}</code>
-          <span className="oh-order-date">{formatDate(order.createdAt)}</span>
+          <div className="oh-card-head-info">
+            <code className="oh-order-id">{order.id.slice(-6).toUpperCase()}</code>
+            <span className="oh-order-date">{formatDate(order.createdAt)}</span>
+          </div>
         </div>
 
         <div className="oh-card-head-right">
