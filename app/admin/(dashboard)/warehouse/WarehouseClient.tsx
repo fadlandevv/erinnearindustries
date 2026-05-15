@@ -282,12 +282,11 @@ export default function WarehouseClient({ products, stockMap, logs }: Props) {
           <div style={{ marginBottom: '1rem' }}>
             <input
               type="text"
-              className="admin-form-input"
+              className="admin-form-input wh-search-bar"
               placeholder="Cari nama produk atau tag..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{ maxWidth: 300 }}
-            />
           </div>
 
           {filtered.length === 0 ? (

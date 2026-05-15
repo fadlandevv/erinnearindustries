@@ -136,8 +136,7 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
                             <label>Harga Jual (Rp)</label>
                             <input
                               type="text"
-                              className="admin-form-input"
-                              style={{ width: 130 }}
+                              className="admin-form-input wh-price-input"
                               placeholder="cth. 150000"
                               value={harga}
                               onChange={e => setHarga(e.target.value)}
@@ -147,8 +146,7 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
                             <label>HPP (Rp)</label>
                             <input
                               type="text"
-                              className="admin-form-input"
-                              style={{ width: 130 }}
+                              className="admin-form-input wh-price-input"
                               placeholder="cth. 80000"
                               value={hpp}
                               onChange={e => setHpp(e.target.value)}

@@ -669,14 +669,21 @@
 
 /* ===== RESPONSIVE ADMIN ===== */
 @media (max-width: 768px) {
+  /* ── Core layout fix: stack header above content ── */
+  .admin-layout-wrapper { flex-direction: column; }
+  .admin-content { margin-left: 0; width: 100%; min-height: 0; flex: 1; }
+
+  /* ── Sidebar slides in as overlay ── */
   .admin-sidebar {
     transform: translateX(-100%);
     transition: transform 0.25s ease;
     z-index: 999;
+    width: 260px;
   }
   .admin-sidebar.admin-sidebar-open { transform: translateX(0); }
   .admin-sidebar-close { display: block; }
 
+  /* ── Mobile top bar ── */
   .admin-mobile-header {
     display: flex;
     align-items: center;
@@ -692,17 +699,21 @@
     font-weight: 700;
     letter-spacing: -0.02em;
     flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
   .admin-mobile-brand { display: flex; align-items: center; gap: 0.5rem; }
 
-  .admin-content { margin-left: 0; }
+  /* ── Page padding ── */
   .admin-main { padding: 1.25rem; }
 
+  /* ── Grids ── */
   .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
   .admin-quick-links { grid-template-columns: 1fr; }
   .admin-form-grid { grid-template-columns: 1fr; }
   .admin-form-card { padding: 1.5rem; }
 
+  /* ── Page header ── */
   .admin-page-header {
     flex-direction: column;
     align-items: flex-start;
@@ -711,22 +722,25 @@
   }
   .admin-page-title { font-size: 1.25rem; }
 
-  /* Tables — horizontal scroll with touch momentum */
-  .admin-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .admin-table { min-width: 580px; }
+  /* ── Tables ── */
+  .admin-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+  .admin-table { min-width: 560px; }
+  .wh-table { min-width: 640px; }
 
-  /* Warehouse table is wider */
-  .wh-table { min-width: 720px; }
-
-  /* Warehouse — inline edit form stacks nicely on tablet */
-  .wh-form-row-inner { gap: 0.5rem; }
-  .wh-select { min-width: 160px; }
-
-  /* Sizechart table in form */
+  /* ── Sizechart ── */
   .admin-sizechart-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-  /* Order status form wraps */
+  /* ── Warehouse search full-width ── */
+  .wh-search-bar { max-width: 100% !important; width: 100% !important; }
+
+  /* ── Warehouse inline form ── */
+  .wh-form-row-inner { gap: 0.5rem; }
+
+  /* ── Order filter bar wraps ── */
   .admin-order-status-form { flex-wrap: wrap; }
+
+  /* ── Showcase ── */
+  .admin-showcase-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
@@ -734,7 +748,7 @@
   .admin-form-card { padding: 1.125rem; }
   .admin-login-card { padding: 1.75rem; }
 
-  /* Stats single col on very small */
+  /* Stats 1 col */
   .admin-stats-grid { grid-template-columns: 1fr; }
 
   /* Form actions stack */
@@ -742,7 +756,11 @@
   .admin-form-actions .btn-admin-primary,
   .admin-form-actions .btn-admin-secondary { width: 100%; justify-content: center; }
 
-  /* Photos grid: 3 col then overflow scroll */
+  /* Page header button full width */
+  .admin-page-header > a,
+  .admin-page-header > button { width: 100%; justify-content: center; }
+
+  /* Photos grid scrolls */
   .admin-photos-5col {
     grid-template-columns: repeat(3, 80px);
     overflow-x: auto;
@@ -750,7 +768,7 @@
     padding-bottom: 0.25rem;
   }
 
-  /* Warehouse inline edit — stack vertically */
+  /* Warehouse inline edit stacks */
   .wh-form-row-inner { flex-direction: column; align-items: stretch; }
   .wh-num-input { width: 100%; }
   .wh-form-group { width: 100%; }
@@ -758,18 +776,18 @@
   .wh-form-group-btn .btn-admin-primary { width: 100%; justify-content: center; }
   .wh-select { min-width: unset; width: 100%; }
 
-  /* Warehouse stats 2 col */
+  /* Warehouse stats */
   .wh-stats { grid-template-columns: repeat(2, 1fr); }
 
-  /* Sizechart inputs narrower */
-  .admin-sizechart-input { width: 64px; }
+  /* Gallery 1 col */
+  .admin-gallery-grid { grid-template-columns: 1fr; }
 
-  /* Toast inset on small screens */
+  /* Sizechart input */
+  .admin-sizechart-input { width: 60px; font-size: 0.8rem; }
+
+  /* Toast */
   .admin-toast-wrap { bottom: 1rem; right: 1rem; left: 1rem; }
   .admin-toast { min-width: unset; max-width: 100%; }
-
-  /* Page header action buttons full width */
-  .admin-page-header .btn-admin-secondary { width: 100%; justify-content: center; }
 }
 
 /* ===== QUICK LINKS ===== */
@@ -1178,6 +1196,7 @@
 .wh-form-group-btn { min-width: 90px; }
 .wh-select { min-width: 200px; }
 .wh-num-input { width: 90px; }
+.wh-price-input { width: 130px; }
 
 /* dark mode */
 [data-theme="dark"] .wh-stat-card { background: #141414; border-color: #1e1e1e; }
