@@ -18,12 +18,12 @@ import { getPricingItems, upsertPricingItem, insertPricingItem, deletePricingIte
 import { generateId } from './utils'
 import { db } from './db'
 
-const ALL_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size']
-
 function parseSizechart(formData: FormData): string | undefined {
   const chart: Record<string, { panjang: number; lebar: number }> = {}
-  for (const size of ALL_SIZES) {
-    const p = parseInt(formData.get(`sc_p_${size}`) as string)
+  for (const [key, value] of formData.entries()) {
+    if (!key.startsWith('sc_p_')) continue
+    const size = key.slice(5)
+    const p = parseInt(value as string)
     const l = parseInt(formData.get(`sc_l_${size}`) as string)
     if (!isNaN(p) || !isNaN(l)) {
       chart[size] = { panjang: isNaN(p) ? 0 : p, lebar: isNaN(l) ? 0 : l }
@@ -689,6 +689,7 @@ export async function updateProductInfo(
     await saveProducts(updated)
     revalidatePath('/product')
     revalidatePath(`/product/${id}`)
+    revalidatePath(`/admin/products/${id}/edit`)
     return { ok: true }
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Gagal menyimpan' }
