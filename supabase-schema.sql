@@ -197,7 +197,10 @@ create table if not exists order_messages (
   sender text not null check (sender in ('customer', 'admin')),
   sender_name text not null,
   message text not null,
+  is_read boolean default false,
   created_at timestamptz default now()
 );
+
+alter table order_messages add column if not exists is_read boolean default false;
 
 create index if not exists order_messages_order_idx on order_messages (order_id, created_at);

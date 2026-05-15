@@ -6,6 +6,7 @@ export type OrderMessage = {
   sender: 'customer' | 'admin'
   senderName: string
   message: string
+  isRead: boolean
   createdAt: string
 }
 
@@ -16,6 +17,7 @@ function toMsg(row: Record<string, unknown>): OrderMessage {
     sender: row.sender as 'customer' | 'admin',
     senderName: row.sender_name as string,
     message: row.message as string,
+    isRead: (row.is_read as boolean) ?? false,
     createdAt: row.created_at as string,
   }
 }
@@ -41,7 +43,7 @@ export async function getMessagesByOrderIds(orderIds: string[]): Promise<OrderMe
   return (data ?? []).map(toMsg)
 }
 
-export async function sendOrderMessage(msg: Omit<OrderMessage, 'createdAt'>): Promise<void> {
+export async function sendOrderMessage(msg: Omit<OrderMessage, 'createdAt' | 'isRead'>): Promise<void> {
   const { error } = await db.from('order_messages').insert({
     id: msg.id,
     order_id: msg.orderId,
@@ -49,5 +51,15 @@ export async function sendOrderMessage(msg: Omit<OrderMessage, 'createdAt'>): Pr
     sender_name: msg.senderName,
     message: msg.message,
   })
+  if (error) throw new Error(error.message)
+}
+
+export async function markMessagesRead(orderId: string, fromSender: 'customer' | 'admin'): Promise<void> {
+  const { error } = await db
+    .from('order_messages')
+    .update({ is_read: true })
+    .eq('order_id', orderId)
+    .eq('sender', fromSender)
+    .eq('is_read', false)
   if (error) throw new Error(error.message)
 }

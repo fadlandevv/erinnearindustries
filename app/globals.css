@@ -2576,10 +2576,15 @@ p:last-child { margin-bottom: 0; }
 .oh-chat-btn--active:hover { background: #333; border-color: #333; color: #fff; }
 .oh-chat-btn--muted { opacity: 0.35; cursor: not-allowed; }
 .oh-chat-btn:disabled { pointer-events: none; }
-.oh-chat-btn-dot {
-  position: absolute; top: -2px; right: -2px;
-  width: 8px; height: 8px; border-radius: 50%;
+.oh-chat-btn--unread { border-color: #16a34a; background: #f0fdf4; color: #16a34a; }
+.oh-chat-btn--unread:hover { border-color: #15803d; background: #dcfce7; color: #15803d; }
+.oh-chat-btn-badge {
+  position: absolute; top: -5px; right: -5px;
+  min-width: 16px; height: 16px; border-radius: 8px;
   background: #e85c3a; border: 1.5px solid #fff;
+  color: #fff; font-size: 0.6rem; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0 3px; line-height: 1;
 }
 
 /* Order card two-layer wrapper */
@@ -2681,7 +2686,10 @@ p:last-child { margin-bottom: 0; }
 }
 .od-chat-msg--admin .od-chat-bubble { background: #f0ede8; color: #222; border-bottom-left-radius: 4px; }
 .od-chat-msg--customer .od-chat-bubble { background: #222; color: #fff; border-bottom-right-radius: 4px; }
-.od-chat-meta { font-size: 0.7rem; color: #bbb; margin-top: 0.2rem; }
+.od-chat-msg-foot { display: flex; align-items: center; gap: 0.35rem; margin-top: 0.2rem; }
+.od-chat-meta { font-size: 0.7rem; color: #bbb; }
+.od-msg-status { font-size: 0.65rem; color: #bbb; }
+.od-msg-status--read { color: #16a34a; }
 .od-chat-empty { font-size: 0.8rem; color: #bbb; text-align: center; padding: 0.9rem 0; }
 .od-chat-error { font-size: 0.78rem; color: #e85c3a; margin: 0.3rem 0 0; }
 .od-chat-form { display: flex; gap: 0.5rem; margin-top: 0.75rem; }

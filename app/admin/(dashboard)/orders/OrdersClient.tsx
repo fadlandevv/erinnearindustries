@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useActionState, useEffect, useRef } from 'react'
 import type { Order } from '@/lib/orders'
 import type { OrderMessage } from '@/lib/order-messages'
-import { updateOrderStatusFormAction, adminSendOrderMessageAction, getOrderMessagesAction } from '@/lib/actions'
+import { updateOrderStatusFormAction, adminSendOrderMessageAction, getOrderMessagesAction, adminMarkOrderMessagesReadAction } from '@/lib/actions'
 
 const statusLabel: Record<string, string> = {
   pending:    'Menunggu',
@@ -45,6 +45,7 @@ function AdminChatPanel({ orderId, onClose }: { orderId: string; onClose: () => 
 
   useEffect(() => {
     getOrderMessagesAction(orderId).then(msgs => { setMessages(msgs); setLoading(false) })
+    adminMarkOrderMessagesReadAction(orderId)
   }, [orderId])
 
   useEffect(() => {

@@ -41,7 +41,7 @@ export default function OrderCard({ order, messages }: Props) {
     setChatOpen(o => !o)
   }
 
-  const adminCount = messages.filter(m => m.sender === 'admin').length
+  const unreadAdminCount = messages.filter(m => m.sender === 'admin' && !m.isRead).length
 
   return (
     <div className="oh-card-wrapper">
@@ -50,12 +50,12 @@ export default function OrderCard({ order, messages }: Props) {
       <div className="oh-chat-icon-col">
         <button
           type="button"
-          className={`oh-chat-btn${chatOpen ? ' oh-chat-btn--active' : ''}${!open ? ' oh-chat-btn--muted' : ''}`}
+          className={`oh-chat-btn${chatOpen ? ' oh-chat-btn--active' : ''}${!open ? ' oh-chat-btn--muted' : ''}${unreadAdminCount > 0 && !chatOpen ? ' oh-chat-btn--unread' : ''}`}
           onClick={toggleChat}
           disabled={!open}
           aria-label="Diskusi"
         >
-          {adminCount > 0 && !chatOpen && <span className="oh-chat-btn-dot" />}
+          {unreadAdminCount > 0 && !chatOpen && <span className="oh-chat-btn-badge">{unreadAdminCount}</span>}
           {chatOpen ? (
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
               <path d="M9 3L4 7.5 9 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>

@@ -22,7 +22,7 @@ import { logAdminAccess } from './access-log'
 import { getPricingItems, upsertPricingItem, insertPricingItem, deletePricingItem } from './pricing'
 import { generateId } from './utils'
 import { db } from './db'
-import { getOrderMessages, getMessagesByOrderIds, sendOrderMessage, type OrderMessage } from './order-messages'
+import { getOrderMessages, getMessagesByOrderIds, sendOrderMessage, markMessagesRead, type OrderMessage } from './order-messages'
 
 function parseSizechart(formData: FormData): string | undefined {
   const chart: Record<string, { panjang: number; lebar: number }> = {}
@@ -1021,4 +1021,20 @@ export async function getOrderMessagesAction(orderId: string): Promise<OrderMess
   const jar = await cookies()
   if (!jar.get('admin-token')) return []
   return getOrderMessages(orderId)
+}
+
+export async function markOrderMessagesReadAction(orderId: string): Promise<void> {
+  const jar = await cookies()
+  const email = jar.get('user-session')?.value
+  if (!email) return
+  const orders = await getOrdersByEmail(email)
+  if (!orders.find(o => o.id === orderId)) return
+  await markMessagesRead(orderId, 'admin')
+  revalidatePath('/orders')
+}
+
+export async function adminMarkOrderMessagesReadAction(orderId: string): Promise<void> {
+  const jar = await cookies()
+  if (!jar.get('admin-token')) return
+  await markMessagesRead(orderId, 'customer')
 }

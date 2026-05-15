@@ -1,7 +1,7 @@
 'use client'
 import { useState, useActionState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { sendOrderMessageAction } from '@/lib/actions'
+import { sendOrderMessageAction, markOrderMessagesReadAction } from '@/lib/actions'
 import type { OrderMessage } from '@/lib/order-messages'
 
 const fmtTime = (iso: string) =>
@@ -19,6 +19,11 @@ export default function OrderChat({ orderId, initialMessages, bare = false }: Pr
 
   const isOpen = bare || open
   const msgCount = initialMessages.length
+
+  // When bare chat opens, mark admin messages as read
+  useEffect(() => {
+    if (bare) markOrderMessagesReadAction(orderId)
+  }, [bare, orderId])
 
   useEffect(() => {
     if (state && !state.error) {
@@ -55,7 +60,14 @@ export default function OrderChat({ orderId, initialMessages, bare = false }: Pr
               initialMessages.map(msg => (
                 <div key={msg.id} className={`od-chat-msg od-chat-msg--${msg.sender}`}>
                   <div className="od-chat-bubble">{msg.message}</div>
-                  <span className="od-chat-meta">{msg.senderName} · {fmtTime(msg.createdAt)}</span>
+                  <div className="od-chat-msg-foot">
+                    <span className="od-chat-meta">{msg.senderName} · {fmtTime(msg.createdAt)}</span>
+                    {msg.sender === 'customer' && (
+                      <span className={`od-msg-status${msg.isRead ? ' od-msg-status--read' : ''}`}>
+                        {msg.isRead ? '✓✓ Dibaca' : '✓ Terkirim'}
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))
             )}
