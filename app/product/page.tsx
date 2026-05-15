@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getProducts } from '@/lib/data'
 import ProductsClient from './ProductsClient'
+import GalleryMarquee from '@/components/GalleryMarquee'
 
 export const metadata: Metadata = {
   title: 'Products — Erinnear Industries',
@@ -9,5 +10,10 @@ export const metadata: Metadata = {
 
 export default async function ProductPage() {
   const products = await getProducts()
-  return <ProductsClient products={products} />
+  return (
+    <>
+      <ProductsClient products={products} />
+      <GalleryMarquee />
+    </>
+  )
 }

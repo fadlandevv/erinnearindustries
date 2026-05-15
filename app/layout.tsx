@@ -7,7 +7,6 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import Providers from '@/components/Providers'
 import ChatBot from '@/components/ChatBotWrapper'
-import GalleryMarquee from '@/components/GalleryMarquee'
 import { getUserByEmail } from '@/lib/users'
 import { getContent } from '@/lib/data'
 
@@ -31,7 +30,6 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <Providers content={content}>
           <Navbar user={userInfo} />
           <main>{children}</main>
-          <GalleryMarquee />
           <Footer />
           <ChatBot />
         </Providers>

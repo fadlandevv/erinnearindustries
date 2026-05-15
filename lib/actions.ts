@@ -1,6 +1,4 @@
 'use server'
-import fs from 'fs'
-import path from 'path'
 import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
@@ -18,6 +16,7 @@ import { saveManualEntry, deleteManualEntry, type RekapSource } from './rekap'
 import { logAdminAccess } from './access-log'
 import { getPricingItems, upsertPricingItem, insertPricingItem, deletePricingItem } from './pricing'
 import { generateId } from './utils'
+import { db } from './db'
 
 const ALL_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size']
 
@@ -34,12 +33,17 @@ function parseSizechart(formData: FormData): string | undefined {
 }
 
 async function saveImage(file: File, productId: string, slot: string): Promise<string> {
-  const dir = path.join(process.cwd(), 'public', 'products', productId)
-  fs.mkdirSync(dir, { recursive: true })
   const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-  const filename = `${slot}.${ext}`
-  fs.writeFileSync(path.join(dir, filename), Buffer.from(await file.arrayBuffer()))
-  return `/products/${productId}/${filename}`
+  const storagePath = `products/${productId}/${slot}.${ext}`
+  const { error } = await db.storage
+    .from('images')
+    .upload(storagePath, Buffer.from(await file.arrayBuffer()), {
+      upsert: true,
+      contentType: file.type || `image/${ext}`,
+    })
+  if (error) throw new Error(error.message)
+  const { data: { publicUrl } } = db.storage.from('images').getPublicUrl(storagePath)
+  return publicUrl
 }
 
 async function getClientIp(): Promise<string> {
@@ -224,12 +228,17 @@ export async function updateShowcaseItem(itemId: string, formData: FormData): Pr
 
   const imageFile = formData.get('image') as File | null
   if (imageFile && imageFile.size > 0) {
-    const dir = path.join(process.cwd(), 'public', 'showcase')
-    fs.mkdirSync(dir, { recursive: true })
     const ext = imageFile.name.split('.').pop()?.toLowerCase() || 'jpg'
-    const filename = `item-${itemId}.${ext}`
-    fs.writeFileSync(path.join(dir, filename), Buffer.from(await imageFile.arrayBuffer()))
-    item.image = `/showcase/${filename}`
+    const storagePath = `showcase/item-${itemId}.${ext}`
+    const { error } = await db.storage
+      .from('images')
+      .upload(storagePath, Buffer.from(await imageFile.arrayBuffer()), {
+        upsert: true,
+        contentType: imageFile.type || `image/${ext}`,
+      })
+    if (error) throw new Error(error.message)
+    const { data: { publicUrl } } = db.storage.from('images').getPublicUrl(storagePath)
+    item.image = publicUrl
   }
 
   item.title = (formData.get('title') as string).trim() || item.title
@@ -250,12 +259,17 @@ export async function updateGallerySlot(slotId: string, formData: FormData): Pro
 
   const imageFile = formData.get('image') as File | null
   if (imageFile && imageFile.size > 0) {
-    const dir = path.join(process.cwd(), 'public', 'gallery')
-    fs.mkdirSync(dir, { recursive: true })
     const ext = imageFile.name.split('.').pop()?.toLowerCase() || 'jpg'
-    const filename = `slot-${slotId}.${ext}`
-    fs.writeFileSync(path.join(dir, filename), Buffer.from(await imageFile.arrayBuffer()))
-    slot.image = `/gallery/${filename}`
+    const storagePath = `gallery/slot-${slotId}.${ext}`
+    const { error } = await db.storage
+      .from('images')
+      .upload(storagePath, Buffer.from(await imageFile.arrayBuffer()), {
+        upsert: true,
+        contentType: imageFile.type || `image/${ext}`,
+      })
+    if (error) throw new Error(error.message)
+    const { data: { publicUrl } } = db.storage.from('images').getPublicUrl(storagePath)
+    slot.image = publicUrl
   }
 
   const label = (formData.get('label') as string).trim()

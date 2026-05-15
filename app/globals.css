@@ -1170,10 +1170,7 @@ p:last-child { margin-bottom: 0; }
 .pd-sizechart-table td:first-child { font-weight: 600; color: #111; }
 
 .related-section {
-  background: #f8f7f5;
-  border: 1px solid #ede9e3;
-  border-radius: 24px;
-  padding: 2rem 2.5rem 2.5rem;
+  padding: 2rem 0 2.5rem;
   margin-top: 2rem;
 }
 .related-title {
@@ -3478,7 +3475,6 @@ p:last-child { margin-bottom: 0; }
 [data-theme="dark"] .pd-sizechart-table th { color: #555; border-bottom-color: #2a2a2a; }
 [data-theme="dark"] .pd-sizechart-table td { color: #aaa; border-bottom-color: #1e1e1e; }
 [data-theme="dark"] .pd-sizechart-table td:first-child { color: #f0ede8; }
-[data-theme="dark"] .related-section { background: #111; border-color: #1e1e1e; }
 [data-theme="dark"] .related-title { color: #f0ede8; }
 [data-theme="dark"] .product-detail-name { color: #f0ede8; }
 [data-theme="dark"] .product-detail-info { background: #111; border-color: #1e1e1e; }
