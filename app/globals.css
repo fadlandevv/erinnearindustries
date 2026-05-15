@@ -2629,10 +2629,13 @@ p:last-child { margin-bottom: 0; }
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-height: 0;
 }
 .od-chat-bare .od-chat-body {
   flex: 1;
   max-height: none;
+  min-height: 0;
+  overflow-y: auto;
 }
 .oh-chat-layer-label {
   font-size: 0.7rem; font-weight: 600; color: #bbb;
