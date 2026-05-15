@@ -2670,10 +2670,6 @@ p:last-child { margin-bottom: 0; }
 .od-chat-body {
   display: flex; flex-direction: column; gap: 0.55rem;
   max-height: 260px; overflow-y: auto; margin-top: 0.85rem;
-  /* pull scrollbar outside the content area into the layer's right padding */
-  margin-right: -14px;
-  padding-right: 14px;
-  scrollbar-gutter: stable;
 }
 .od-chat-body::-webkit-scrollbar { width: 3px; }
 .od-chat-body::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }

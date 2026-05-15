@@ -13,19 +13,25 @@ const statusLabel: Record<string, string> = {
   failed:     'Gagal',
   expired:    'Kedaluwarsa',
 }
-const statusClass: Record<string, string> = {
-  pending:    'order-badge-pending',
-  paid:       'order-badge-paid',
-  processing: 'order-badge-processing',
-  shipped:    'order-badge-shipped',
-  delivered:  'order-badge-delivered',
-  failed:     'order-badge-failed',
-  expired:    'order-badge-expired',
+const statusCls: Record<string, string> = {
+  pending:    'oh-badge-pending',
+  paid:       'oh-badge-paid',
+  processing: 'oh-badge-processing',
+  shipped:    'oh-badge-shipped',
+  delivered:  'oh-badge-delivered',
+  failed:     'oh-badge-failed',
+  expired:    'oh-badge-expired',
 }
 const allStatuses: Order['status'][] = [
   'pending', 'paid', 'processing', 'shipped', 'delivered', 'failed', 'expired',
 ]
 const IDX = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']
+
+const fmtDate = (iso: string) =>
+  new Date(iso).toLocaleDateString('id-ID', {
+    day: '2-digit', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  })
 
 const fmtChatTime = (iso: string) =>
   new Date(iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) +
@@ -65,7 +71,7 @@ function AdminChatPanel({ orderId, onClose }: { orderId: string; onClose: () => 
   return (
     <>
       <div className="oh-chat-layer-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span>Diskusi #{orderId.slice(-6).toUpperCase()}</span>
+        <span>#{orderId.slice(-6).toUpperCase()}</span>
         <button
           type="button"
           onClick={onClose}
@@ -77,44 +83,47 @@ function AdminChatPanel({ orderId, onClose }: { orderId: string; onClose: () => 
         </button>
       </div>
 
-      <div className="od-chat-body">
-        {loading ? (
-          <p className="od-chat-empty">Memuat...</p>
-        ) : messages.length === 0 ? (
-          <p className="od-chat-empty">Belum ada pesan untuk pesanan ini.</p>
-        ) : (
-          messages.map(msg => (
-            <div key={msg.id} className={`od-chat-msg od-chat-msg--${msg.sender}`}>
-              <div className="od-chat-bubble">{msg.message}</div>
-              <div className="od-chat-msg-foot">
-                <span className="od-chat-meta">{msg.senderName} · {fmtChatTime(msg.createdAt)}</span>
+      <div className="od-chat-bare">
+        <div className="od-chat-body">
+          {loading ? (
+            <p className="od-chat-empty">Memuat...</p>
+          ) : messages.length === 0 ? (
+            <p className="od-chat-empty">Belum ada pesan untuk pesanan ini.</p>
+          ) : (
+            messages.map(msg => (
+              <div key={msg.id} className={`od-chat-msg od-chat-msg--${msg.sender}`}>
+                <div className="od-chat-bubble">{msg.message}</div>
+                <div className="od-chat-msg-foot">
+                  <span className="od-chat-meta">{msg.senderName} · {fmtChatTime(msg.createdAt)}</span>
+                </div>
               </div>
-            </div>
-          ))
-        )}
-        <div ref={bottomRef} />
+            ))
+          )}
+          <div ref={bottomRef} />
+        </div>
+
+        {state?.error && <p className="od-chat-error">{state.error}</p>}
+
+        <form ref={formRef} action={action} className="od-chat-form">
+          <input type="hidden" name="orderId" value={orderId} />
+          <input name="message" type="text" className="od-chat-input" placeholder="Balas pesan..." maxLength={500} required />
+          <button type="submit" className="od-chat-send" disabled={isPending}>
+            {isPending ? '...' : 'Kirim'}
+          </button>
+        </form>
       </div>
-
-      {state?.error && <p className="od-chat-error">{state.error}</p>}
-
-      <form ref={formRef} action={action} className="od-chat-form">
-        <input type="hidden" name="orderId" value={orderId} />
-        <input name="message" type="text" className="od-chat-input" placeholder="Balas pesan..." maxLength={500} required />
-        <button type="submit" className="od-chat-send" disabled={isPending}>
-          {isPending ? '...' : 'Kirim'}
-        </button>
-      </form>
     </>
   )
 }
 
 export default function OrdersClient({ orders, userMap, allMessages }: Props) {
-  const [search, setSearch]     = useState('')
-  const [year, setYear]         = useState('all')
-  const [month, setMonth]       = useState('all')
-  const [sort, setSort]         = useState<'newest' | 'oldest'>('newest')
-  const [source, setSource]     = useState<'all' | 'reseller' | 'customer'>('all')
+  const [search, setSearch]   = useState('')
+  const [year, setYear]       = useState('all')
+  const [month, setMonth]     = useState('all')
+  const [sort, setSort]       = useState<'newest' | 'oldest'>('newest')
+  const [source, setSource]   = useState<'all' | 'reseller' | 'customer'>('all')
   const [chatOrderId, setChatOrderId] = useState<string | null>(null)
+  const [openOrders, setOpenOrders]   = useState<Set<string>>(new Set())
 
   const [unreadMap, setUnreadMap] = useState<Record<string, number>>(() => {
     const map: Record<string, number> = {}
@@ -126,7 +135,20 @@ export default function OrdersClient({ orders, userMap, allMessages }: Props) {
     return map
   })
 
-  function openChat(orderId: string) {
+  function toggleOrder(orderId: string) {
+    setOpenOrders(prev => {
+      const next = new Set(prev)
+      if (next.has(orderId)) {
+        next.delete(orderId)
+        if (chatOrderId === orderId) setChatOrderId(null)
+      } else {
+        next.add(orderId)
+      }
+      return next
+    })
+  }
+
+  function toggleChat(orderId: string) {
     setChatOrderId(id => {
       if (id === orderId) return null
       setUnreadMap(m => ({ ...m, [orderId]: 0 }))
@@ -149,60 +171,40 @@ export default function OrdersClient({ orders, userMap, allMessages }: Props) {
 
   const filtered = useMemo(() => {
     let res = [...orders]
-
     if (source === 'reseller') res = res.filter(isReseller)
     if (source === 'customer') res = res.filter(o => !isReseller(o))
-
-    if (year !== 'all')
-      res = res.filter(o => new Date(o.createdAt).getFullYear() === Number(year))
-
-    if (month !== 'all')
-      res = res.filter(o => new Date(o.createdAt).getMonth() === Number(month))
-
+    if (year !== 'all') res = res.filter(o => new Date(o.createdAt).getFullYear() === Number(year))
+    if (month !== 'all') res = res.filter(o => new Date(o.createdAt).getMonth() === Number(month))
     const q = search.trim().toUpperCase()
-    if (q)
-      res = res.filter(o =>
-        o.id.slice(-6).toUpperCase().includes(q) ||
-        o.id.toUpperCase().includes(q) ||
-        o.customer.name.toUpperCase().includes(q)
-      )
-
+    if (q) res = res.filter(o =>
+      o.id.slice(-6).toUpperCase().includes(q) ||
+      o.id.toUpperCase().includes(q) ||
+      o.customer.name.toUpperCase().includes(q)
+    )
     res.sort((a, b) => {
       const d = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       return sort === 'newest' ? -d : d
     })
-
     return res
   }, [orders, year, month, sort, search, source])
-
-  function handleYearChange(v: string) {
-    setYear(v)
-    setMonth('all')
-  }
 
   const isFiltering = search || year !== 'all' || month !== 'all' || source !== 'all'
 
   return (
     <>
       {/* Filter bar */}
-      <div style={{
-        display: 'flex', gap: '0.6rem', flexWrap: 'wrap',
-        marginBottom: '1rem', alignItems: 'center',
-      }}>
+      <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '1rem', alignItems: 'center' }}>
         <input
-          type="text"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
+          type="text" value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Cari ID pesanan atau nama..."
-          className="admin-search-input"
-          style={{ flex: '1 1 200px', minWidth: 0 }}
+          className="admin-search-input" style={{ flex: '1 1 200px', minWidth: 0 }}
         />
         <select value={source} onChange={e => setSource(e.target.value as typeof source)} className="admin-select-inline">
           <option value="all">Semua Tipe</option>
           <option value="customer">Customer</option>
           <option value="reseller">Reseller</option>
         </select>
-        <select value={year} onChange={e => handleYearChange(e.target.value)} className="admin-select-inline">
+        <select value={year} onChange={e => { setYear(e.target.value); setMonth('all') }} className="admin-select-inline">
           <option value="all">Semua Tahun</option>
           {years.map(y => <option key={y} value={y}>{y}</option>)}
         </select>
@@ -216,130 +218,143 @@ export default function OrdersClient({ orders, userMap, allMessages }: Props) {
         </select>
       </div>
 
-      {/* Result count */}
       {isFiltering && (
         <p style={{ fontSize: '0.8rem', color: '#aaa', marginBottom: '0.75rem' }}>
           {filtered.length} dari {orders.length} pesanan
         </p>
       )}
 
-      <div className="admin-orders-wrapper">
+      {filtered.length === 0 ? (
+        <p className="admin-empty">
+          {orders.length === 0 ? 'Belum ada pesanan' : 'Tidak ada pesanan yang cocok'}
+        </p>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {filtered.map(order => {
+            const isOpen   = openOrders.has(order.id)
+            const chatOpen = chatOrderId === order.id
+            const unread   = unreadMap[order.id] ?? 0
+            const st       = statusCls[order.status] ?? ''
 
-        {/* Chat side panel — left */}
-        {chatOrderId && (
-          <div className="admin-orders-side">
-            <AdminChatPanel orderId={chatOrderId} onClose={() => setChatOrderId(null)} />
-          </div>
-        )}
+            return (
+              <div className="oh-card-wrapper" key={order.id}>
 
-        {/* Table */}
-        <div className="admin-table-wrap" style={{ flex: 1, minWidth: 0 }}>
-          {filtered.length === 0 ? (
-            <p className="admin-empty">
-              {orders.length === 0 ? 'Belum ada pesanan' : 'Tidak ada pesanan yang cocok'}
-            </p>
-          ) : (
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th style={{ width: 34 }} />
-                  <th>ID Pesanan</th>
-                  <th>Pelanggan</th>
-                  <th>Item</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                  <th>Tanggal</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((order) => {
-                  const unread = unreadMap[order.id] ?? 0
-                  const isActive = chatOrderId === order.id
-                  return (
-                    <tr key={order.id}>
-                      <td style={{ padding: '0.4rem 0.25rem', verticalAlign: 'middle' }}>
-                        <button
-                          type="button"
-                          className={`oh-chat-btn${isActive ? ' oh-chat-btn--active' : ''}${unread > 0 && !isActive ? ' oh-chat-btn--unread' : ''}`}
-                          onClick={() => openChat(order.id)}
-                          aria-label="Diskusi"
-                        >
-                          {unread > 0 && !isActive && (
-                            <span className="oh-chat-btn-badge">{unread}</span>
-                          )}
-                          {isActive ? (
-                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                              <path d="M9 3L4 7.5 9 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          ) : (
-                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                              <path
-                                d="M2 2.5C2 1.67 2.67 1 3.5 1h8C12.33 1 13 1.67 13 2.5v7c0 .83-.67 1.5-1.5 1.5H5.5L2 13V2.5z"
-                                stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"
-                              />
-                            </svg>
-                          )}
-                        </button>
-                      </td>
-                      <td>
-                        <code style={{ fontSize: '0.78rem', color: '#555' }}>
-                          {order.id.slice(-6).toUpperCase()}
-                        </code>
-                      </td>
-                      <td style={{ maxWidth: '140px' }}>
-                        <div style={{ fontWeight: 600, fontSize: '0.875rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {order.customer.name}
-                        </div>
-                        {order.customer.email.endsWith('@reseller.internal') ? (
-                          <div style={{ fontSize: '0.7rem', color: '#16a34a', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                {/* Chat icon column */}
+                <div className="oh-chat-icon-col">
+                  <button
+                    type="button"
+                    className={`oh-chat-btn${chatOpen ? ' oh-chat-btn--active' : ''}${!isOpen ? ' oh-chat-btn--muted' : ''}${unread > 0 && !chatOpen ? ' oh-chat-btn--unread' : ''}`}
+                    onClick={() => toggleChat(order.id)}
+                    disabled={!isOpen}
+                    aria-label="Diskusi"
+                  >
+                    {unread > 0 && !chatOpen && <span className="oh-chat-btn-badge">{unread}</span>}
+                    {chatOpen ? (
+                      <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                        <path d="M9 3L4 7.5 9 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    ) : (
+                      <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                        <path d="M2 2.5C2 1.67 2.67 1 3.5 1h8C12.33 1 13 1.67 13 2.5v7c0 .83-.67 1.5-1.5 1.5H5.5L2 13V2.5z"
+                          stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </button>
+                </div>
+
+                {/* Chat panel */}
+                {isOpen && chatOpen && (
+                  <div className="oh-chat-layer">
+                    <AdminChatPanel orderId={order.id} onClose={() => setChatOrderId(null)} />
+                  </div>
+                )}
+
+                {/* Main card */}
+                <div className="oh-card">
+
+                  {/* Header — always visible */}
+                  <div className="oh-card-head">
+                    <div className="oh-card-head-left">
+                      <div className="oh-card-head-info">
+                        <code className="oh-order-id">{order.id.slice(-6).toUpperCase()}</code>
+                        <span className="oh-order-date">{fmtDate(order.createdAt)}</span>
+                      </div>
+                      <div style={{ fontSize: '0.82rem', color: '#555', fontWeight: 500, marginTop: '0.15rem' }}>
+                        {order.customer.name}
+                        {isReseller(order) && (
+                          <span style={{ marginLeft: '0.4rem', fontSize: '0.7rem', color: '#16a34a', fontWeight: 600 }}>
                             ◈ {order.customer.notes?.replace('via reseller: ', '') ?? 'Reseller'}
-                          </div>
-                        ) : userMap[order.customer.email.toLowerCase()] ? (
-                          <div style={{ fontSize: '0.72rem', color: '#aaa', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
-                            #{userMap[order.customer.email.toLowerCase()].slice(-8).toUpperCase()}
-                          </div>
-                        ) : null}
-                      </td>
-                      <td>
-                        <div style={{ fontSize: '0.82rem', color: '#555' }}>
-                          {order.items.map(i => `${i.title} (${i.size}) ×${i.quantity}`).join(', ')}
-                        </div>
-                      </td>
-                      <td style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
-                        Rp {order.totalPrice.toLocaleString('id-ID')}
-                      </td>
-                      <td>
-                        <span className={`admin-badge ${statusClass[order.status] ?? ''}`}>
-                          {statusLabel[order.status] ?? order.status}
-                        </span>
-                      </td>
-                      <td style={{ fontSize: '0.8rem', color: '#777', whiteSpace: 'nowrap' }}>
-                        {new Date(order.createdAt).toLocaleDateString('id-ID', {
-                          day: '2-digit', month: 'short', year: 'numeric',
-                          hour: '2-digit', minute: '2-digit',
-                        })}
-                      </td>
-                      <td>
-                        <form action={updateOrderStatusFormAction} className="admin-order-status-form">
-                          <input type="hidden" name="orderId" value={order.id} />
-                          <select name="status" defaultValue={order.status} className="admin-order-status-select">
-                            {allStatuses.map(s => (
-                              <option key={s} value={s}>{statusLabel[s]}</option>
-                            ))}
-                          </select>
-                          <button type="submit" className="admin-order-status-btn">✓</button>
-                        </form>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          )}
-        </div>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="oh-card-head-right">
+                      <span className={`oh-badge ${st}`}>{statusLabel[order.status] ?? order.status}</span>
+                      <button
+                        type="button"
+                        className="oh-detail-toggle"
+                        onClick={() => toggleOrder(order.id)}
+                        aria-expanded={isOpen}
+                      >
+                        <svg
+                          width="16" height="16" viewBox="0 0 16 16" fill="none"
+                          style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}
+                        >
+                          <path d="M3 6l5 5 5-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
 
-      </div>
+                  {/* Detail — collapsible */}
+                  {isOpen && (
+                    <div className="oh-card-body-fill">
+                      <div className="oh-items">
+                        {order.items.map((item, i) => (
+                          <div key={i} className="oh-item">
+                            <div className="oh-item-visual" style={{ background: item.bg }} />
+                            <div className="oh-item-info">
+                              <span className="oh-item-name">{item.title}</span>
+                              <span className="oh-item-meta">Ukuran <strong>{item.size}</strong> · {item.quantity} pcs</span>
+                            </div>
+                            <span className="oh-item-price">
+                              Rp {(item.unitPrice * item.quantity).toLocaleString('id-ID')}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="oh-card-foot">
+                        <div className="oh-ship-info">
+                          <span className="oh-ship-label">Alamat Pengiriman</span>
+                          <span className="oh-ship-addr">
+                            {order.customer.address}, {order.customer.city} {order.customer.postalCode}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                          <strong style={{ fontSize: '0.95rem' }}>
+                            Rp {order.totalPrice.toLocaleString('id-ID')}
+                          </strong>
+                          <form action={updateOrderStatusFormAction} className="admin-order-status-form">
+                            <input type="hidden" name="orderId" value={order.id} />
+                            <select name="status" defaultValue={order.status} className="admin-order-status-select">
+                              {allStatuses.map(s => (
+                                <option key={s} value={s}>{statusLabel[s]}</option>
+                              ))}
+                            </select>
+                            <button type="submit" className="admin-order-status-btn">✓</button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
     </>
   )
 }
