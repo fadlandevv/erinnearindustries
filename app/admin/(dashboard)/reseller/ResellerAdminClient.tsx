@@ -1,5 +1,6 @@
 'use client'
 import { useState, useActionState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   createResellerAction,
   deleteResellerAction,
@@ -117,11 +118,13 @@ function OrderRow({ order }: { order: ResellerOrder }) {
 
 function CreateResellerForm({ onCreated }: { onCreated: () => void }) {
   const { toast } = useAdminToast()
+  const router = useRouter()
   const [state, action, isPending] = useActionState(createResellerAction, {})
 
   useEffect(() => {
     if (state.ok) {
       toast('Akun reseller berhasil dibuat')
+      router.refresh()
       onCreated()
     } else if (state.error) {
       toast(state.error, 'error')
@@ -168,6 +171,7 @@ function CreateResellerForm({ onCreated }: { onCreated: () => void }) {
 
 export default function ResellerAdminClient({ resellers, orders }: Props) {
   const { toast } = useAdminToast()
+  const router = useRouter()
   const [tab, setTab] = useState<'akun' | 'pesanan'>('akun')
   const [showAddForm, setShowAddForm] = useState(false)
 
@@ -175,6 +179,7 @@ export default function ResellerAdminClient({ resellers, orders }: Props) {
     if (!confirm(`Hapus akun reseller "${name}"? Pesanan tidak akan terhapus.`)) return
     await deleteResellerAction(id)
     toast(`Akun "${name}" dihapus`)
+    router.refresh()
   }
 
   return (

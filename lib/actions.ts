@@ -840,9 +840,9 @@ export async function createResellerOrderAction(
 // ── Admin: Reseller CRUD ──────────────────────────────────────
 
 export async function createResellerAction(
-  _prev: { error?: string },
+  _prev: { error?: string; ok?: boolean },
   formData: FormData
-): Promise<{ error?: string }> {
+): Promise<{ error?: string; ok?: boolean }> {
   const jar = await cookies()
   if (!jar.get('admin-token')) return { error: 'Unauthorized' }
 
@@ -870,7 +870,7 @@ export async function createResellerAction(
   })
 
   revalidatePath('/admin/reseller')
-  return {}
+  return { ok: true }
 }
 
 export async function deleteResellerAction(id: string): Promise<void> {
