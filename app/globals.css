@@ -1118,6 +1118,19 @@ p:last-child { margin-bottom: 0; }
   gap: 2rem;
 }
 .pd-detail-col { display: flex; flex-direction: column; gap: 0.5rem; }
+.pd-detail-material-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.pd-detail-material-list li {
+  font-size: 0.875rem;
+  color: #555;
+  line-height: 1.6;
+}
 .pd-detail-sub {
   font-size: 0.72rem;
   text-transform: uppercase;
@@ -1125,26 +1138,7 @@ p:last-child { margin-bottom: 0; }
   color: #aaa;
   font-weight: 600;
 }
-.pd-detail-material-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-.pd-detail-material-list li {
-  font-size: 0.875rem;
-  color: #555;
-  padding-left: 0.9rem;
-  position: relative;
-}
-.pd-detail-material-list li::before {
-  content: '—';
-  position: absolute;
-  left: 0;
-  color: #ccc;
-}
+
 .pd-detail-sizechart {
   font-size: 0.875rem;
   color: #555;
