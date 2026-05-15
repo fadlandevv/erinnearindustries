@@ -7,7 +7,7 @@ import { useAdminToast } from '@/context/AdminToastContext'
 import type { Product } from '@/lib/data'
 
 const tagOptions = ['New Arrival', 'Best Seller', 'Limited', 'Sale', 'Coming Soon']
-const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size']
+const sizeOptions = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL']
 
 type Props = {
   product: Product
