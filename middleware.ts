@@ -24,10 +24,10 @@ export function middleware(request: NextRequest) {
   const isResellerAuth = !!resellerToken?.value && resellerToken.value.length > 0
 
   if (pathname === '/reseller/login') {
-    if (isResellerAuth) return NextResponse.redirect(new URL('/reseller', request.url))
+    if (isResellerAuth) return NextResponse.redirect(new URL('/reseller/dashboard', request.url))
     return NextResponse.next()
   }
-  if (pathname.startsWith('/reseller')) {
+  if (pathname.startsWith('/reseller/')) {
     if (!isResellerAuth) return NextResponse.redirect(new URL('/reseller/login', request.url))
     return NextResponse.next()
   }

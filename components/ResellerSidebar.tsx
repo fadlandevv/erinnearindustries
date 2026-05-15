@@ -7,11 +7,11 @@ import { resellerLogout } from '@/lib/actions'
 type NavItem = { label: string; href: string; icon: string }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard',     href: '/reseller',          icon: '◉' },
-  { label: 'Produk',        href: '/reseller/products', icon: '◈' },
-  { label: 'Pesanan',       href: '/reseller/orders',   icon: '◷' },
-  { label: 'Penghasilan',   href: '/reseller/earnings', icon: '◱' },
-  { label: 'Materi Promo',  href: '/reseller/promo',    icon: '◧' },
+  { label: 'Dashboard',     href: '/reseller/dashboard',          icon: '◉' },
+  { label: 'Produk',        href: '/reseller/dashboard/products', icon: '◈' },
+  { label: 'Pesanan',       href: '/reseller/dashboard/orders',   icon: '◷' },
+  { label: 'Penghasilan',   href: '/reseller/dashboard/earnings', icon: '◱' },
+  { label: 'Materi Promo',  href: '/reseller/dashboard/promo',    icon: '◧' },
 ]
 
 type Props = {
@@ -26,7 +26,7 @@ export default function ResellerSidebar({ resellerName, level }: Props) {
   function close() { setMobileOpen(false) }
 
   function isActive(href: string) {
-    if (href === '/reseller') return pathname === '/reseller'
+    if (href === '/reseller/dashboard') return pathname === '/reseller/dashboard'
     return pathname.startsWith(href)
   }
 

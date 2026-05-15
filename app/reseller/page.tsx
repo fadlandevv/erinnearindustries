@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
+import { getResellerById } from '@/lib/resellers'
 
 export const metadata: Metadata = {
   title: 'Program Reseller — Erinnear Industries',
@@ -54,7 +56,11 @@ const FAQS = [
   { q: 'Apakah ada area eksklusif?', a: 'Saat ini belum ada eksklusivitas area. Namun kami batasi jumlah reseller per kota untuk menjaga kualitas pasar.' },
 ]
 
-export default function ResellerPage() {
+export default async function ResellerPage() {
+  const jar = await cookies()
+  const resellerId = jar.get('reseller-token')?.value
+  const isLoggedIn = resellerId ? !!(await getResellerById(resellerId)) : false
+
   return (
     <>
       {/* Hero */}
@@ -68,6 +74,10 @@ export default function ResellerPage() {
           <div className="reseller-hero-ctas">
             <a href="#daftar" className="btn-dark">Daftar Sekarang →</a>
             <a href="#tier" className="btn-outline">Lihat Program</a>
+            {isLoggedIn
+              ? <Link href="/reseller/dashboard" className="btn-outline">Masuk ke Dashboard →</Link>
+              : <Link href="/reseller/login" className="btn-outline">Login Reseller</Link>
+            }
           </div>
         </div>
       </div>

@@ -1,6 +1,5 @@
-import '@/app/admin/admin.css'
-import './reseller.css'
+import type { ReactNode } from 'react'
 
-export default function ResellerLayout({ children }: { children: React.ReactNode }) {
-  return <div className="admin-overlay">{children}</div>
+export default function ResellerLayout({ children }: { children: ReactNode }) {
+  return <>{children}</>
 }

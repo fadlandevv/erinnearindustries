@@ -776,7 +776,7 @@ export async function resellerLogin(
   }
   const jar = await cookies()
   jar.set('reseller-token', reseller.id, { httpOnly: true, sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 })
-  redirect('/reseller')
+  redirect('/reseller/dashboard')
 }
 
 export async function resellerLogout(): Promise<void> {
@@ -827,8 +827,8 @@ export async function createResellerOrderAction(
       createdAt: new Date().toISOString(),
     })
 
-    revalidatePath('/reseller/orders')
-    revalidatePath('/reseller')
+    revalidatePath('/reseller/dashboard/orders')
+    revalidatePath('/reseller/dashboard')
     revalidatePath('/admin/reseller')
     return { ok: true }
   } catch (e) {
