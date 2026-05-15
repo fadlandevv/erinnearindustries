@@ -2548,9 +2548,7 @@ p:last-child { margin-bottom: 0; }
 .oh-ship-addr {
   font-size: 0.78rem;
   color: #666;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-word;
 }
 .oh-total-wrap {
   display: flex;
