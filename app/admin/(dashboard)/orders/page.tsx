@@ -1,12 +1,14 @@
 import { getOrders } from '@/lib/orders'
 import { getUsers } from '@/lib/users'
+import { getMessagesByOrderIds } from '@/lib/order-messages'
 import OrdersClient from './OrdersClient'
 
 export default async function OrdersPage() {
   const orders = await getOrders()
-  const userMap = Object.fromEntries(
-    (await getUsers()).map(u => [u.email.toLowerCase(), u.id])
-  )
+  const [userMap, allMessages] = await Promise.all([
+    getUsers().then(users => Object.fromEntries(users.map(u => [u.email.toLowerCase(), u.id]))),
+    getMessagesByOrderIds(orders.map(o => o.id)),
+  ])
 
   const stats = {
     total:   orders.length,
@@ -45,7 +47,7 @@ export default async function OrdersPage() {
         </div>
       </div>
 
-      <OrdersClient orders={orders} userMap={userMap} />
+      <OrdersClient orders={orders} userMap={userMap} allMessages={allMessages} />
     </>
   )
 }

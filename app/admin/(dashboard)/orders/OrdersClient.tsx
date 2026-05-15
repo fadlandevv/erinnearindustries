@@ -27,14 +27,15 @@ const allStatuses: Order['status'][] = [
 ]
 const IDX = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']
 
-type Props = {
-  orders: Order[]
-  userMap: Record<string, string>
-}
-
 const fmtChatTime = (iso: string) =>
   new Date(iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) +
   ' · ' + new Date(iso).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })
+
+type Props = {
+  orders: Order[]
+  userMap: Record<string, string>
+  allMessages: OrderMessage[]
+}
 
 function AdminChatPanel({ orderId, onClose }: { orderId: string; onClose: () => void }) {
   const [messages, setMessages] = useState<OrderMessage[]>([])
@@ -42,6 +43,7 @@ function AdminChatPanel({ orderId, onClose }: { orderId: string; onClose: () => 
   const [state, action, isPending] = useActionState(adminSendOrderMessageAction, null)
   const formRef = useRef<HTMLFormElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const mountedRef = useRef(false)
 
   useEffect(() => {
     getOrderMessagesAction(orderId).then(msgs => { setMessages(msgs); setLoading(false) })
@@ -56,52 +58,81 @@ function AdminChatPanel({ orderId, onClose }: { orderId: string; onClose: () => 
   }, [state])
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (!mountedRef.current) { mountedRef.current = true; return }
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   }, [messages.length])
 
   return (
-    <div className="admin-chat-panel">
-      <div className="admin-chat-panel-header">
-        Diskusi pesanan #{orderId.slice(-6).toUpperCase()}
-        <button type="button" onClick={onClose} style={{ float: 'right', background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', fontSize: '0.9rem' }}>✕</button>
+    <>
+      <div className="oh-chat-layer-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span>Diskusi #{orderId.slice(-6).toUpperCase()}</span>
+        <button
+          type="button"
+          onClick={onClose}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#bbb', lineHeight: 1, padding: 0 }}
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+          </svg>
+        </button>
       </div>
 
-      <div className="admin-chat-messages">
+      <div className="od-chat-body">
         {loading ? (
-          <p className="admin-chat-empty">Memuat...</p>
+          <p className="od-chat-empty">Memuat...</p>
         ) : messages.length === 0 ? (
-          <p className="admin-chat-empty">Belum ada pesan untuk pesanan ini.</p>
+          <p className="od-chat-empty">Belum ada pesan untuk pesanan ini.</p>
         ) : (
           messages.map(msg => (
-            <div key={msg.id} className={`admin-chat-msg admin-chat-msg--${msg.sender}`}>
-              <div className="admin-chat-bubble">{msg.message}</div>
-              <span className="admin-chat-msg-meta">{msg.senderName} · {fmtChatTime(msg.createdAt)}</span>
+            <div key={msg.id} className={`od-chat-msg od-chat-msg--${msg.sender}`}>
+              <div className="od-chat-bubble">{msg.message}</div>
+              <div className="od-chat-msg-foot">
+                <span className="od-chat-meta">{msg.senderName} · {fmtChatTime(msg.createdAt)}</span>
+              </div>
             </div>
           ))
         )}
         <div ref={bottomRef} />
       </div>
 
-      {state?.error && <p style={{ fontSize: '0.76rem', color: '#e85c3a', marginBottom: '0.5rem' }}>{state.error}</p>}
+      {state?.error && <p className="od-chat-error">{state.error}</p>}
 
-      <form ref={formRef} action={action} className="admin-chat-form">
+      <form ref={formRef} action={action} className="od-chat-form">
         <input type="hidden" name="orderId" value={orderId} />
-        <input name="message" type="text" className="admin-chat-input" placeholder="Balas pesan..." maxLength={500} required />
-        <button type="submit" className="admin-chat-send" disabled={isPending}>
+        <input name="message" type="text" className="od-chat-input" placeholder="Balas pesan..." maxLength={500} required />
+        <button type="submit" className="od-chat-send" disabled={isPending}>
           {isPending ? '...' : 'Kirim'}
         </button>
       </form>
-    </div>
+    </>
   )
 }
 
-export default function OrdersClient({ orders, userMap }: Props) {
+export default function OrdersClient({ orders, userMap, allMessages }: Props) {
   const [search, setSearch]     = useState('')
   const [year, setYear]         = useState('all')
   const [month, setMonth]       = useState('all')
   const [sort, setSort]         = useState<'newest' | 'oldest'>('newest')
   const [source, setSource]     = useState<'all' | 'reseller' | 'customer'>('all')
   const [chatOrderId, setChatOrderId] = useState<string | null>(null)
+
+  const [unreadMap, setUnreadMap] = useState<Record<string, number>>(() => {
+    const map: Record<string, number> = {}
+    for (const msg of allMessages) {
+      if (msg.sender === 'customer' && !msg.isRead) {
+        map[msg.orderId] = (map[msg.orderId] ?? 0) + 1
+      }
+    }
+    return map
+  })
+
+  function openChat(orderId: string) {
+    setChatOrderId(id => {
+      if (id === orderId) return null
+      setUnreadMap(m => ({ ...m, [orderId]: 0 }))
+      return orderId
+    })
+  }
 
   const isReseller = (o: Order) => o.customer.email.endsWith('@reseller.internal')
 
@@ -192,99 +223,122 @@ export default function OrdersClient({ orders, userMap }: Props) {
         </p>
       )}
 
-      <div className="admin-table-wrap">
-        {filtered.length === 0 ? (
-          <p className="admin-empty">
-            {orders.length === 0 ? 'Belum ada pesanan' : 'Tidak ada pesanan yang cocok'}
-          </p>
-        ) : (
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>ID Pesanan</th>
-                <th>Pelanggan</th>
-                <th>Item</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Tanggal</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((order) => (
-                <React.Fragment key={order.id}>
-                <tr>
-                  <td>
-                    <code style={{ fontSize: '0.78rem', color: '#555' }}>
-                      {order.id.slice(-6).toUpperCase()}
-                    </code>
-                  </td>
-                  <td style={{ maxWidth: '140px' }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.875rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {order.customer.name}
-                    </div>
-                    {order.customer.email.endsWith('@reseller.internal') ? (
-                      <div style={{ fontSize: '0.7rem', color: '#16a34a', fontWeight: 600, whiteSpace: 'nowrap' }}>
-                        ◈ {order.customer.notes?.replace('via reseller: ', '') ?? 'Reseller'}
-                      </div>
-                    ) : userMap[order.customer.email.toLowerCase()] ? (
-                      <div style={{ fontSize: '0.72rem', color: '#aaa', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
-                        #{userMap[order.customer.email.toLowerCase()].slice(-8).toUpperCase()}
-                      </div>
-                    ) : null}
-                  </td>
-                  <td>
-                    <div style={{ fontSize: '0.82rem', color: '#555' }}>
-                      {order.items.map(i => `${i.title} (${i.size}) ×${i.quantity}`).join(', ')}
-                    </div>
-                  </td>
-                  <td style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
-                    Rp {order.totalPrice.toLocaleString('id-ID')}
-                  </td>
-                  <td>
-                    <span className={`admin-badge ${statusClass[order.status] ?? ''}`}>
-                      {statusLabel[order.status] ?? order.status}
-                    </span>
-                  </td>
-                  <td style={{ fontSize: '0.8rem', color: '#777', whiteSpace: 'nowrap' }}>
-                    {new Date(order.createdAt).toLocaleDateString('id-ID', {
-                      day: '2-digit', month: 'short', year: 'numeric',
-                      hour: '2-digit', minute: '2-digit',
-                    })}
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                      <form action={updateOrderStatusFormAction} className="admin-order-status-form">
-                        <input type="hidden" name="orderId" value={order.id} />
-                        <select name="status" defaultValue={order.status} className="admin-order-status-select">
-                          {allStatuses.map(s => (
-                            <option key={s} value={s}>{statusLabel[s]}</option>
-                          ))}
-                        </select>
-                        <button type="submit" className="admin-order-status-btn">✓</button>
-                      </form>
-                      <button
-                        type="button"
-                        className={`admin-chat-toggle${chatOrderId === order.id ? ' admin-chat-toggle--active' : ''}`}
-                        onClick={() => setChatOrderId(id => id === order.id ? null : order.id)}
-                      >
-                        💬 Diskusi
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                {chatOrderId === order.id && (
-                  <tr className="admin-chat-row">
-                    <td colSpan={7}>
-                      <AdminChatPanel orderId={order.id} onClose={() => setChatOrderId(null)} />
-                    </td>
-                  </tr>
-                )}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
+      <div className="admin-orders-wrapper">
+
+        {/* Chat side panel — left */}
+        {chatOrderId && (
+          <div className="admin-orders-side">
+            <AdminChatPanel orderId={chatOrderId} onClose={() => setChatOrderId(null)} />
+          </div>
         )}
+
+        {/* Table */}
+        <div className="admin-table-wrap" style={{ flex: 1, minWidth: 0 }}>
+          {filtered.length === 0 ? (
+            <p className="admin-empty">
+              {orders.length === 0 ? 'Belum ada pesanan' : 'Tidak ada pesanan yang cocok'}
+            </p>
+          ) : (
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th style={{ width: 34 }} />
+                  <th>ID Pesanan</th>
+                  <th>Pelanggan</th>
+                  <th>Item</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Tanggal</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((order) => {
+                  const unread = unreadMap[order.id] ?? 0
+                  const isActive = chatOrderId === order.id
+                  return (
+                    <tr key={order.id}>
+                      <td style={{ padding: '0.4rem 0.25rem', verticalAlign: 'middle' }}>
+                        <button
+                          type="button"
+                          className={`oh-chat-btn${isActive ? ' oh-chat-btn--active' : ''}${unread > 0 && !isActive ? ' oh-chat-btn--unread' : ''}`}
+                          onClick={() => openChat(order.id)}
+                          aria-label="Diskusi"
+                        >
+                          {unread > 0 && !isActive && (
+                            <span className="oh-chat-btn-badge">{unread}</span>
+                          )}
+                          {isActive ? (
+                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                              <path d="M9 3L4 7.5 9 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          ) : (
+                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                              <path
+                                d="M2 2.5C2 1.67 2.67 1 3.5 1h8C12.33 1 13 1.67 13 2.5v7c0 .83-.67 1.5-1.5 1.5H5.5L2 13V2.5z"
+                                stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"
+                              />
+                            </svg>
+                          )}
+                        </button>
+                      </td>
+                      <td>
+                        <code style={{ fontSize: '0.78rem', color: '#555' }}>
+                          {order.id.slice(-6).toUpperCase()}
+                        </code>
+                      </td>
+                      <td style={{ maxWidth: '140px' }}>
+                        <div style={{ fontWeight: 600, fontSize: '0.875rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {order.customer.name}
+                        </div>
+                        {order.customer.email.endsWith('@reseller.internal') ? (
+                          <div style={{ fontSize: '0.7rem', color: '#16a34a', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                            ◈ {order.customer.notes?.replace('via reseller: ', '') ?? 'Reseller'}
+                          </div>
+                        ) : userMap[order.customer.email.toLowerCase()] ? (
+                          <div style={{ fontSize: '0.72rem', color: '#aaa', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>
+                            #{userMap[order.customer.email.toLowerCase()].slice(-8).toUpperCase()}
+                          </div>
+                        ) : null}
+                      </td>
+                      <td>
+                        <div style={{ fontSize: '0.82rem', color: '#555' }}>
+                          {order.items.map(i => `${i.title} (${i.size}) ×${i.quantity}`).join(', ')}
+                        </div>
+                      </td>
+                      <td style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
+                        Rp {order.totalPrice.toLocaleString('id-ID')}
+                      </td>
+                      <td>
+                        <span className={`admin-badge ${statusClass[order.status] ?? ''}`}>
+                          {statusLabel[order.status] ?? order.status}
+                        </span>
+                      </td>
+                      <td style={{ fontSize: '0.8rem', color: '#777', whiteSpace: 'nowrap' }}>
+                        {new Date(order.createdAt).toLocaleDateString('id-ID', {
+                          day: '2-digit', month: 'short', year: 'numeric',
+                          hour: '2-digit', minute: '2-digit',
+                        })}
+                      </td>
+                      <td>
+                        <form action={updateOrderStatusFormAction} className="admin-order-status-form">
+                          <input type="hidden" name="orderId" value={order.id} />
+                          <select name="status" defaultValue={order.status} className="admin-order-status-select">
+                            {allStatuses.map(s => (
+                              <option key={s} value={s}>{statusLabel[s]}</option>
+                            ))}
+                          </select>
+                          <button type="submit" className="admin-order-status-btn">✓</button>
+                        </form>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+
       </div>
     </>
   )
