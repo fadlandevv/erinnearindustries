@@ -2622,6 +2622,7 @@ p:last-child { margin-bottom: 0; }
   animation: oh-slide-in 0.18s ease;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 /* Bare chat (inside layer) fills panel height */
@@ -2636,6 +2637,8 @@ p:last-child { margin-bottom: 0; }
   max-height: none;
   min-height: 0;
   overflow-y: auto;
+  margin-right: -14px;
+  padding-right: 14px;
 }
 .oh-chat-layer-label {
   font-size: 0.7rem; font-weight: 600; color: #bbb;
@@ -2674,8 +2677,8 @@ p:last-child { margin-bottom: 0; }
   display: flex; flex-direction: column; gap: 0.55rem;
   max-height: 260px; overflow-y: auto; margin-top: 0.85rem;
 }
-.od-chat-body::-webkit-scrollbar { width: 3px; }
-.od-chat-body::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+.od-chat-body::-webkit-scrollbar { width: 2px; }
+.od-chat-body::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
 .od-chat-body::-webkit-scrollbar-track { background: transparent; }
 .od-chat-msg { display: flex; flex-direction: column; max-width: 76%; }
 .od-chat-msg--admin { align-self: flex-start; }
@@ -2686,9 +2689,9 @@ p:last-child { margin-bottom: 0; }
 }
 .od-chat-msg--admin .od-chat-bubble { background: #f0ede8; color: #222; border-bottom-left-radius: 4px; }
 .od-chat-msg--customer .od-chat-bubble { background: #222; color: #fff; border-bottom-right-radius: 4px; }
-.od-chat-msg-foot { display: flex; align-items: center; gap: 0.35rem; margin-top: 0.2rem; }
-.od-chat-meta { font-size: 0.7rem; color: #bbb; }
-.od-msg-status { font-size: 0.65rem; color: #bbb; }
+.od-chat-msg-foot { display: flex; align-items: center; gap: 0.35rem; margin-top: 0.2rem; overflow: hidden; }
+.od-chat-meta { font-size: 0.7rem; color: #bbb; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.od-msg-status { font-size: 0.65rem; color: #bbb; white-space: nowrap; flex-shrink: 0; }
 .od-msg-status--read { color: #16a34a; }
 .od-chat-empty { font-size: 0.8rem; color: #bbb; text-align: center; padding: 0.9rem 0; }
 .od-chat-error { font-size: 0.78rem; color: #e85c3a; margin: 0.3rem 0 0; }
