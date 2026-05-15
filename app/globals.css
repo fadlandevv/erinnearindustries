@@ -881,7 +881,7 @@ p:last-child { margin-bottom: 0; }
 
 .product-gallery-details {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 0.5rem;
   flex-shrink: 0;
 }
