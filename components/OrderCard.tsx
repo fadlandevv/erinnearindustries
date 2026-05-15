@@ -31,68 +31,71 @@ export default function OrderCard({ order, messages }: Props) {
   const [chatOpen, setChatOpen] = useState(false)
   const st = statusConfig[order.status] ?? { label: order.status, cls: '' }
 
+  function toggleDetail() {
+    if (open && chatOpen) setChatOpen(false)
+    setOpen(o => !o)
+  }
+
   function toggleChat() {
-    if (!chatOpen) setOpen(true)
+    if (!open) return
     setChatOpen(o => !o)
   }
 
   const adminCount = messages.filter(m => m.sender === 'admin').length
 
   return (
-    <div className="oh-card">
-      {/* Header */}
-      <div className="oh-card-head">
-        <div className="oh-card-head-left">
-          {/* Chat button */}
-          <button
-            type="button"
-            className={`oh-chat-btn${chatOpen ? ' oh-chat-btn--active' : ''}`}
-            onClick={toggleChat}
-            aria-label="Diskusi"
-          >
-            {adminCount > 0 && !chatOpen && (
-              <span className="oh-chat-btn-dot" />
-            )}
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-              <path
-                d="M2 2.5C2 1.67 2.67 1 3.5 1h8C12.33 1 13 1.67 13 2.5v7c0 .83-.67 1.5-1.5 1.5H5.5L2 13V2.5z"
-                stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+    <div className="oh-card-wrapper">
+      {/* Main card */}
+      <div className="oh-card">
+        {/* Header */}
+        <div className="oh-card-head">
+          <div className="oh-card-head-left">
+            <button
+              type="button"
+              className={`oh-chat-btn${chatOpen ? ' oh-chat-btn--active' : ''}${!open ? ' oh-chat-btn--muted' : ''}`}
+              onClick={toggleChat}
+              disabled={!open}
+              aria-label="Diskusi"
+            >
+              {adminCount > 0 && !chatOpen && <span className="oh-chat-btn-dot" />}
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                <path
+                  d="M2 2.5C2 1.67 2.67 1 3.5 1h8C12.33 1 13 1.67 13 2.5v7c0 .83-.67 1.5-1.5 1.5H5.5L2 13V2.5z"
+                  stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"
+                />
+              </svg>
+            </button>
 
-          <div className="oh-card-head-info">
-            <code className="oh-order-id">{order.id.slice(-6).toUpperCase()}</code>
-            <span className="oh-order-date">{formatDate(order.createdAt)}</span>
+            <div className="oh-card-head-info">
+              <code className="oh-order-id">{order.id.slice(-6).toUpperCase()}</code>
+              <span className="oh-order-date">{formatDate(order.createdAt)}</span>
+            </div>
+          </div>
+
+          <div className="oh-card-head-right">
+            <span className={`oh-badge ${st.cls}`}>{st.label}</span>
+            {order.status === 'pending' && <RepayButton orderId={order.id} />}
+            <DeleteOrderButton orderId={order.id} />
+            <button
+              type="button"
+              className="oh-detail-toggle"
+              onClick={toggleDetail}
+              aria-expanded={open}
+              aria-label={open ? 'Tutup detail' : 'Lihat detail'}
+            >
+              <svg
+                width="16" height="16" viewBox="0 0 16 16" fill="none"
+                style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}
+              >
+                <path d="M3 6l5 5 5-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
           </div>
         </div>
 
-        <div className="oh-card-head-right">
-          <span className={`oh-badge ${st.cls}`}>{st.label}</span>
-          {order.status === 'pending' && <RepayButton orderId={order.id} />}
-          <DeleteOrderButton orderId={order.id} />
-          <button
-            type="button"
-            className="oh-detail-toggle"
-            onClick={() => setOpen(o => !o)}
-            aria-expanded={open}
-            aria-label={open ? 'Tutup detail' : 'Lihat detail'}
-          >
-            <svg
-              width="16" height="16" viewBox="0 0 16 16" fill="none"
-              style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }}
-            >
-              <path d="M3 6l5 5 5-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Body */}
-      {open && (
-        <div className={`oh-card-body${chatOpen ? ' oh-card-body--split' : ''}`}>
-          {/* Main details */}
-          <div className="oh-card-body-main">
+        {/* Detail body */}
+        {open && (
+          <>
             <div className="oh-items">
               {order.items.map((item, i) => (
                 <div key={i} className="oh-item">
@@ -126,15 +129,15 @@ export default function OrderCard({ order, messages }: Props) {
                 </strong>
               </div>
             </div>
-          </div>
+          </>
+        )}
+      </div>
 
-          {/* Chat panel — right half */}
-          {chatOpen && (
-            <div className="oh-card-body-chat">
-              <p className="oh-card-chat-label">Diskusi</p>
-              <OrderChat orderId={order.id} initialMessages={messages} bare />
-            </div>
-          )}
+      {/* Chat panel — second layer sliding in from right */}
+      {open && chatOpen && (
+        <div className="oh-chat-layer">
+          <p className="oh-chat-layer-label">Diskusi</p>
+          <OrderChat orderId={order.id} initialMessages={messages} bare />
         </div>
       )}
     </div>
