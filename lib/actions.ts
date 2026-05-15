@@ -647,52 +647,68 @@ export async function updateProductPriceAction(
   return {}
 }
 
-export async function updateProductInfo(id: string, formData: FormData) {
-  const products = await getProducts()
-  const existing = products.find(p => p.id === id)
-  if (!existing) return
-  const colorsRaw = (formData.get('colors') as string | null) ?? ''
-  const colors = colorsRaw.split(',').map(c => c.trim()).filter(Boolean)
-  const updated = products.map(p =>
-    p.id === id ? {
-      ...p,
-      tag: formData.get('tag') as string,
-      title: formData.get('title') as string,
-      bg: colors[0] ?? p.bg,
-      colors: colors.length > 0 ? colors : p.colors,
-      description: formData.get('description') as string,
-      material: ((formData.get('material') as string | null) ?? '').split('\n').map(s => s.trim()).filter(Boolean),
-      sizechart: parseSizechart(formData),
-      sizes: formData.getAll('sizes') as string[],
-      updatedAt: new Date().toISOString(),
-    } : p
-  )
-  await saveProducts(updated)
-  revalidatePath('/product')
-  revalidatePath(`/product/${id}`)
-  redirect(`/admin/products/${id}/edit`)
+export async function updateProductInfo(
+  id: string,
+  _prev: unknown,
+  formData: FormData
+): Promise<{ ok?: boolean; error?: string }> {
+  try {
+    const products = await getProducts()
+    const existing = products.find(p => p.id === id)
+    if (!existing) return { error: 'Produk tidak ditemukan' }
+    const colorsRaw = (formData.get('colors') as string | null) ?? ''
+    const colors = colorsRaw.split(',').map(c => c.trim()).filter(Boolean)
+    const updated = products.map(p =>
+      p.id === id ? {
+        ...p,
+        tag: formData.get('tag') as string,
+        title: formData.get('title') as string,
+        bg: colors[0] ?? p.bg,
+        colors: colors.length > 0 ? colors : p.colors,
+        description: formData.get('description') as string,
+        material: ((formData.get('material') as string | null) ?? '').split('\n').map(s => s.trim()).filter(Boolean),
+        sizechart: parseSizechart(formData),
+        sizes: formData.getAll('sizes') as string[],
+        updatedAt: new Date().toISOString(),
+      } : p
+    )
+    await saveProducts(updated)
+    revalidatePath('/product')
+    revalidatePath(`/product/${id}`)
+    return { ok: true }
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Gagal menyimpan' }
+  }
 }
 
-export async function updateProductPhotos(id: string, formData: FormData) {
-  const products = await getProducts()
-  const existing = products.find(p => p.id === id)
-  if (!existing) return
-  let image = existing.image
-  const mainFile = formData.get('image') as File | null
-  if (mainFile && mainFile.size > 0) image = await saveImage(mainFile, id, 'main')
-  const images: string[] = ['', '', '', '']
-  existing.images?.forEach((v, i) => { if (i < 4) images[i] = v })
-  for (let i = 0; i < 4; i++) {
-    const f = formData.get(`detail-${i}`) as File | null
-    if (f && f.size > 0) images[i] = await saveImage(f, id, `detail-${i}`)
+export async function updateProductPhotos(
+  id: string,
+  _prev: unknown,
+  formData: FormData
+): Promise<{ ok?: boolean; error?: string }> {
+  try {
+    const products = await getProducts()
+    const existing = products.find(p => p.id === id)
+    if (!existing) return { error: 'Produk tidak ditemukan' }
+    let image = existing.image
+    const mainFile = formData.get('image') as File | null
+    if (mainFile && mainFile.size > 0) image = await saveImage(mainFile, id, 'main')
+    const images: string[] = ['', '', '', '']
+    existing.images?.forEach((v, i) => { if (i < 4) images[i] = v })
+    for (let i = 0; i < 4; i++) {
+      const f = formData.get(`detail-${i}`) as File | null
+      if (f && f.size > 0) images[i] = await saveImage(f, id, `detail-${i}`)
+    }
+    const updated = products.map(p =>
+      p.id === id ? { ...p, image, images, updatedAt: new Date().toISOString() } : p
+    )
+    await saveProducts(updated)
+    revalidatePath('/product')
+    revalidatePath(`/product/${id}`)
+    return { ok: true }
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Gagal menyimpan foto' }
   }
-  const updated = products.map(p =>
-    p.id === id ? { ...p, image, images, updatedAt: new Date().toISOString() } : p
-  )
-  await saveProducts(updated)
-  revalidatePath('/product')
-  revalidatePath(`/product/${id}`)
-  redirect(`/admin/products/${id}/edit`)
 }
 
 export async function upsertSizeEntryAction(input: {

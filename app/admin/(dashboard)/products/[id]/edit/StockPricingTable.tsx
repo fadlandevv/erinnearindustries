@@ -2,6 +2,7 @@
 import { Fragment, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { upsertSizeEntryAction } from '@/lib/actions'
+import { useAdminToast } from '@/context/AdminToastContext'
 import type { SizeEntry } from '@/lib/warehouse'
 
 type Props = {
@@ -22,6 +23,7 @@ function parseRp(s: string): number | null {
 
 export default function StockPricingTable({ productId, productTitle, entries }: Props) {
   const router = useRouter()
+  const { toast } = useAdminToast()
   const [activeSize, setActiveSize] = useState<string | null>(null)
   const [qty, setQty] = useState('')
   const [harga, setHarga] = useState('')
@@ -49,11 +51,14 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
           harga: parseRp(harga),
           hpp: parseRp(hpp),
         })
-        if (res?.error) { setError(res.error); return }
+        if (res?.error) { setError(res.error); toast(res.error, 'error'); return }
         setActiveSize(null)
+        toast('Stok & harga berhasil disimpan')
         router.refresh()
       } catch {
-        setError('Terjadi kesalahan. Pastikan tabel sudah dibuat di Supabase.')
+        const msg = 'Terjadi kesalahan. Pastikan tabel sudah dibuat di Supabase.'
+        setError(msg)
+        toast(msg, 'error')
       }
     })
   }
