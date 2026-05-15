@@ -661,7 +661,6 @@
 }
 .admin-sidebar-close:hover { color: #fff; }
 .admin-sidebar-overlay {
-  display: none;
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.55);
@@ -675,11 +674,8 @@
     transition: transform 0.25s ease;
     z-index: 999;
   }
-  .admin-sidebar.admin-sidebar-open {
-    transform: translateX(0);
-  }
+  .admin-sidebar.admin-sidebar-open { transform: translateX(0); }
   .admin-sidebar-close { display: block; }
-  .admin-sidebar-overlay { display: block; }
 
   .admin-mobile-header {
     display: flex;
@@ -697,16 +693,12 @@
     letter-spacing: -0.02em;
     flex-shrink: 0;
   }
-  .admin-mobile-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
+  .admin-mobile-brand { display: flex; align-items: center; gap: 0.5rem; }
 
   .admin-content { margin-left: 0; }
   .admin-main { padding: 1.25rem; }
 
-  .admin-stats-grid { grid-template-columns: 1fr; }
+  .admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
   .admin-quick-links { grid-template-columns: 1fr; }
   .admin-form-grid { grid-template-columns: 1fr; }
   .admin-form-card { padding: 1.5rem; }
@@ -719,17 +711,65 @@
   }
   .admin-page-title { font-size: 1.25rem; }
 
-  .admin-table-wrap { overflow-x: auto; }
-  .admin-table { min-width: 560px; }
+  /* Tables — horizontal scroll with touch momentum */
+  .admin-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .admin-table { min-width: 580px; }
+
+  /* Warehouse table is wider */
+  .wh-table { min-width: 720px; }
+
+  /* Warehouse — inline edit form stacks nicely on tablet */
+  .wh-form-row-inner { gap: 0.5rem; }
+  .wh-select { min-width: 160px; }
+
+  /* Sizechart table in form */
+  .admin-sizechart-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Order status form wraps */
+  .admin-order-status-form { flex-wrap: wrap; }
 }
 
 @media (max-width: 480px) {
   .admin-main { padding: 1rem; }
-  .admin-form-card { padding: 1.25rem; }
+  .admin-form-card { padding: 1.125rem; }
   .admin-login-card { padding: 1.75rem; }
+
+  /* Stats single col on very small */
+  .admin-stats-grid { grid-template-columns: 1fr; }
+
+  /* Form actions stack */
   .admin-form-actions { flex-direction: column; }
   .admin-form-actions .btn-admin-primary,
   .admin-form-actions .btn-admin-secondary { width: 100%; justify-content: center; }
+
+  /* Photos grid: 3 col then overflow scroll */
+  .admin-photos-5col {
+    grid-template-columns: repeat(3, 80px);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 0.25rem;
+  }
+
+  /* Warehouse inline edit — stack vertically */
+  .wh-form-row-inner { flex-direction: column; align-items: stretch; }
+  .wh-num-input { width: 100%; }
+  .wh-form-group { width: 100%; }
+  .wh-form-group-btn { min-width: unset; }
+  .wh-form-group-btn .btn-admin-primary { width: 100%; justify-content: center; }
+  .wh-select { min-width: unset; width: 100%; }
+
+  /* Warehouse stats 2 col */
+  .wh-stats { grid-template-columns: repeat(2, 1fr); }
+
+  /* Sizechart inputs narrower */
+  .admin-sizechart-input { width: 64px; }
+
+  /* Toast inset on small screens */
+  .admin-toast-wrap { bottom: 1rem; right: 1rem; left: 1rem; }
+  .admin-toast { min-width: unset; max-width: 100%; }
+
+  /* Page header action buttons full width */
+  .admin-page-header .btn-admin-secondary { width: 100%; justify-content: center; }
 }
 
 /* ===== QUICK LINKS ===== */

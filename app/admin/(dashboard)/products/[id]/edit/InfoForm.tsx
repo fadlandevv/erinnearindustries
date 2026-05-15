@@ -93,25 +93,26 @@ export default function InfoForm({ product, sizechartData }: Props) {
 
         <div className="admin-form-group">
           <label>Size Chart</label>
-          <table className="admin-sizechart-table">
-            <thead>
-              <tr>
-                <th>Ukuran</th>
-                <th>Panjang (cm)</th>
-                <th>Lebar (cm)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sizeOptions.map(size => (
-                <tr key={size}>
-                  <td>{size}</td>
-                  <td><input name={`sc_p_${size}`} type="number" min={0} className="admin-sizechart-input" defaultValue={sizechartData[size]?.panjang ?? ''} placeholder="—" /></td>
-                  <td><input name={`sc_l_${size}`} type="number" min={0} className="admin-sizechart-input" defaultValue={sizechartData[size]?.lebar ?? ''} placeholder="—" /></td>
+          <div className="admin-sizechart-table-wrap">
+            <table className="admin-sizechart-table">
+              <thead>
+                <tr>
+                  <th>Ukuran</th>
+                  <th>Panjang (cm)</th>
+                  <th>Lebar (cm)</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {sizeOptions.map(size => (
+                  <tr key={size}>
+                    <td>{size}</td>
+                    <td><input name={`sc_p_${size}`} type="number" min={0} className="admin-sizechart-input" defaultValue={sizechartData[size]?.panjang ?? ''} placeholder="—" /></td>
+                    <td><input name={`sc_l_${size}`} type="number" min={0} className="admin-sizechart-input" defaultValue={sizechartData[size]?.lebar ?? ''} placeholder="—" /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
         <div className="admin-form-divider" />
         <div className="admin-form-actions">
