@@ -33,7 +33,7 @@ export default async function ResellerOrdersPage() {
           <h1 className="admin-page-title">Pesanan</h1>
           <p className="admin-page-subtitle">{orders.length} total pesanan</p>
         </div>
-        <Link href="/reseller/orders/new" className="btn-admin-primary" style={{ background: '#16a34a' }}>
+        <Link href="/reseller/dashboard/orders/new" className="btn-admin-primary" style={{ background: '#16a34a' }}>
           + Buat Pesanan Baru
         </Link>
       </div>
@@ -42,7 +42,7 @@ export default async function ResellerOrdersPage() {
         {orders.length === 0 ? (
           <div className="admin-empty">
             Belum ada pesanan.{' '}
-            <Link href="/reseller/orders/new" style={{ color: '#16a34a' }}>Buat pesanan pertama →</Link>
+            <Link href="/reseller/dashboard/orders/new" style={{ color: '#16a34a' }}>Buat pesanan pertama →</Link>
           </div>
         ) : (
           <table className="admin-table">

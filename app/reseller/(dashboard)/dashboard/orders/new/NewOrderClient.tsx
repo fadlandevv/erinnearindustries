@@ -41,7 +41,7 @@ export default function NewOrderClient({ products }: Props) {
     if (!state) return
     if (state.ok) {
       toast('Pesanan berhasil dibuat!')
-      router.push('/reseller/orders')
+      router.push('/reseller/dashboard/orders')
     } else if (state.error) {
       toast(state.error, 'error')
     }
