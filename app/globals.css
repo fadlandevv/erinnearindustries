@@ -2561,20 +2561,47 @@ p:last-child { margin-bottom: 0; }
 .oh-total-label { font-size: 0.65rem; color: #bbb; text-transform: uppercase; letter-spacing: 0.06em; }
 .oh-total-num { font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; }
 
+/* Order chat icon button (header left) */
+.oh-chat-btn {
+  position: relative;
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 1px solid #d8d4cc; background: #f5f2ec;
+  color: #666; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.oh-chat-btn:hover { background: #ede9e2; border-color: #bbb; color: #222; }
+.oh-chat-btn--active { background: #222; border-color: #222; color: #fff; }
+.oh-chat-btn--active:hover { background: #333; border-color: #333; }
+.oh-chat-btn-dot {
+  position: absolute; top: -2px; right: -2px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #e85c3a; border: 1.5px solid #fff;
+}
+
+/* Order card split body */
+.oh-card-body { padding-top: 0.25rem; }
+.oh-card-body--split { display: flex; gap: 0; align-items: flex-start; }
+.oh-card-body-main { flex: 1; min-width: 0; }
+.oh-card-body-chat {
+  width: 50%; flex-shrink: 0;
+  border-left: 1px solid #edeae4;
+  padding-left: 1.25rem;
+  margin-left: 1.25rem;
+}
+.oh-card-chat-label {
+  font-size: 0.7rem; font-weight: 600; color: #bbb;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin-bottom: 0.5rem;
+}
+
 /* Order detail toggle */
 .oh-detail-toggle {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid #d8d4cc;
-  background: #f5f2ec;
-  color: #555;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid #d8d4cc; background: #f5f2ec;
+  color: #555; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 .oh-detail-toggle:hover { background: #ede9e2; border-color: #bbb; color: #222; }
 
