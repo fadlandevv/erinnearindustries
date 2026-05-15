@@ -296,10 +296,13 @@
 .admin-logout-btn:hover { background: rgba(239,68,68,0.15); color: #f87171; }
 .admin-content {
   flex: 1;
-  margin-left: 230px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+}
+@media (min-width: 769px) {
+  .admin-content { margin-left: 230px; }
 }
 .admin-main {
   padding: 2rem 2.5rem;
@@ -671,7 +674,7 @@
 @media (max-width: 768px) {
   /* ── Core layout fix: stack header above content ── */
   .admin-layout-wrapper { flex-direction: column; }
-  .admin-content { margin-left: 0; width: 100%; min-height: 0; flex: 1; }
+  .admin-content { min-height: 0; }
 
   /* ── Sidebar slides in as overlay ── */
   .admin-sidebar {
