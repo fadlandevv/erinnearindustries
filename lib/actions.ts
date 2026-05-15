@@ -14,7 +14,7 @@ import {
 import {
   getResellerByUsername, getResellerById, getResellers, saveReseller, deleteReseller as _deleteReseller,
   hashResellerPassword, verifyResellerPassword, saveResellerOrder, updateResellerOrderStatus,
-  type ResellerOrderStatus,
+  getResellerOrders, type ResellerOrderStatus,
 } from './resellers'
 import { adjustStock, upsertSizeEntry } from './warehouse'
 import { saveManualEntry, deleteManualEntry, type RekapSource } from './rekap'
@@ -1037,4 +1037,39 @@ export async function adminMarkOrderMessagesReadAction(orderId: string): Promise
   const jar = await cookies()
   if (!jar.get('admin-token')) return
   await markMessagesRead(orderId, 'customer')
+}
+
+export async function resellerSendOrderMessageAction(
+  _prev: { error?: string } | null,
+  formData: FormData
+): Promise<{ error?: string }> {
+  const jar = await cookies()
+  const resellerId = jar.get('reseller-token')?.value
+  if (!resellerId) return { error: 'Sesi habis, silakan login ulang.' }
+  const reseller = await getResellerById(resellerId)
+  if (!reseller) return { error: 'Reseller tidak ditemukan.' }
+
+  const orderId = formData.get('orderId') as string
+  const message = (formData.get('message') as string ?? '').trim()
+  if (!message) return { error: 'Pesan tidak boleh kosong.' }
+
+  const orders = await getResellerOrders(resellerId)
+  if (!orders.find(o => o.id === orderId)) return { error: 'Pesanan tidak ditemukan.' }
+
+  await sendOrderMessage({ id: generateId(12), orderId, sender: 'customer', senderName: reseller.name, message })
+  revalidatePath('/reseller/dashboard/orders')
+  return {}
+}
+
+export async function resellerGetOrderMessagesAction(orderId: string): Promise<OrderMessage[]> {
+  const jar = await cookies()
+  if (!jar.get('reseller-token')) return []
+  return getOrderMessages(orderId)
+}
+
+export async function resellerMarkOrderMessagesReadAction(orderId: string): Promise<void> {
+  const jar = await cookies()
+  if (!jar.get('reseller-token')) return
+  await markMessagesRead(orderId, 'admin')
+  revalidatePath('/reseller/dashboard/orders')
 }
