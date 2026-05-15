@@ -1,7 +1,8 @@
 'use client'
-import { useState, useMemo } from 'react'
+import React, { useState, useMemo, useActionState, useEffect, useRef } from 'react'
 import type { Order } from '@/lib/orders'
-import { updateOrderStatusFormAction } from '@/lib/actions'
+import type { OrderMessage } from '@/lib/order-messages'
+import { updateOrderStatusFormAction, adminSendOrderMessageAction, getOrderMessagesAction } from '@/lib/actions'
 
 const statusLabel: Record<string, string> = {
   pending:    'Menunggu',
@@ -31,12 +32,75 @@ type Props = {
   userMap: Record<string, string>
 }
 
+const fmtChatTime = (iso: string) =>
+  new Date(iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) +
+  ' · ' + new Date(iso).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })
+
+function AdminChatPanel({ orderId, onClose }: { orderId: string; onClose: () => void }) {
+  const [messages, setMessages] = useState<OrderMessage[]>([])
+  const [loading, setLoading] = useState(true)
+  const [state, action, isPending] = useActionState(adminSendOrderMessageAction, null)
+  const formRef = useRef<HTMLFormElement>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    getOrderMessagesAction(orderId).then(msgs => { setMessages(msgs); setLoading(false) })
+  }, [orderId])
+
+  useEffect(() => {
+    if (state && !state.error) {
+      formRef.current?.reset()
+      getOrderMessagesAction(orderId).then(setMessages)
+    }
+  }, [state])
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages.length])
+
+  return (
+    <div className="admin-chat-panel">
+      <div className="admin-chat-panel-header">
+        Diskusi pesanan #{orderId.slice(-6).toUpperCase()}
+        <button type="button" onClick={onClose} style={{ float: 'right', background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', fontSize: '0.9rem' }}>✕</button>
+      </div>
+
+      <div className="admin-chat-messages">
+        {loading ? (
+          <p className="admin-chat-empty">Memuat...</p>
+        ) : messages.length === 0 ? (
+          <p className="admin-chat-empty">Belum ada pesan untuk pesanan ini.</p>
+        ) : (
+          messages.map(msg => (
+            <div key={msg.id} className={`admin-chat-msg admin-chat-msg--${msg.sender}`}>
+              <div className="admin-chat-bubble">{msg.message}</div>
+              <span className="admin-chat-msg-meta">{msg.senderName} · {fmtChatTime(msg.createdAt)}</span>
+            </div>
+          ))
+        )}
+        <div ref={bottomRef} />
+      </div>
+
+      {state?.error && <p style={{ fontSize: '0.76rem', color: '#e85c3a', marginBottom: '0.5rem' }}>{state.error}</p>}
+
+      <form ref={formRef} action={action} className="admin-chat-form">
+        <input type="hidden" name="orderId" value={orderId} />
+        <input name="message" type="text" className="admin-chat-input" placeholder="Balas pesan..." maxLength={500} required />
+        <button type="submit" className="admin-chat-send" disabled={isPending}>
+          {isPending ? '...' : 'Kirim'}
+        </button>
+      </form>
+    </div>
+  )
+}
+
 export default function OrdersClient({ orders, userMap }: Props) {
   const [search, setSearch]     = useState('')
   const [year, setYear]         = useState('all')
   const [month, setMonth]       = useState('all')
   const [sort, setSort]         = useState<'newest' | 'oldest'>('newest')
   const [source, setSource]     = useState<'all' | 'reseller' | 'customer'>('all')
+  const [chatOrderId, setChatOrderId] = useState<string | null>(null)
 
   const isReseller = (o: Order) => o.customer.email.endsWith('@reseller.internal')
 
@@ -147,7 +211,8 @@ export default function OrdersClient({ orders, userMap }: Props) {
             </thead>
             <tbody>
               {filtered.map((order) => (
-                <tr key={order.id}>
+                <React.Fragment key={order.id}>
+                <tr>
                   <td>
                     <code style={{ fontSize: '0.78rem', color: '#555' }}>
                       {order.id.slice(-6).toUpperCase()}
@@ -187,17 +252,34 @@ export default function OrdersClient({ orders, userMap }: Props) {
                     })}
                   </td>
                   <td>
-                    <form action={updateOrderStatusFormAction} className="admin-order-status-form">
-                      <input type="hidden" name="orderId" value={order.id} />
-                      <select name="status" defaultValue={order.status} className="admin-order-status-select">
-                        {allStatuses.map(s => (
-                          <option key={s} value={s}>{statusLabel[s]}</option>
-                        ))}
-                      </select>
-                      <button type="submit" className="admin-order-status-btn">✓</button>
-                    </form>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      <form action={updateOrderStatusFormAction} className="admin-order-status-form">
+                        <input type="hidden" name="orderId" value={order.id} />
+                        <select name="status" defaultValue={order.status} className="admin-order-status-select">
+                          {allStatuses.map(s => (
+                            <option key={s} value={s}>{statusLabel[s]}</option>
+                          ))}
+                        </select>
+                        <button type="submit" className="admin-order-status-btn">✓</button>
+                      </form>
+                      <button
+                        type="button"
+                        className={`admin-chat-toggle${chatOrderId === order.id ? ' admin-chat-toggle--active' : ''}`}
+                        onClick={() => setChatOrderId(id => id === order.id ? null : order.id)}
+                      >
+                        💬 Diskusi
+                      </button>
+                    </div>
                   </td>
                 </tr>
+                {chatOrderId === order.id && (
+                  <tr className="admin-chat-row">
+                    <td colSpan={7}>
+                      <AdminChatPanel orderId={order.id} onClose={() => setChatOrderId(null)} />
+                    </td>
+                  </tr>
+                )}
+                </React.Fragment>
               ))}
             </tbody>
           </table>

@@ -1,8 +1,10 @@
 import type { Order } from '@/lib/orders'
+import type { OrderMessage } from '@/lib/order-messages'
 import Link from 'next/link'
 import DeleteOrderButton from './DeleteOrderButton'
 import RepayButton from './RepayButton'
 import OrderTracker from './OrderTracker'
+import OrderChat from './OrderChat'
 
 const statusConfig: Record<string, { label: string; cls: string }> = {
   pending:    { label: 'Menunggu Pembayaran', cls: 'oh-badge-pending'    },
@@ -21,7 +23,7 @@ function formatDate(iso: string) {
   })
 }
 
-export default function OrderList({ orders }: { orders: Order[] }) {
+export default function OrderList({ orders, messagesByOrder = {} }: { orders: Order[]; messagesByOrder?: Record<string, OrderMessage[]> }) {
   if (orders.length === 0) {
     return (
       <div className="oh-empty">
@@ -92,7 +94,8 @@ export default function OrderList({ orders }: { orders: Order[] }) {
               </div>
             </div>
 
-
+            {/* Discussion */}
+            <OrderChat orderId={order.id} initialMessages={messagesByOrder[order.id] ?? []} />
 
           </div>
         )

@@ -22,6 +22,7 @@ import { logAdminAccess } from './access-log'
 import { getPricingItems, upsertPricingItem, insertPricingItem, deletePricingItem } from './pricing'
 import { generateId } from './utils'
 import { db } from './db'
+import { getOrderMessages, getMessagesByOrderIds, sendOrderMessage, type OrderMessage } from './order-messages'
 
 function parseSizechart(formData: FormData): string | undefined {
   const chart: Record<string, { panjang: number; lebar: number }> = {}
@@ -971,4 +972,53 @@ export async function updateProductResellerPriceAction(
   revalidatePath(`/product/${productId}`)
   revalidatePath('/admin/reseller')
   return {}
+}
+
+// ── Order Discussion ──────────────────────────────────────────
+
+export async function sendOrderMessageAction(
+  _prev: { error?: string } | null,
+  formData: FormData
+): Promise<{ error?: string }> {
+  const jar = await cookies()
+  const email = jar.get('user-session')?.value
+  if (!email) return { error: 'Sesi habis, silakan login ulang.' }
+  const user = await getUserByEmail(email)
+  if (!user) return { error: 'Pengguna tidak ditemukan.' }
+
+  const orderId = formData.get('orderId') as string
+  const message = (formData.get('message') as string ?? '').trim()
+  if (!message) return { error: 'Pesan tidak boleh kosong.' }
+
+  const orders = await getOrdersByEmail(email)
+  if (!orders.find(o => o.id === orderId)) return { error: 'Pesanan tidak ditemukan.' }
+
+  await sendOrderMessage({ id: generateId(12), orderId, sender: 'customer', senderName: user.name, message })
+  revalidatePath('/orders')
+  return {}
+}
+
+export async function adminSendOrderMessageAction(
+  _prev: { error?: string } | null,
+  formData: FormData
+): Promise<{ error?: string }> {
+  const jar = await cookies()
+  const adminId = jar.get('admin-token')?.value
+  if (!adminId) return { error: 'Unauthorized' }
+  const admin = await getAdminById(adminId)
+  if (!admin) return { error: 'Admin tidak ditemukan.' }
+
+  const orderId = formData.get('orderId') as string
+  const message = (formData.get('message') as string ?? '').trim()
+  if (!message) return { error: 'Pesan tidak boleh kosong.' }
+
+  await sendOrderMessage({ id: generateId(12), orderId, sender: 'admin', senderName: admin.username, message })
+  revalidatePath('/admin/orders')
+  return {}
+}
+
+export async function getOrderMessagesAction(orderId: string): Promise<OrderMessage[]> {
+  const jar = await cookies()
+  if (!jar.get('admin-token')) return []
+  return getOrderMessages(orderId)
 }

@@ -474,6 +474,56 @@
 }
 .admin-order-status-btn:hover { background: #333; }
 
+/* ===== ORDER CHAT ===== */
+.admin-chat-toggle {
+  background: none; border: 1px solid #e0ddd8; border-radius: 6px;
+  padding: 0.3rem 0.6rem; font-size: 0.78rem; cursor: pointer; color: #666;
+  display: inline-flex; align-items: center; gap: 0.3rem; transition: background 0.15s;
+}
+.admin-chat-toggle:hover { background: #f5f2ec; }
+.admin-chat-toggle--active { background: #f5f2ec; border-color: #bbb; }
+.admin-chat-unread {
+  background: #e85c3a; color: #fff; border-radius: 99px;
+  font-size: 0.65rem; font-weight: 700; padding: 0.05rem 0.4rem; line-height: 1.5;
+}
+.admin-chat-row > td {
+  padding: 0 !important; background: #fafaf8; border-top: none !important;
+  border-bottom: 1px solid #eee;
+}
+.admin-chat-panel { padding: 1rem 1.5rem 1.25rem; }
+.admin-chat-panel-header {
+  font-size: 0.72rem; font-weight: 600; color: #999;
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem;
+}
+.admin-chat-messages {
+  display: flex; flex-direction: column; gap: 0.45rem;
+  max-height: 200px; overflow-y: auto; margin-bottom: 0.75rem;
+}
+.admin-chat-msg { display: flex; flex-direction: column; max-width: 68%; }
+.admin-chat-msg--customer { align-self: flex-start; }
+.admin-chat-msg--admin { align-self: flex-end; align-items: flex-end; }
+.admin-chat-bubble {
+  padding: 0.4rem 0.75rem; border-radius: 10px;
+  font-size: 0.82rem; line-height: 1.45;
+}
+.admin-chat-msg--customer .admin-chat-bubble { background: #edeae4; color: #222; border-bottom-left-radius: 3px; }
+.admin-chat-msg--admin .admin-chat-bubble { background: #222; color: #fff; border-bottom-right-radius: 3px; }
+.admin-chat-msg-meta { font-size: 0.68rem; color: #bbb; margin-top: 0.15rem; }
+.admin-chat-empty { font-size: 0.78rem; color: #bbb; text-align: center; padding: 0.75rem 0; }
+.admin-chat-form { display: flex; gap: 0.5rem; }
+.admin-chat-input {
+  flex: 1; border: 1px solid #ddd; border-radius: 6px;
+  padding: 0.38rem 0.65rem; font-size: 0.82rem; outline: none;
+  transition: border-color 0.15s;
+}
+.admin-chat-input:focus { border-color: #222; }
+.admin-chat-send {
+  background: #222; color: #fff; border: none; border-radius: 6px;
+  padding: 0.38rem 0.85rem; font-size: 0.8rem; cursor: pointer; white-space: nowrap;
+}
+.admin-chat-send:hover { background: #333; }
+.admin-chat-send:disabled { opacity: 0.45; cursor: not-allowed; }
+
 /* ===== FORM ===== */
 .admin-form-card {
   background: #fff;

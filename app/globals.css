@@ -2561,6 +2561,51 @@ p:last-child { margin-bottom: 0; }
 .oh-total-label { font-size: 0.65rem; color: #bbb; text-transform: uppercase; letter-spacing: 0.06em; }
 .oh-total-num { font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; }
 
+/* Order discussion / chat */
+.od-chat { border-top: 1px solid #edeae4; margin-top: 1.25rem; padding-top: 1rem; }
+.od-chat-toggle {
+  background: none; border: 1px solid #d8d4cc; border-radius: 8px;
+  padding: 0.38rem 0.85rem; font-size: 0.8rem; cursor: pointer;
+  color: #555; display: inline-flex; align-items: center; gap: 0.4rem;
+  transition: background 0.15s;
+}
+.od-chat-toggle:hover { background: #f5f2ec; }
+.od-chat-unread {
+  background: #e85c3a; color: #fff; border-radius: 99px;
+  font-size: 0.68rem; font-weight: 700; padding: 0.05rem 0.45rem; line-height: 1.5;
+}
+.od-chat-body {
+  display: flex; flex-direction: column; gap: 0.55rem;
+  max-height: 260px; overflow-y: auto; margin-top: 0.85rem;
+  padding-right: 0.2rem;
+}
+.od-chat-msg { display: flex; flex-direction: column; max-width: 76%; }
+.od-chat-msg--admin { align-self: flex-start; }
+.od-chat-msg--customer { align-self: flex-end; align-items: flex-end; }
+.od-chat-bubble {
+  padding: 0.5rem 0.9rem; border-radius: 14px;
+  font-size: 0.845rem; line-height: 1.5;
+}
+.od-chat-msg--admin .od-chat-bubble { background: #f0ede8; color: #222; border-bottom-left-radius: 4px; }
+.od-chat-msg--customer .od-chat-bubble { background: #222; color: #fff; border-bottom-right-radius: 4px; }
+.od-chat-meta { font-size: 0.7rem; color: #bbb; margin-top: 0.2rem; }
+.od-chat-empty { font-size: 0.8rem; color: #bbb; text-align: center; padding: 0.9rem 0; }
+.od-chat-error { font-size: 0.78rem; color: #e85c3a; margin: 0.3rem 0 0; }
+.od-chat-form { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+.od-chat-input {
+  flex: 1; border: 1px solid #ddd; border-radius: 8px;
+  padding: 0.45rem 0.75rem; font-size: 0.845rem; outline: none;
+  background: #fff; transition: border-color 0.15s;
+}
+.od-chat-input:focus { border-color: #222; }
+.od-chat-send {
+  background: #222; color: #fff; border: none; border-radius: 8px;
+  padding: 0.45rem 1rem; font-size: 0.82rem; cursor: pointer; white-space: nowrap;
+  transition: background 0.15s;
+}
+.od-chat-send:hover { background: #333; }
+.od-chat-send:disabled { opacity: 0.45; cursor: not-allowed; }
+
 /* Repay action bar */
 .oh-repay-btn {
   display: inline-flex;

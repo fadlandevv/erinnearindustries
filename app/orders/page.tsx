@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 import { getUserByEmail } from '@/lib/users'
 import { getOrdersByEmail } from '@/lib/orders'
+import { getMessagesByOrderIds, type OrderMessage } from '@/lib/order-messages'
 import Link from 'next/link'
 import OrderList from '@/components/OrderList'
 
@@ -12,6 +13,13 @@ export default async function OrdersPage() {
   const email = jar.get('user-session')?.value ?? ''
   const user = await getUserByEmail(email)
   const orders = await getOrdersByEmail(email)
+
+  const allMessages = await getMessagesByOrderIds(orders.map(o => o.id))
+  const messagesByOrder: Record<string, OrderMessage[]> = {}
+  for (const msg of allMessages) {
+    if (!messagesByOrder[msg.orderId]) messagesByOrder[msg.orderId] = []
+    messagesByOrder[msg.orderId].push(msg)
+  }
 
   return (
     <section className="orders-section">
@@ -26,7 +34,7 @@ export default async function OrdersPage() {
           <Link href="/profile" className="btn-outline oh-logout-btn">← Kembali ke Profil</Link>
         </div>
 
-        <OrderList orders={orders} />
+        <OrderList orders={orders} messagesByOrder={messagesByOrder} />
       </div>
     </section>
   )

@@ -188,3 +188,16 @@ create index if not exists reseller_orders_created_at_idx on reseller_orders (cr
 -- ── Add price_reseller to products ───────────────────────────
 
 alter table products add column if not exists price_reseller integer;
+
+-- ── Order discussion messages ─────────────────────────────────
+
+create table if not exists order_messages (
+  id text primary key,
+  order_id text not null references orders(id) on delete cascade,
+  sender text not null check (sender in ('customer', 'admin')),
+  sender_name text not null,
+  message text not null,
+  created_at timestamptz default now()
+);
+
+create index if not exists order_messages_order_idx on order_messages (order_id, created_at);
