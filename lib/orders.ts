@@ -53,7 +53,7 @@ export async function getOrderById(id: string): Promise<Order | undefined> {
 }
 
 export async function saveOrder(order: Order): Promise<void> {
-  await db.from('orders').upsert({
+  const { error } = await db.from('orders').upsert({
     id: order.id,
     created_at: order.createdAt,
     status: order.status,
@@ -62,10 +62,12 @@ export async function saveOrder(order: Order): Promise<void> {
     total_price: order.totalPrice,
     snap_token: order.snapToken,
   })
+  if (error) throw new Error(error.message)
 }
 
 export async function updateOrderStatus(id: string, status: Order['status']): Promise<void> {
-  await db.from('orders').update({ status }).eq('id', id)
+  const { error } = await db.from('orders').update({ status }).eq('id', id)
+  if (error) throw new Error(error.message)
 }
 
 export async function getOrdersByEmail(email: string): Promise<Order[]> {

@@ -852,7 +852,16 @@ export async function createResellerOrderAction(
     })
 
     // Mirror into main orders table so it counts toward revenue and admin status tracking
-    const IDR = (n: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
+    const formatIDR = (n: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
+    const orderItems: OrderItem[] = items.map(i => ({
+      productId: i.productId,
+      title: i.title,
+      price: formatIDR(i.unitPrice),
+      unitPrice: i.unitPrice,
+      size: i.size,
+      quantity: i.qty,
+      bg: '',
+    }))
     await saveOrder({
       id: orderId,
       createdAt,
@@ -866,15 +875,7 @@ export async function createResellerOrderAction(
         postalCode: '',
         notes: `via reseller: ${reseller.username}`,
       },
-      items: items.map(i => ({
-        productId: i.productId,
-        title: i.title,
-        price: IDR(i.unitPrice),
-        unitPrice: i.unitPrice,
-        size: i.size,
-        quantity: i.qty,
-        bg: '',
-      } satisfies OrderItem)),
+      items: orderItems,
       totalPrice,
       snapToken: '',
     })
