@@ -18,6 +18,7 @@ export default function OrderChat({ orderId, initialMessages, bare = false }: Pr
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const isOpen = bare || open
+  const msgCount = initialMessages.length
 
   useEffect(() => {
     if (state && !state.error) {
@@ -26,9 +27,12 @@ export default function OrderChat({ orderId, initialMessages, bare = false }: Pr
     }
   }, [state])
 
+  // Only scroll when a NEW message arrives after mount, not on open
+  const mountedRef = useRef(false)
   useEffect(() => {
-    if (isOpen) setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
-  }, [isOpen, initialMessages.length])
+    if (!mountedRef.current) { mountedRef.current = true; return }
+    if (isOpen) bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }, [msgCount])
 
   const adminCount = initialMessages.filter(m => m.sender === 'admin').length
 
