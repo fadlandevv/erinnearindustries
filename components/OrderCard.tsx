@@ -45,6 +45,14 @@ export default function OrderCard({ order, messages }: Props) {
 
   return (
     <div className="oh-card-wrapper">
+      {/* Chat panel — left layer */}
+      {open && chatOpen && (
+        <div className="oh-chat-layer">
+          <p className="oh-chat-layer-label">Diskusi</p>
+          <OrderChat orderId={order.id} initialMessages={messages} bare />
+        </div>
+      )}
+
       {/* Main card */}
       <div className="oh-card">
         {/* Header */}
@@ -133,13 +141,6 @@ export default function OrderCard({ order, messages }: Props) {
         )}
       </div>
 
-      {/* Chat panel — second layer sliding in from right */}
-      {open && chatOpen && (
-        <div className="oh-chat-layer">
-          <p className="oh-chat-layer-label">Diskusi</p>
-          <OrderChat orderId={order.id} initialMessages={messages} bare />
-        </div>
-      )}
     </div>
   )
 }
