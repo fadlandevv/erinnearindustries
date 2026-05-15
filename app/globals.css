@@ -2746,7 +2746,8 @@ p:last-child { margin-bottom: 0; }
 @media (max-width: 640px) {
   /* Card head: info stacks above right (badge/chevron) */
   .oh-card-head { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-  .oh-card-head-right { flex-wrap: wrap; gap: 0.5rem; }
+  .oh-card-head-right { flex-wrap: wrap; gap: 0.5rem; width: 100%; }
+  .oh-card-head-right .oh-detail-toggle { margin-left: auto; }
   .oh-card-foot { flex-direction: column; align-items: flex-start; }
   .oh-total-wrap { align-items: flex-start; }
   .orders-section { padding: 2rem 0 4rem; }
