@@ -153,3 +153,38 @@ create table if not exists warehouse_log (
 
 create index if not exists warehouse_stock_product_idx on warehouse_stock (product_id);
 create index if not exists warehouse_log_created_at_idx on warehouse_log (created_at desc);
+
+-- ── Reseller tables ──────────────────────────────────────────
+
+create table if not exists resellers (
+  id text primary key,
+  username text unique not null,
+  password_hash text not null,
+  name text not null,
+  phone text default '',
+  level text not null default 'bronze',
+  active boolean default true,
+  created_at timestamptz default now()
+);
+
+create table if not exists reseller_orders (
+  id text primary key,
+  reseller_id text not null,
+  reseller_username text not null,
+  customer_name text not null,
+  customer_phone text default '',
+  customer_address text default '',
+  items jsonb not null default '[]',
+  total_price integer not null default 0,
+  commission integer not null default 0,
+  status text not null default 'pending',
+  note text default '',
+  created_at timestamptz default now()
+);
+
+create index if not exists reseller_orders_reseller_idx on reseller_orders (reseller_id);
+create index if not exists reseller_orders_created_at_idx on reseller_orders (created_at desc);
+
+-- ── Add price_reseller to products ───────────────────────────
+
+alter table products add column if not exists price_reseller integer;

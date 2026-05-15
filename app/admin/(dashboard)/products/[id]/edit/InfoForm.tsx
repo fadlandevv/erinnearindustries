@@ -92,6 +92,19 @@ export default function InfoForm({ product, sizechartData }: Props) {
         </div>
 
         <div className="admin-form-group">
+          <label>Harga Reseller (Rp)</label>
+          <input
+            name="price_reseller"
+            type="number"
+            min={0}
+            className="admin-form-input"
+            defaultValue={product.priceReseller ?? ''}
+            placeholder="cth. 85000"
+          />
+          <p className="admin-form-hint">Harga khusus untuk reseller (kosongkan jika belum diset)</p>
+        </div>
+
+        <div className="admin-form-group">
           <label>Size Chart</label>
           <div className="admin-sizechart-table-wrap">
             <table className="admin-sizechart-table">

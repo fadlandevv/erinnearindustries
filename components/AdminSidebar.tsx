@@ -58,6 +58,13 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    group: 'Reseller',
+    icon: '◈',
+    items: [
+      { label: 'Reseller', href: '/admin/reseller', icon: '◈', permission: 'reseller' },
+    ],
+  },
+  {
     group: 'Sistem',
     icon: '⊞',
     items: [

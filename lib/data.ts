@@ -8,6 +8,7 @@ export type Product = {
   bg: string
   colors?: string[]
   priceUSD?: number
+  priceReseller?: number
   description: string
   material: string | string[]
   sizechart?: string
@@ -73,6 +74,7 @@ function toProduct(row: Record<string, unknown>): Product {
     bg: (row.bg as string) ?? '#f0ede8',
     colors: (row.colors as string[]) ?? undefined,
     priceUSD: (row.price_usd as number) ?? undefined,
+    priceReseller: (row.price_reseller as number) ?? undefined,
     description: row.description as string,
     material: (row.material as string[]) ?? [],
     sizechart: (row.sizechart as string) ?? undefined,
@@ -101,6 +103,7 @@ export async function saveProducts(products: Product[]): Promise<void> {
       material: Array.isArray(p.material) ? p.material : [p.material],
       sizes: p.sizes, sizechart: p.sizechart ?? null,
       image: p.image ?? null, images: p.images ?? null,
+      price_reseller: p.priceReseller ?? null,
     })
     if (error) throw new Error(error.message)
   }

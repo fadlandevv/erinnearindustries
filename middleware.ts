@@ -19,6 +19,19 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Reseller auth
+  const resellerToken = request.cookies.get('reseller-token')
+  const isResellerAuth = !!resellerToken?.value && resellerToken.value.length > 0
+
+  if (pathname === '/reseller/login') {
+    if (isResellerAuth) return NextResponse.redirect(new URL('/reseller', request.url))
+    return NextResponse.next()
+  }
+  if (pathname.startsWith('/reseller')) {
+    if (!isResellerAuth) return NextResponse.redirect(new URL('/reseller/login', request.url))
+    return NextResponse.next()
+  }
+
   // Customer auth
   const userSession = request.cookies.get('user-session')
   const isUserAuth = !!userSession?.value
@@ -40,5 +53,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/orders/:path*', '/profile/:path*', '/login', '/register'],
+  matcher: ['/admin/:path*', '/reseller/:path*', '/orders/:path*', '/profile/:path*', '/login', '/register'],
 }

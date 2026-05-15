@@ -11,6 +11,11 @@ import {
   getRoles, getRoleById, saveRole, deleteRole as _deleteRole,
   hashAdminPassword, verifyAdminPassword, type Permission,
 } from './rbac'
+import {
+  getResellerByUsername, getResellerById, getResellers, saveReseller, deleteReseller as _deleteReseller,
+  hashResellerPassword, verifyResellerPassword, saveResellerOrder, updateResellerOrderStatus,
+  type ResellerOrderStatus,
+} from './resellers'
 import { adjustStock, upsertSizeEntry } from './warehouse'
 import { saveManualEntry, deleteManualEntry, type RekapSource } from './rekap'
 import { logAdminAccess } from './access-log'
@@ -672,6 +677,10 @@ export async function updateProductInfo(
     if (!existing) return { error: 'Produk tidak ditemukan' }
     const colorsRaw = (formData.get('colors') as string | null) ?? ''
     const colors = colorsRaw.split(',').map(c => c.trim()).filter(Boolean)
+    const priceResellerRaw = formData.get('price_reseller') as string | null
+    const priceReseller = priceResellerRaw && priceResellerRaw.trim() !== ''
+      ? parseInt(priceResellerRaw.trim(), 10) || undefined
+      : undefined
     const updated = products.map(p =>
       p.id === id ? {
         ...p,
@@ -683,6 +692,7 @@ export async function updateProductInfo(
         material: ((formData.get('material') as string | null) ?? '').split('\n').map(s => s.trim()).filter(Boolean),
         sizechart: parseSizechart(formData),
         sizes: formData.getAll('sizes') as string[],
+        priceReseller,
         updatedAt: new Date().toISOString(),
       } : p
     )
@@ -747,4 +757,161 @@ export async function upsertSizeEntryAction(input: {
     revalidatePath(`/admin/products/${input.productId}/edit`)
   }
   return result
+}
+
+// ── Reseller Auth ─────────────────────────────────────────────
+
+export async function resellerLogin(
+  _prev: { error?: string },
+  formData: FormData
+): Promise<{ error?: string }> {
+  const username = (formData.get('username') as string).trim()
+  const password = formData.get('password') as string
+  const reseller = await getResellerByUsername(username)
+  if (!reseller || !verifyResellerPassword(password, reseller.passwordHash)) {
+    return { error: 'Username atau password salah.' }
+  }
+  if (!reseller.active) {
+    return { error: 'Akun reseller ini tidak aktif. Hubungi admin.' }
+  }
+  const jar = await cookies()
+  jar.set('reseller-token', reseller.id, { httpOnly: true, sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 })
+  redirect('/reseller')
+}
+
+export async function resellerLogout(): Promise<void> {
+  const jar = await cookies()
+  jar.delete('reseller-token')
+  redirect('/reseller/login')
+}
+
+// ── Reseller Orders ───────────────────────────────────────────
+
+export async function createResellerOrderAction(
+  _prev: { ok?: boolean; error?: string } | null,
+  formData: FormData
+): Promise<{ ok?: boolean; error?: string }> {
+  try {
+    const jar = await cookies()
+    const resellerId = jar.get('reseller-token')?.value
+    if (!resellerId) return { error: 'Sesi habis, silakan login ulang.' }
+    const reseller = await getResellerById(resellerId)
+    if (!reseller) return { error: 'Akun reseller tidak ditemukan.' }
+
+    const customerName = (formData.get('customerName') as string).trim()
+    const customerPhone = (formData.get('customerPhone') as string ?? '').trim()
+    const customerAddress = (formData.get('customerAddress') as string ?? '').trim()
+    const itemsJson = formData.get('itemsJson') as string
+
+    if (!customerName) return { error: 'Nama customer wajib diisi.' }
+
+    const items = JSON.parse(itemsJson) as Array<{
+      productId: string; title: string; size: string; qty: number; unitPrice: number; subtotal: number
+    }>
+    if (!items.length) return { error: 'Keranjang kosong.' }
+
+    const totalPrice = items.reduce((s, i) => s + i.subtotal, 0)
+
+    await saveResellerOrder({
+      id: generateId(10),
+      resellerId: reseller.id,
+      resellerUsername: reseller.username,
+      customerName,
+      customerPhone,
+      customerAddress,
+      items,
+      totalPrice,
+      commission: 0,
+      status: 'pending',
+      note: '',
+      createdAt: new Date().toISOString(),
+    })
+
+    revalidatePath('/reseller/orders')
+    revalidatePath('/reseller')
+    revalidatePath('/admin/reseller')
+    return { ok: true }
+  } catch (e) {
+    console.error(e)
+    return { error: e instanceof Error ? e.message : 'Gagal membuat pesanan.' }
+  }
+}
+
+// ── Admin: Reseller CRUD ──────────────────────────────────────
+
+export async function createResellerAction(
+  _prev: { error?: string },
+  formData: FormData
+): Promise<{ error?: string }> {
+  const jar = await cookies()
+  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+
+  const username = (formData.get('username') as string).trim()
+  const password = (formData.get('password') as string).trim()
+  const name = (formData.get('name') as string).trim()
+  const phone = (formData.get('phone') as string ?? '').trim()
+  const level = (formData.get('level') as string) || 'bronze'
+
+  if (!username || !password || !name) return { error: 'Username, password, dan nama wajib diisi.' }
+  if (password.length < 6) return { error: 'Password minimal 6 karakter.' }
+
+  const exists = await getResellerByUsername(username)
+  if (exists) return { error: 'Username sudah digunakan.' }
+
+  await saveReseller({
+    id: generateId(8),
+    username,
+    passwordHash: hashResellerPassword(password),
+    name,
+    phone,
+    level: level as 'bronze' | 'silver' | 'gold',
+    active: true,
+    createdAt: new Date().toISOString(),
+  })
+
+  revalidatePath('/admin/reseller')
+  return {}
+}
+
+export async function deleteResellerAction(id: string): Promise<void> {
+  const jar = await cookies()
+  if (!jar.get('admin-token')) return
+  await _deleteReseller(id)
+  revalidatePath('/admin/reseller')
+}
+
+export async function updateResellerOrderStatusAction(
+  _prev: { error?: string } | null,
+  formData: FormData
+): Promise<{ error?: string }> {
+  const jar = await cookies()
+  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+
+  const id = formData.get('id') as string
+  const status = formData.get('status') as ResellerOrderStatus
+  const commissionRaw = formData.get('commission') as string
+  const commission = parseInt(commissionRaw, 10) || 0
+
+  await updateResellerOrderStatus(id, status, commission)
+  revalidatePath('/admin/reseller')
+  return {}
+}
+
+export async function updateProductResellerPriceAction(
+  productId: string,
+  priceReseller: number | null,
+): Promise<{ error?: string }> {
+  const jar = await cookies()
+  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+  const products = await getProducts()
+  const updated = products.map(p =>
+    p.id === productId
+      ? { ...p, priceReseller: priceReseller ?? undefined }
+      : p
+  )
+  await saveProducts(updated)
+  revalidatePath('/product')
+  revalidatePath(`/product/${productId}`)
+  revalidatePath('/admin/reseller')
+  return {}
 }
