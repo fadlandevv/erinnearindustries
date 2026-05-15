@@ -56,12 +56,18 @@ export default function OrderCard({ order, messages }: Props) {
           aria-label="Diskusi"
         >
           {adminCount > 0 && !chatOpen && <span className="oh-chat-btn-dot" />}
-          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-            <path
-              d="M2 2.5C2 1.67 2.67 1 3.5 1h8C12.33 1 13 1.67 13 2.5v7c0 .83-.67 1.5-1.5 1.5H5.5L2 13V2.5z"
-              stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"
-            />
-          </svg>
+          {chatOpen ? (
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+              <path d="M9 3L4 7.5 9 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          ) : (
+            <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+              <path
+                d="M2 2.5C2 1.67 2.67 1 3.5 1h8C12.33 1 13 1.67 13 2.5v7c0 .83-.67 1.5-1.5 1.5H5.5L2 13V2.5z"
+                stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"
+              />
+            </svg>
+          )}
         </button>
       </div>
 
