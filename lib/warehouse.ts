@@ -48,21 +48,30 @@ export async function upsertSizeEntry(
   hpp: number | null,
   adminUsername: string,
 ): Promise<{ error?: string }> {
-  const { data: current } = await db
+  const { data: current, error: selectErr } = await db
     .from('warehouse_stock')
-    .select('quantity')
+    .select('id,quantity')
     .eq('product_id', productId)
     .eq('size', size)
     .maybeSingle()
 
+  if (selectErr) return { error: selectErr.message }
+
   const currentQty: number = current?.quantity ?? 0
   const delta = quantity - currentQty
 
-  const { error: upsertErr } = await db.from('warehouse_stock').upsert(
-    { product_id: productId, size, quantity, harga, hpp, updated_at: new Date().toISOString() },
-    { onConflict: 'product_id,size' },
-  )
-  if (upsertErr) return { error: upsertErr.message }
+  if (current) {
+    const { error } = await db
+      .from('warehouse_stock')
+      .update({ quantity, harga, hpp, updated_at: new Date().toISOString() })
+      .eq('id', current.id)
+    if (error) return { error: error.message }
+  } else {
+    const { error } = await db
+      .from('warehouse_stock')
+      .insert({ product_id: productId, size, quantity, harga, hpp })
+    if (error) return { error: error.message }
+  }
 
   if (delta !== 0) {
     await db.from('warehouse_log').insert({
@@ -100,12 +109,14 @@ export async function adjustStock(
   note: string,
   adminUsername: string,
 ): Promise<{ error?: string }> {
-  const { data: current } = await db
+  const { data: current, error: selectErr } = await db
     .from('warehouse_stock')
-    .select('quantity')
+    .select('id,quantity')
     .eq('product_id', productId)
     .eq('size', size)
     .maybeSingle()
+
+  if (selectErr) return { error: selectErr.message }
 
   const currentQty: number = current?.quantity ?? 0
   let newQty: number
@@ -124,11 +135,18 @@ export async function adjustStock(
 
   if (newQty < 0) return { error: 'Stok tidak bisa negatif.' }
 
-  const { error: upsertErr } = await db.from('warehouse_stock').upsert(
-    { product_id: productId, size, quantity: newQty, updated_at: new Date().toISOString() },
-    { onConflict: 'product_id,size' },
-  )
-  if (upsertErr) return { error: upsertErr.message }
+  if (current) {
+    const { error } = await db
+      .from('warehouse_stock')
+      .update({ quantity: newQty, updated_at: new Date().toISOString() })
+      .eq('id', current.id)
+    if (error) return { error: error.message }
+  } else {
+    const { error } = await db
+      .from('warehouse_stock')
+      .insert({ product_id: productId, size, quantity: newQty })
+    if (error) return { error: error.message }
+  }
 
   await db.from('warehouse_log').insert({
     product_id: productId,

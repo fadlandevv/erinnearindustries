@@ -46,11 +46,39 @@ create table if not exists products (
   description text,
   material text[],
   sizes text[],
+  sizechart text,
   image text,
   images text[],
   price_usd numeric,
+  updated_at timestamptz,
   created_at timestamptz default now()
 );
+
+create table if not exists warehouse_stock (
+  id uuid default gen_random_uuid() primary key,
+  product_id text not null,
+  size text not null,
+  quantity integer not null default 0,
+  harga integer,
+  hpp integer,
+  updated_at timestamptz default now()
+);
+
+create table if not exists warehouse_log (
+  id uuid default gen_random_uuid() primary key,
+  product_id text not null,
+  product_title text not null,
+  size text not null,
+  quantity_change integer not null,
+  quantity_after integer not null,
+  type text not null check (type in ('restock', 'keluar', 'koreksi')),
+  note text,
+  admin_username text not null,
+  created_at timestamptz default now()
+);
+
+create index if not exists warehouse_stock_product_idx on warehouse_stock (product_id);
+create index if not exists warehouse_log_created_at_idx on warehouse_log (created_at desc);
 
 create table if not exists services (
   id text primary key,
