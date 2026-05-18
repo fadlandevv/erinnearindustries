@@ -59,16 +59,24 @@ export default function Navbar({ user }: NavbarProps) {
         </Link>
 
         <ul className="nav-links">
-          {navLinks.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                className={pathname === link.href ? 'nav-link-active' : ''}
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
+          {navLinks.map((link) => {
+            const isCustom   = link.href === '/custom'
+            const isReseller = link.href === '/reseller'
+            const isActive   = pathname === link.href
+            const base = isCustom ? 'nav-custom-link' : isReseller ? 'nav-reseller-link' : ''
+            const cls = [
+              base,
+              isActive && !base ? 'nav-link-active' : '',
+              isActive && base  ? `${base}--active`  : '',
+            ].filter(Boolean).join(' ')
+            return (
+              <li key={link.href}>
+                <Link href={link.href} className={cls || undefined}>
+                  {link.label}
+                </Link>
+              </li>
+            )
+          })}
         </ul>
 
         <div className="nav-actions">
@@ -90,14 +98,17 @@ export default function Navbar({ user }: NavbarProps) {
 
           {/* Desktop only */}
           {user ? (
-            <Link href="/profile" className="nav-user-btn nav-desktop-only">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <Link href="/profile" className="nav-user-btn nav-desktop-only" aria-label="Profil">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
               </svg>
-              {user.name.split(' ')[0]}
             </Link>
           ) : (
-            <Link href="/login" className="nav-login-btn nav-desktop-only">{t.nav.login}</Link>
+            <Link href="/login" className="nav-login-btn nav-desktop-only" aria-label="Masuk">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
+            </Link>
           )}
 
           {/* Theme toggle — desktop only */}
@@ -124,16 +135,27 @@ export default function Navbar({ user }: NavbarProps) {
       {open && (
         <div className="nav-mobile">
           {/* Nav links */}
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={pathname === link.href ? 'nav-mobile-link-active' : ''}
-              onClick={() => setOpen(false)}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isCustom   = link.href === '/custom'
+            const isReseller = link.href === '/reseller'
+            const isActive   = pathname === link.href
+            const base = isCustom ? 'nav-custom-link' : isReseller ? 'nav-reseller-link' : ''
+            const cls = [
+              base,
+              isActive && !base ? 'nav-mobile-link-active' : '',
+              isActive && base  ? `${base}--active`         : '',
+            ].filter(Boolean).join(' ')
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cls || undefined}
+                onClick={() => setOpen(false)}
+              >
+                {link.label}
+              </Link>
+            )
+          })}
 
           <div className="nav-mobile-divider" />
 
