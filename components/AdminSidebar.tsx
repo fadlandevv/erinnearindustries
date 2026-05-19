@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { logout } from '@/lib/actions'
@@ -78,6 +78,7 @@ type Props = {
   permissions: Permission[]
   adminName: string
   roleName: string
+  isSuperAdmin?: boolean
 }
 
 function ExpandableNavItem({
@@ -191,9 +192,22 @@ function NavGroupSection({
   )
 }
 
-export default function AdminSidebar({ permissions, adminName, roleName }: Props) {
+export default function AdminSidebar({ permissions, adminName, roleName, isSuperAdmin }: Props) {
   const pathname = usePathname()
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [mobileOpen,  setMobileOpen]  = useState(false)
+  const [collapsed,   setCollapsed]   = useState(false)
+
+  useEffect(() => {
+    const saved = localStorage.getItem('admin-sidebar-collapsed')
+    if (saved === 'true') setCollapsed(true)
+  }, [])
+
+  function toggle() {
+    setCollapsed(c => {
+      localStorage.setItem('admin-sidebar-collapsed', String(!c))
+      return !c
+    })
+  }
 
   function close() { setMobileOpen(false) }
 
@@ -212,10 +226,15 @@ export default function AdminSidebar({ permissions, adminName, roleName }: Props
 
       {mobileOpen && <div className="admin-sidebar-overlay" onClick={close} />}
 
-      <aside className={`admin-sidebar${mobileOpen ? ' admin-sidebar-open' : ''}`}>
+      <aside className={`admin-sidebar${mobileOpen ? ' admin-sidebar-open' : ''}${collapsed ? ' admin-sidebar--collapsed' : ''}`}>
         <div className="admin-sidebar-brand">
-          <span className="admin-sidebar-brand-mark">EI</span>
-          Erinnear System
+          <span className="admin-sidebar-brand-mark admin-sidebar-brand-toggle" onClick={toggle}>EI</span>
+          <span className="admin-sidebar-brand-text">Erinnear System</span>
+          <button className="admin-sidebar-collapse-btn" onClick={toggle} aria-label="Toggle sidebar">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
           <button className="admin-sidebar-close" onClick={close} aria-label="Close menu">✕</button>
         </div>
 
@@ -232,13 +251,23 @@ export default function AdminSidebar({ permissions, adminName, roleName }: Props
         </nav>
 
         <div className="admin-sidebar-footer">
-          <div style={{ fontSize: '0.75rem', color: '#888', marginBottom: '0.5rem', paddingLeft: '0.25rem' }}>
-            <div style={{ fontWeight: 600, color: '#666' }}>{adminName}</div>
-            <div>{roleName}</div>
+          <div className={`admin-sidebar-footer-item${isSuperAdmin ? ' admin-footer-super' : ''}`}>
+            <svg className="admin-nav-group-icon" width="18" height="18" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="5" r="3" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+            <div className="admin-footer-info">
+              <div className="admin-footer-name">{adminName}</div>
+              <div className="admin-footer-role">{roleName}</div>
+            </div>
           </div>
           <form action={logout}>
             <button type="submit" className="admin-logout-btn">
-              <span>↩</span> Logout
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                <path d="M6 2H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M11 11l3-3-3-3M14 8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="admin-sidebar-brand-text">Logout</span>
             </button>
           </form>
         </div>

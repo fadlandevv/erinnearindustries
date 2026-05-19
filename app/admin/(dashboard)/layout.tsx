@@ -17,7 +17,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   return (
     <AdminToastProvider>
       <div className="admin-layout-wrapper">
-        <AdminSidebar permissions={permissions} adminName={admin.username} roleName={role?.name ?? ''} />
+        <AdminSidebar permissions={permissions} adminName={admin.username} roleName={role?.name ?? ''} isSuperAdmin={role?.locked ?? false} />
         <div className="admin-content">
           <div className="admin-main">{children}</div>
         </div>
