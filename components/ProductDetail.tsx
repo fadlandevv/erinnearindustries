@@ -8,6 +8,32 @@ import ProductCard from './ProductCard'
 
 type SizeChartRow = { panjang: number; lebar: number }
 
+function SizeChartMockup() {
+  return (
+    <div className="pd-sizechart-mockup">
+      <svg viewBox="0 0 158 178" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        {/* T-shirt silhouette */}
+        <path
+          d="M22,48 L4,28 L0,60 L22,70 L22,158 L122,158 L122,70 L144,60 L140,28 L122,48 C106,36 88,58 72,58 C56,58 38,36 22,48Z"
+          className="pd-mockup-shirt"
+          strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round"
+        />
+        {/* Lebar — horizontal arrow */}
+        <line x1="22" y1="112" x2="122" y2="112" className="pd-mockup-line" strokeWidth="1" strokeDasharray="3,2"/>
+        <path d="M28,108 L22,112 L28,116" className="pd-mockup-arrow" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M116,108 L122,112 L116,116" className="pd-mockup-arrow" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+        <text x="72" y="107" textAnchor="middle" fontSize="9" className="pd-mockup-label" fontFamily="system-ui,sans-serif">lebar</text>
+        {/* Panjang — vertical arrow */}
+        <line x1="136" y1="48" x2="136" y2="158" className="pd-mockup-line" strokeWidth="1" strokeDasharray="3,2"/>
+        <path d="M132,54 L136,48 L140,54" className="pd-mockup-arrow" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M132,152 L136,158 L140,152" className="pd-mockup-arrow" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+        <text x="136" y="107" textAnchor="middle" fontSize="9" className="pd-mockup-label" fontFamily="system-ui,sans-serif"
+          transform="rotate(-90,136,103)">panjang</text>
+      </svg>
+    </div>
+  )
+}
+
 function parseSizechartRows(raw: string | undefined): [string, SizeChartRow][] {
   if (!raw) return []
   try {
@@ -224,24 +250,27 @@ export default function ProductDetail({
               {parseSizechartRows(product.sizechart).length > 0 && (
                 <div className="pd-detail-col">
                   <p className="pd-detail-sub">Size Chart</p>
-                  <table className="pd-sizechart-table">
-                    <thead>
-                      <tr>
-                        <th>Size</th>
-                        <th>Panjang</th>
-                        <th>Lebar</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {parseSizechartRows(product.sizechart).map(([size, v]) => (
-                        <tr key={size}>
-                          <td>{size}</td>
-                          <td>{v.panjang} cm</td>
-                          <td>{v.lebar} cm</td>
+                  <div className="pd-sizechart-wrap">
+                    <SizeChartMockup />
+                    <table className="pd-sizechart-table">
+                      <thead>
+                        <tr>
+                          <th>Size</th>
+                          <th>Panjang</th>
+                          <th>Lebar</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {parseSizechartRows(product.sizechart).map(([size, v]) => (
+                          <tr key={size}>
+                            <td>{size}</td>
+                            <td>{v.panjang} cm</td>
+                            <td>{v.lebar} cm</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>

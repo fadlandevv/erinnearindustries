@@ -5,6 +5,33 @@ import { generateId } from '@/lib/utils'
 
 type Side = 'front' | 'back'
 
+const PRODUCT_TABS = [
+  {
+    id: 'tshirt', name: 'T-Shirt',
+    icon: <svg viewBox="0 0 80 88" fill="none"><path d="M18,22 L2,12 L0,30 L18,36 L18,78 L62,78 L62,36 L80,30 L78,12 L62,22 Q40,36 18,22Z" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round"/></svg>,
+  },
+  {
+    id: 'totebag', name: 'Totebag',
+    icon: <svg viewBox="0 0 80 88" fill="none"><path d="M12,32 L10,78 L70,78 L68,32 Z" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round"/><path d="M24,32 C24,14 36,10 40,10 C44,10 56,14 56,32" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/><line x1="12" y1="32" x2="24" y2="32" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/><line x1="56" y1="32" x2="68" y2="32" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/></svg>,
+  },
+  {
+    id: 'amplop-packaging', name: 'Amplop Packaging',
+    icon: <svg viewBox="0 0 80 88" fill="none"><rect x="6" y="22" width="68" height="52" rx="4" stroke="currentColor" strokeWidth="2.2"/><path d="M6,22 L40,50 L74,22" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round"/><path d="M6,74 L32,50" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M74,74 L48,50" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+  },
+  {
+    id: 'coach-jacket', name: 'Coach Jacket',
+    icon: <svg viewBox="0 0 80 88" fill="none"><path d="M18,26 L2,14 L0,32 L18,38 L18,78 L62,78 L62,38 L80,32 L78,14 L62,26 L52,20 L40,22 L28,20 Z" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round"/><path d="M28,20 L28,30 L52,30 L52,20" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/><line x1="40" y1="30" x2="40" y2="78" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4,3"/></svg>,
+  },
+  {
+    id: 'hoodie', name: 'Hoodie',
+    icon: <svg viewBox="0 0 80 88" fill="none"><path d="M18,32 L2,16 L0,34 L18,40 L18,78 L62,78 L62,40 L80,34 L78,16 L62,32 C58,20 50,12 40,12 C30,12 22,20 18,32Z" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round"/><path d="M18,32 C22,20 30,10 40,10 C50,10 58,20 62,32" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><rect x="28" y="58" width="24" height="14" rx="4" stroke="currentColor" strokeWidth="1.8"/><line x1="40" y1="30" x2="40" y2="58" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4,3"/></svg>,
+  },
+  {
+    id: 'jersey', name: 'Jersey',
+    icon: <svg viewBox="0 0 80 88" fill="none"><path d="M18,24 L2,12 L0,30 L18,36 L18,78 L62,78 L62,36 L80,30 L78,12 L62,24 L40,38 L18,24Z" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round"/><line x1="20" y1="52" x2="30" y2="52" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><line x1="50" y1="52" x2="60" y2="52" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><text x="40" y="64" textAnchor="middle" fontSize="15" fontWeight="700" fill="currentColor" fontFamily="system-ui,sans-serif">10</text></svg>,
+  },
+]
+
 const SHIRT_COLORS = [
   { label: 'Putih',  value: '#FFFFFF' },
   { label: 'Krem',   value: '#f5f0e8' },
@@ -37,31 +64,92 @@ type InvoiceItem = {
   catatan?: string
 }
 
-function ShirtSVG({ color, design, side }: { color: string; design: string | null; side: Side }) {
+const MOCKUP_CONFIGS: Record<string, {
+  paths: string[]
+  clipPath: string
+  da: { x: number; y: number; w: number; h: number }
+}> = {
+  tshirt: {
+    paths: ['M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 Q 176,50 150,55 Q 124,50 118,0 Z'],
+    clipPath: 'M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 Q 176,50 150,55 Q 124,50 118,0 Z',
+    da: { x: 90, y: 90, w: 120, h: 120 },
+  },
+  totebag: {
+    paths: [
+      'M 40,100 L 20,330 L 280,330 L 260,100 Z',
+      'M 80,0 L 80,100 L 110,100 L 110,0 Z',
+      'M 190,0 L 190,100 L 220,100 L 220,0 Z',
+    ],
+    clipPath: 'M 40,100 L 20,330 L 280,330 L 260,100 Z',
+    da: { x: 75, y: 130, w: 150, h: 150 },
+  },
+  'amplop-packaging': {
+    paths: ['M 15,80 L 15,310 L 285,310 L 285,80 Z'],
+    clipPath: 'M 15,80 L 15,310 L 285,310 L 285,80 Z',
+    da: { x: 60, y: 105, w: 180, h: 155 },
+  },
+  'coach-jacket': {
+    paths: ['M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 L 162,26 L 150,18 L 138,26 Z'],
+    clipPath: 'M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 L 162,26 L 150,18 L 138,26 Z',
+    da: { x: 90, y: 100, w: 120, h: 120 },
+  },
+  hoodie: {
+    paths: ['M 108,68 L 52,80 L 0,122 L 0,158 L 52,138 L 52,340 L 248,340 L 248,138 L 300,158 L 300,122 L 248,80 L 192,68 C 182,18 150,4 150,4 C 150,4 118,18 108,68 Z'],
+    clipPath: 'M 108,68 L 52,80 L 0,122 L 0,158 L 52,138 L 52,340 L 248,340 L 248,138 L 300,158 L 300,122 L 248,80 L 192,68 C 182,18 150,4 150,4 C 150,4 118,18 108,68 Z',
+    da: { x: 90, y: 118, w: 120, h: 110 },
+  },
+  jersey: {
+    paths: ['M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 L 150,56 L 118,0 Z'],
+    clipPath: 'M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 L 150,56 L 118,0 Z',
+    da: { x: 90, y: 90, w: 120, h: 120 },
+  },
+}
+
+function ProductMockupSVG({ color, design, side, productType }: {
+  color: string; design: string | null; side: Side; productType: string
+}) {
   const isDark = color === '#1a1a1a' || color === '#1e3a5f' || color === '#6b7c3d'
   const stroke = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'
   const hint   = isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.18)'
-  const id     = `sc-${side}`
-  const path   = 'M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 Q 176,50 150,55 Q 124,50 118,0 Z'
+  const id     = `clip-${productType}-${side}`
+  const cfg    = MOCKUP_CONFIGS[productType] ?? MOCKUP_CONFIGS.tshirt
+  const { da } = cfg
 
   return (
     <svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg" className="custom-shirt-svg">
-      <defs><clipPath id={id}><path d={path} /></clipPath></defs>
-      <path d={path} fill={color} stroke={stroke} strokeWidth="1.5" />
-      {design && (
-        <image href={design} x="90" y="90" width="120" height="120"
-          clipPath={`url(#${id})`} preserveAspectRatio="xMidYMid meet" />
-      )}
-      {!design && (
-        <g clipPath={`url(#${id})`}>
-          <rect x="90" y="90" width="120" height="120" fill="none" stroke={hint} strokeWidth="1.2" strokeDasharray="6 4" rx="6" />
-          <text x="150" y="146" textAnchor="middle" fontSize="10" fill={hint} fontFamily="inherit">
-            {side === 'front' ? 'Desain Depan' : 'Desain Belakang'}
-          </text>
-          <text x="150" y="160" textAnchor="middle" fontSize="9" fill={hint} fontFamily="inherit">Upload di kiri</text>
-        </g>
-      )}
-      <path d={path} fill="none" stroke={stroke} strokeWidth="1.5" />
+      <defs><clipPath id={id}><path d={cfg.clipPath}/></clipPath></defs>
+
+      {cfg.paths.map((p, i) => <path key={i} d={p} fill={color} stroke={stroke} strokeWidth="1.5"/>)}
+
+      {design
+        ? <image href={design} x={da.x} y={da.y} width={da.w} height={da.h} clipPath={`url(#${id})`} preserveAspectRatio="xMidYMid meet"/>
+        : (
+          <g clipPath={`url(#${id})`}>
+            <rect x={da.x} y={da.y} width={da.w} height={da.h} fill="none" stroke={hint} strokeWidth="1.2" strokeDasharray="6 4" rx="6"/>
+            <text x={da.x + da.w / 2} y={da.y + da.h / 2 - 7} textAnchor="middle" fontSize="10" fill={hint} fontFamily="inherit">
+              {side === 'front' ? 'Desain Depan' : 'Desain Belakang'}
+            </text>
+            <text x={da.x + da.w / 2} y={da.y + da.h / 2 + 8} textAnchor="middle" fontSize="9" fill={hint} fontFamily="inherit">Upload di kiri</text>
+          </g>
+        )
+      }
+
+      {cfg.paths.map((p, i) => <path key={`o${i}`} d={p} fill="none" stroke={stroke} strokeWidth="1.5"/>)}
+
+      {productType === 'coach-jacket' && <line x1="150" y1="18" x2="150" y2="340" stroke={stroke} strokeWidth="1" strokeDasharray="5,3"/>}
+      {productType === 'hoodie' && <>
+        <line x1="150" y1="68" x2="150" y2="210" stroke={stroke} strokeWidth="1" strokeDasharray="5,3"/>
+        <rect x="108" y="268" width="84" height="48" rx="8" fill="none" stroke={stroke} strokeWidth="1.2"/>
+      </>}
+      {productType === 'jersey' && <>
+        <rect x="52" y="85" width="18" height="135" fill={stroke}/>
+        <rect x="230" y="85" width="18" height="135" fill={stroke}/>
+      </>}
+      {productType === 'amplop-packaging' && <>
+        <path d="M 15,80 L 150,185 L 285,80" fill="none" stroke={stroke} strokeWidth="1.5"/>
+        <line x1="15" y1="310" x2="115" y2="195" stroke={stroke} strokeWidth="1" strokeLinecap="round"/>
+        <line x1="285" y1="310" x2="185" y2="195" stroke={stroke} strokeWidth="1" strokeLinecap="round"/>
+      </>}
     </svg>
   )
 }
@@ -94,6 +182,7 @@ export default function CustomDesignClient({
 }) {
   const { addCustomItem, openCart } = useCart()
 
+  const [selectedTab, setSelectedTab] = useState('tshirt')
   const [form, setForm]         = useState({ ...EMPTY_FORM })
   const [activeSide, setActiveSide] = useState<Side>('front')
   const [error, setError]       = useState('')
@@ -180,8 +269,40 @@ export default function CustomDesignClient({
     openCart()
   }
 
+  const activeTab = PRODUCT_TABS.find(t => t.id === selectedTab)!
+
   return (
     <div>
+      {/* ── Product Tabs ── */}
+      <section className="custom-products-section">
+        <div className="custom-products-inner">
+<div className="custom-products-grid">
+            {PRODUCT_TABS.map(tab => (
+              <button
+                key={tab.id}
+                type="button"
+                className={`custom-product-card${selectedTab === tab.id ? ' custom-product-card--active' : ''}`}
+                onClick={() => setSelectedTab(tab.id)}
+              >
+                <div className="custom-product-icon">{tab.icon}</div>
+                <span className="custom-product-name">{tab.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Hero ── */}
+      <div className="custom-hero">
+        <div className="custom-hero-inner">
+          <span className="pill pill-yellow">✦ {activeTab.name}</span>
+          <h1 className="custom-hero-title">Desain {activeTab.name} Sendiri</h1>
+          <p className="custom-hero-sub">
+            Upload desain depan & belakang, pilih warna dan ukuran — kami produksi sesuai pesananmu.
+          </p>
+        </div>
+      </div>
+
       {/* ── Form + Mockup ── */}
       <section className="custom-section">
         <div className="custom-inner">
@@ -383,7 +504,7 @@ export default function CustomDesignClient({
               </button>
             </div>
             <div className="custom-shirt-wrap">
-              <ShirtSVG color={form.shirtColor} design={activeDesign} side={activeSide} />
+              <ProductMockupSVG color={form.shirtColor} design={activeDesign} side={activeSide} productType={selectedTab} />
             </div>
             {!activeDesign && (
               <p className="custom-mockup-hint">

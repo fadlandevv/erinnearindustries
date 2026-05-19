@@ -1,10 +1,11 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useCart } from '@/context/CartContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from '@/context/ThemeContext'
+import { logoutUser } from '@/lib/actions'
 
 type NavbarProps = {
   user?: { name: string } | null
@@ -12,10 +13,30 @@ type NavbarProps = {
 
 export default function Navbar({ user }: NavbarProps) {
   const [open, setOpen] = useState(false)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
+  const router = useRouter()
   const { totalItems, openCart } = useCart()
   const { lang, setLang, t } = useLanguage()
   const { theme, toggleTheme } = useTheme()
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  async function handleLogout() {
+    await logoutUser()
+    setUserMenuOpen(false)
+    router.push('/')
+    router.refresh()
+  }
 
   const navLinks = [
     { label: t.nav.home, href: '/' },
@@ -98,11 +119,41 @@ export default function Navbar({ user }: NavbarProps) {
 
           {/* Desktop only */}
           {user ? (
-            <Link href="/profile" className="nav-user-btn nav-desktop-only" aria-label="Profil">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-              </svg>
-            </Link>
+            <div className="nav-user-menu nav-desktop-only" ref={userMenuRef}>
+              <button
+                type="button"
+                className={`nav-user-btn${userMenuOpen ? ' nav-user-btn--open' : ''}`}
+                onClick={() => setUserMenuOpen(v => !v)}
+                aria-label="Menu profil"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+              </button>
+              {userMenuOpen && (
+                <div className="nav-user-dropdown">
+                  <Link href="/profile" className="nav-user-dropdown-item" onClick={() => setUserMenuOpen(false)}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                    </svg>
+                    Profil Saya
+                  </Link>
+                  <Link href="/orders" className="nav-user-dropdown-item" onClick={() => setUserMenuOpen(false)}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    Riwayat Pesanan
+                  </Link>
+                  <div className="nav-user-dropdown-divider" />
+                  <button type="button" className="nav-user-dropdown-item nav-user-dropdown-item--danger" onClick={handleLogout}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Keluar
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <Link href="/login" className="nav-login-btn nav-desktop-only" aria-label="Masuk">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

@@ -21,16 +21,6 @@ export default async function CustomPage() {
         </div>
       </div>
 
-      <div className="custom-hero">
-        <div className="custom-hero-inner">
-          <span className="pill pill-yellow">✦ Custom Order</span>
-          <h1 className="custom-hero-title">Desain Bajumu Sendiri</h1>
-          <p className="custom-hero-sub">
-            Upload desain depan & belakang, pilih warna dan ukuran — kami produksi sesuai pesananmu.
-          </p>
-        </div>
-      </div>
-
       <CustomDesignClient bahanOptions={bahanOptions} sablonOptions={sablonOptions} />
     </>
   )
