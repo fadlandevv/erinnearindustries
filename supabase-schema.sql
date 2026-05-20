@@ -204,3 +204,19 @@ create table if not exists order_messages (
 alter table order_messages add column if not exists is_read boolean default false;
 
 create index if not exists order_messages_order_idx on order_messages (order_id, created_at);
+
+-- ── Pembukuan (bookkeeping) ───────────────────────────────────
+
+create table if not exists pembukuan (
+  id uuid primary key default gen_random_uuid(),
+  date date not null,
+  type text not null check (type in ('pemasukan', 'pengeluaran')),
+  category text not null,
+  description text,
+  amount bigint not null,
+  note text,
+  filled_by text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists pembukuan_date_idx on pembukuan (date);
