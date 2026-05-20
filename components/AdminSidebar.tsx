@@ -46,8 +46,9 @@ const NAV_GROUPS: NavGroup[] = [
     group: 'Transaksi',
     icon: '◷',
     items: [
-      { label: 'Orders', href: '/admin/orders', icon: '◷', permission: 'orders' },
-      { label: 'Rekap',  href: '/admin/rekap',  icon: '◱', permission: 'rekap'  },
+      { label: 'Orders',     href: '/admin/orders',     icon: '◷', permission: 'orders'     },
+      { label: 'Rekap',      href: '/admin/rekap',      icon: '◱', permission: 'rekap'      },
+      { label: 'Pembukuan',  href: '/admin/pembukuan',  icon: '◫', permission: 'pembukuan'  },
     ],
   },
   {

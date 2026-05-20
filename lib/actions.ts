@@ -18,6 +18,7 @@ import {
 } from './resellers'
 import { adjustStock, upsertSizeEntry } from './warehouse'
 import { saveManualEntry, deleteManualEntry, type RekapSource } from './rekap'
+import { savePembukuanEntry, deletePembukuanEntry, type EntryType } from './pembukuan'
 import { logAdminAccess } from './access-log'
 import { getPricingItems, upsertPricingItem, insertPricingItem, deletePricingItem } from './pricing'
 import { generateId } from './utils'
@@ -608,6 +609,36 @@ export async function addManualEntryAction(
 export async function deleteManualEntryAction(id: string) {
   await deleteManualEntry(id)
   revalidatePath('/admin/rekap')
+}
+
+export async function addPembukuanAction(
+  _prev: { error?: string },
+  formData: FormData,
+): Promise<{ error?: string }> {
+  const date = (formData.get('date') as string).trim()
+  const type = (formData.get('type') as string).trim() as EntryType
+  const category = (formData.get('category') as string).trim()
+  const description = (formData.get('description') as string | null)?.trim() || undefined
+  const amount = parseInt(formData.get('amount') as string, 10)
+  const note = (formData.get('note') as string | null)?.trim() || undefined
+
+  if (!date || !type || !category || isNaN(amount) || amount <= 0)
+    return { error: 'Semua field wajib diisi dengan benar.' }
+  if (!['pemasukan', 'pengeluaran'].includes(type))
+    return { error: 'Tipe tidak valid.' }
+
+  const jar = await cookies()
+  const adminId = jar.get('admin-token')?.value
+  const admin = adminId ? await getAdminById(adminId) : null
+
+  await savePembukuanEntry({ date, type, category, description, amount, note, filledBy: admin?.username })
+  revalidatePath('/admin/pembukuan')
+  return {}
+}
+
+export async function deletePembukuanAction(id: string) {
+  await deletePembukuanEntry(id)
+  revalidatePath('/admin/pembukuan')
 }
 
 export async function updatePricingAction(
