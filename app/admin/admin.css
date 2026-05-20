@@ -66,6 +66,20 @@
   margin-bottom: 1.25rem;
 }
 
+/* ===== SCROLLBAR ===== */
+.admin-layout-wrapper *::-webkit-scrollbar        { width: 4px; height: 4px; }
+.admin-layout-wrapper *::-webkit-scrollbar-track  { background: transparent; }
+.admin-layout-wrapper *::-webkit-scrollbar-thumb  { background: #e0ddd8; border-radius: 99px; }
+.admin-layout-wrapper *::-webkit-scrollbar-thumb:hover { background: #c8c4be; }
+
+/* Sidebar — dark bg variant */
+.admin-sidebar::-webkit-scrollbar-thumb          { background: rgba(255,255,255,0.12); }
+.admin-sidebar::-webkit-scrollbar-thumb:hover    { background: rgba(255,255,255,0.25); }
+
+/* Firefox */
+.admin-layout-wrapper * { scrollbar-width: thin; scrollbar-color: #e0ddd8 transparent; }
+.admin-sidebar          { scrollbar-color: rgba(255,255,255,0.12) transparent; }
+
 /* ===== LAYOUT ===== */
 .admin-layout-wrapper {
   display: flex;
