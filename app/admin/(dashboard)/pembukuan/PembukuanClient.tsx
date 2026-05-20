@@ -142,25 +142,13 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
         flexWrap: 'wrap',
       }}>
         {/* Year dropdown */}
-        <select
-          value={year}
-          onChange={e => navigate({ year: parseInt(e.target.value) })}
-          style={{
-            padding: '0.4rem 0.75rem',
-            borderRadius: 8,
-            border: '1.5px solid #e5e5e5',
-            background: '#fafafa',
-            fontWeight: 700,
-            fontSize: '0.875rem',
-            color: '#0d0d0d',
-            cursor: 'pointer',
-            outline: 'none',
-          }}
-        >
-          {years.map(y => (
-            <option key={y} value={y}>{y}</option>
-          ))}
-        </select>
+        <div style={{ width: 100 }}>
+          <AdminSelect
+            value={String(year)}
+            onChange={v => navigate({ year: parseInt(v) })}
+            options={years.map(y => ({ value: String(y), label: String(y) }))}
+          />
+        </div>
 
         {/* Month buttons — only in monthly mode */}
         {mode === 'monthly' && (

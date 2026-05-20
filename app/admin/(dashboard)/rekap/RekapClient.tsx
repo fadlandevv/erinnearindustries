@@ -1,7 +1,8 @@
 'use client'
-import { useState, useMemo, useEffect, useActionState, useTransition } from 'react'
+import { useState, useMemo, useActionState, useTransition } from 'react'
 import { addManualEntryAction, deleteManualEntryAction } from '@/lib/actions'
 import type { PeriodRow, ManualEntry } from '@/lib/rekap'
+import AdminModal from '@/components/AdminModal'
 
 type Tab = 'mingguan' | 'bulanan' | 'tahunan'
 
@@ -68,143 +69,83 @@ const MONTH_LABELS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt
 function EntriesModal({ entries, onClose }: { entries: ManualEntry[]; onClose: () => void }) {
   const [deletingId, startDelete] = useTransition()
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
-
   return (
-    <div
-      style={{
-        position: 'fixed', inset: 0, zIndex: 1000,
-        background: 'rgba(0,0,0,0.45)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '1.5rem',
-      }}
-      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+    <AdminModal
+      title="Detail Input Manual"
+      subtitle={`${entries.length} entri · Marketplace & Offline`}
+      onClose={onClose}
     >
-      <div style={{
-        background: '#fff',
-        borderRadius: 20,
-        width: '100%',
-        maxWidth: 780,
-        maxHeight: '80vh',
-        display: 'flex',
-        flexDirection: 'column',
-        boxShadow: '0 24px 64px rgba(0,0,0,0.18)',
-        overflow: 'hidden',
-      }}>
-        {/* Header */}
-        <div style={{
-          display: 'flex', alignItems: 'center',
-          padding: '1.25rem 1.75rem',
-          borderBottom: '1px solid #f0ede8',
-          flexShrink: 0,
-        }}>
-          <div>
-            <h3 style={{ fontWeight: 700, fontSize: '1rem', margin: 0 }}>Detail Input Manual</h3>
-            <p style={{ fontSize: '0.75rem', color: '#aaa', margin: '0.15rem 0 0' }}>
-              {entries.length} entri · Marketplace & Offline
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              marginLeft: 'auto',
-              width: 32, height: 32,
-              borderRadius: '50%',
-              border: 'none',
-              background: '#f5f3ef',
-              color: '#888',
-              fontSize: '1rem',
-              cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              transition: 'background 0.15s',
-            }}
-            onMouseOver={e => (e.currentTarget.style.background = '#ebe8e2')}
-            onMouseOut={e => (e.currentTarget.style.background = '#f5f3ef')}
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* Body */}
-        <div style={{ overflowY: 'auto', flex: 1 }}>
-          {entries.length === 0 ? (
-            <p style={{ textAlign: 'center', color: '#bbb', padding: '3rem', fontSize: '0.875rem' }}>
-              Belum ada entri manual.
-            </p>
-          ) : (
-            <table className="admin-table" style={{ margin: 0 }}>
-              <thead>
-                <tr>
-                  <th>Tanggal</th>
-                  <th>Sumber</th>
-                  <th>Platform</th>
-                  <th>Jumlah</th>
-                  <th>Catatan</th>
-                  <th>Diisi oleh</th>
-                  <th style={{ width: 70 }}>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {entries.map(e => (
-                  <tr key={e.id}>
-                    <td style={{ whiteSpace: 'nowrap' }}>
-                      {new Date(e.date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
-                    </td>
-                    <td>
-                      <span
-                        className="admin-badge"
-                        style={{
-                          background: e.source === 'marketplace' ? 'rgba(139,92,246,0.1)' : 'rgba(16,185,129,0.1)',
-                          color: e.source === 'marketplace' ? '#7c3aed' : '#059669',
-                        }}
-                      >
-                        {e.source === 'marketplace' ? 'Marketplace' : 'Offline'}
+      {entries.length === 0 ? (
+        <p style={{ textAlign: 'center', color: '#bbb', padding: '3rem', fontSize: '0.875rem' }}>
+          Belum ada entri manual.
+        </p>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Sumber</th>
+              <th>Platform</th>
+              <th>Jumlah</th>
+              <th>Catatan</th>
+              <th>Diisi oleh</th>
+              <th style={{ width: 70 }}>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {entries.map(e => (
+              <tr key={e.id}>
+                <td style={{ whiteSpace: 'nowrap' }}>
+                  {new Date(e.date).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                </td>
+                <td>
+                  <span
+                    className="admin-badge"
+                    style={{
+                      background: e.source === 'marketplace' ? 'rgba(139,92,246,0.1)' : 'rgba(16,185,129,0.1)',
+                      color: e.source === 'marketplace' ? '#7c3aed' : '#059669',
+                    }}
+                  >
+                    {e.source === 'marketplace' ? 'Marketplace' : 'Offline'}
+                  </span>
+                </td>
+                <td style={{ fontWeight: 500 }}>{e.platform}</td>
+                <td style={{ fontWeight: 600, color: '#f47c2f' }}>{rp(e.amount)}</td>
+                <td style={{ color: '#888', fontSize: '0.82rem' }}>{e.note ?? '—'}</td>
+                <td>
+                  {e.filledBy ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <span style={{
+                        width: 20, height: 20, borderRadius: '50%', background: '#f47c2f',
+                        color: '#fff', fontSize: '0.6rem', fontWeight: 700,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                      }}>
+                        {e.filledBy.charAt(0).toUpperCase()}
                       </span>
-                    </td>
-                    <td style={{ fontWeight: 500 }}>{e.platform}</td>
-                    <td style={{ fontWeight: 600, color: '#f47c2f' }}>{rp(e.amount)}</td>
-                    <td style={{ color: '#888', fontSize: '0.82rem' }}>{e.note ?? '—'}</td>
-                    <td>
-                      {e.filledBy ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                          <span style={{
-                            width: 20, height: 20, borderRadius: '50%', background: '#f47c2f',
-                            color: '#fff', fontSize: '0.6rem', fontWeight: 700,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                          }}>
-                            {e.filledBy.charAt(0).toUpperCase()}
-                          </span>
-                          <span style={{ fontSize: '0.8rem', fontWeight: 500 }}>{e.filledBy}</span>
-                        </div>
-                      ) : <span style={{ color: '#ccc' }}>—</span>}
-                    </td>
-                    <td>
-                      <button
-                        type="button"
-                        className="btn-admin-danger"
-                        style={{ fontSize: '0.72rem', padding: '0.25rem 0.6rem' }}
-                        disabled={deletingId}
-                        onClick={() => {
-                          if (!confirm('Hapus entri ini?')) return
-                          startDelete(() => { deleteManualEntryAction(e.id) })
-                        }}
-                      >
-                        Hapus
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
-    </div>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 500 }}>{e.filledBy}</span>
+                    </div>
+                  ) : <span style={{ color: '#ccc' }}>—</span>}
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    className="btn-admin-danger"
+                    style={{ fontSize: '0.72rem', padding: '0.25rem 0.6rem' }}
+                    disabled={deletingId}
+                    onClick={() => {
+                      if (!confirm('Hapus entri ini?')) return
+                      startDelete(() => { deleteManualEntryAction(e.id) })
+                    }}
+                  >
+                    Hapus
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </AdminModal>
   )
 }
 
