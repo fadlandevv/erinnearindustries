@@ -260,13 +260,13 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
                         type="button"
                         onClick={() => setFormType(t)}
                         style={{
-                          padding: '0.45rem 0.9rem',
-                          borderRadius: 8,
+                          padding: '0.7rem 0.9rem',
+                          borderRadius: 10,
                           border: '1.5px solid',
                           borderColor: formType === t ? (t === 'pemasukan' ? '#10b981' : '#ef4444') : '#e5e5e5',
                           background: formType === t ? (t === 'pemasukan' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.08)') : 'transparent',
                           color: formType === t ? (t === 'pemasukan' ? '#059669' : '#dc2626') : '#888',
-                          fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', transition: 'all 0.12s',
+                          fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', transition: 'all 0.12s',
                         }}
                       >
                         {t === 'pemasukan' ? '↑ Pemasukan' : '↓ Pengeluaran'}
