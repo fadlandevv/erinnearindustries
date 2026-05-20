@@ -1,9 +1,11 @@
 'use client'
-import { useState, useMemo, useActionState, useTransition } from 'react'
+import { useState, useMemo, useEffect, useActionState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { addPembukuanAction, deletePembukuanAction } from '@/lib/actions'
 import type { PembukuanEntry } from '@/lib/pembukuan-constants'
 import { PEMASUKAN_CATEGORIES, PENGELUARAN_CATEGORIES } from '@/lib/pembukuan-constants'
+import AdminSelect from '@/components/AdminSelect'
+import AdminDatePicker from '@/components/AdminDatePicker'
 
 type Filter = 'semua' | 'pemasukan' | 'pengeluaran'
 type Mode = 'monthly' | 'yearly'
@@ -34,14 +36,24 @@ type Props = {
 
 export default function PembukuanClient({ entries, year, month, mode, adminName }: Props) {
   const router = useRouter()
+  const now = new Date()
+  const currentYear = now.getFullYear()
+
   const [filter, setFilter] = useState<Filter>('semua')
   const [formType, setFormType] = useState<'pemasukan' | 'pengeluaran'>('pemasukan')
+  const [dateValue, setDateValue] = useState(
+    `${year}-${String(month).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  )
+  const [categoryValue, setCategoryValue] = useState(PEMASUKAN_CATEGORIES[0])
   const [state, formAction, pending] = useActionState(addPembukuanAction, {})
   const [deletingId, startDelete] = useTransition()
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
 
-  const now = new Date()
-  const currentYear = now.getFullYear()
+  const categories = formType === 'pemasukan' ? PEMASUKAN_CATEGORIES : PENGELUARAN_CATEGORIES
+
+  useEffect(() => {
+    setCategoryValue(categories[0])
+  }, [formType]) // eslint-disable-line react-hooks/exhaustive-deps
   const years = Array.from({ length: currentYear - START_YEAR + 1 }, (_, i) => currentYear - i)
 
   function navigate(params: { year?: number; month?: number; mode?: Mode }) {
@@ -84,8 +96,6 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
     () => filter === 'semua' ? entries : entries.filter(e => e.type === filter),
     [entries, filter],
   )
-
-  const categories = formType === 'pemasukan' ? PEMASUKAN_CATEGORIES : PENGELUARAN_CATEGORIES
 
   // ── Shared tab style ──
   function tabStyle(active: boolean, activeColor = '#0d0d0d') {
@@ -276,22 +286,23 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
                   <input type="hidden" name="type" value={formType} />
                 </div>
 
-                <div className="admin-form-group" style={{ flex: '1 1 130px', margin: 0 }}>
+                <div className="admin-form-group" style={{ flex: '1 1 180px', margin: 0 }}>
                   <label>Tanggal</label>
-                  <input
-                    className="admin-form-input"
+                  <AdminDatePicker
                     name="date"
-                    type="date"
-                    required
-                    defaultValue={`${year}-${String(month).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`}
+                    value={dateValue}
+                    onChange={setDateValue}
                   />
                 </div>
 
-                <div className="admin-form-group" style={{ flex: '1 1 160px', margin: 0 }}>
+                <div className="admin-form-group" style={{ flex: '1 1 180px', margin: 0 }}>
                   <label>Kategori</label>
-                  <select className="admin-form-select" name="category" required>
-                    {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
+                  <AdminSelect
+                    name="category"
+                    value={categoryValue}
+                    onChange={setCategoryValue}
+                    options={categories.map(c => ({ value: c, label: c }))}
+                  />
                 </div>
 
                 <div className="admin-form-group" style={{ flex: '2 1 200px', margin: 0 }}>
