@@ -2,8 +2,8 @@
 import { useState, useMemo, useActionState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { addPembukuanAction, deletePembukuanAction } from '@/lib/actions'
-import type { PembukuanEntry } from '@/lib/pembukuan'
-import { PEMASUKAN_CATEGORIES, PENGELUARAN_CATEGORIES } from '@/lib/pembukuan'
+import type { PembukuanEntry } from '@/lib/pembukuan-constants'
+import { PEMASUKAN_CATEGORIES, PENGELUARAN_CATEGORIES } from '@/lib/pembukuan-constants'
 
 type Filter = 'semua' | 'pemasukan' | 'pengeluaran'
 

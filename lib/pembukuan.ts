@@ -1,43 +1,13 @@
 import { db } from './db'
+import type { EntryType, PembukuanEntry } from './pembukuan-constants'
 
-export type EntryType = 'pemasukan' | 'pengeluaran'
-
-export type PembukuanEntry = {
-  id: string
-  date: string
-  type: EntryType
-  category: string
-  description?: string
-  amount: number
-  note?: string
-  filledBy?: string
-  createdAt: string
-}
-
-export const PEMASUKAN_CATEGORIES = [
-  'Penjualan Web',
-  'Penjualan Marketplace',
-  'Penjualan Offline',
-  'Piutang / Transfer',
-  'Lainnya',
-]
-
-export const PENGELUARAN_CATEGORIES = [
-  'Bahan Baku',
-  'Gaji & Upah',
-  'Biaya Operasional',
-  'Marketing & Promosi',
-  'Sewa Tempat',
-  'Utilitas',
-  'Biaya Pengiriman',
-  'Pembelian Peralatan',
-  'Lainnya',
-]
+export type { EntryType, PembukuanEntry } from './pembukuan-constants'
+export { PEMASUKAN_CATEGORIES, PENGELUARAN_CATEGORIES } from './pembukuan-constants'
 
 /*
-  Supabase table SQL (run once in Supabase SQL editor):
+  Supabase table SQL (run once in Supabase SQL Editor):
 
-  create table pembukuan (
+  create table if not exists pembukuan (
     id uuid primary key default gen_random_uuid(),
     date date not null,
     type text not null check (type in ('pemasukan', 'pengeluaran')),
@@ -48,6 +18,8 @@ export const PENGELUARAN_CATEGORIES = [
     filled_by text,
     created_at timestamptz not null default now()
   );
+
+  create index if not exists pembukuan_date_idx on pembukuan (date);
 */
 
 export async function getPembukuanByMonth(
