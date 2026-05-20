@@ -68,3 +68,27 @@ export async function savePembukuanEntry(
 export async function deletePembukuanEntry(id: string): Promise<void> {
   await db.from('pembukuan').delete().eq('id', id)
 }
+
+export async function getPembukuanByYear(year: number): Promise<PembukuanEntry[]> {
+  const from = `${year}-01-01`
+  const to = `${year}-12-31`
+
+  const { data } = await db
+    .from('pembukuan')
+    .select('*')
+    .gte('date', from)
+    .lte('date', to)
+    .order('date', { ascending: true })
+
+  return (data ?? []).map(row => ({
+    id: row.id,
+    date: row.date,
+    type: row.type as EntryType,
+    category: row.category,
+    description: row.description ?? undefined,
+    amount: row.amount,
+    note: row.note ?? undefined,
+    filledBy: row.filled_by ?? undefined,
+    createdAt: row.created_at,
+  }))
+}
