@@ -8,6 +8,8 @@ export type OrderItem = {
   size: string
   quantity: number
   bg: string
+  customDesignDepan?: string
+  customDesignBelakang?: string
 }
 
 export type OrderCustomer = {

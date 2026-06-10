@@ -299,6 +299,27 @@ function parsePrice(str: string): number {
   return parseInt(str.replace(/[^\d]/g, '')) || 0
 }
 
+export async function uploadDesignFileAction(
+  formData: FormData
+): Promise<{ url?: string; error?: string }> {
+  try {
+    const file = formData.get('file') as File | null
+    if (!file || file.size === 0) return { error: 'File kosong.' }
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+    const path = `custom-designs/${Date.now()}-${generateId(8)}.${ext}`
+    const buf = Buffer.from(await file.arrayBuffer())
+    const { error } = await db.storage.from('images').upload(path, buf, {
+      upsert: false, contentType: file.type || `image/${ext}`,
+    })
+    if (error) return { error: error.message }
+    const { data: { publicUrl } } = db.storage.from('images').getPublicUrl(path)
+    return { url: publicUrl }
+  } catch (e) {
+    console.error(e)
+    return { error: 'Gagal mengupload file desain.' }
+  }
+}
+
 export async function createCheckoutOrder(
   formData: FormData
 ): Promise<{ orderId: string; snapToken: string } | { error: string }> {
@@ -306,13 +327,17 @@ export async function createCheckoutOrder(
     const cartJSON = formData.get('cart') as string
     const rawItems = JSON.parse(cartJSON) as Array<{
       product: { id: string; title: string; price: string; bg: string }
-      size: string; quantity: number
+      size: string
+      quantity: number
+      customSpec?: { depanUrl?: string; belakangUrl?: string }
     }>
     if (!rawItems.length) return { error: 'Keranjang kosong' }
 
     const items: OrderItem[] = rawItems.map((i) => ({
       productId: i.product.id, title: i.product.title, price: i.product.price,
       unitPrice: parsePrice(i.product.price), size: i.size, quantity: i.quantity, bg: i.product.bg,
+      ...(i.customSpec?.depanUrl    ? { customDesignDepan:    i.customSpec.depanUrl }    : {}),
+      ...(i.customSpec?.belakangUrl ? { customDesignBelakang: i.customSpec.belakangUrl } : {}),
     }))
 
     const totalPrice = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0)

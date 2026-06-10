@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react'
 import { useCart } from '@/context/CartContext'
 import { generateId } from '@/lib/utils'
+import { uploadDesignFileAction } from '@/lib/actions'
 
 type Side = 'front' | 'back'
 
@@ -44,8 +45,9 @@ const SHIRT_COLORS = [
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL']
 
 type PriceOption = { label: string; price: number }
-
 type SablonOpt = PriceOption | null
+
+type DesignPos = { x: number; y: number }
 
 type InvoiceItem = {
   rowId: string
@@ -57,6 +59,8 @@ type InvoiceItem = {
   belakang: boolean
   depanPreview?: string
   belakangPreview?: string
+  depanUrl?: string
+  belakangUrl?: string
   sablonDepan: SablonOpt
   sablonBelakang: SablonOpt
   jumlah: number
@@ -105,8 +109,25 @@ const MOCKUP_CONFIGS: Record<string, {
   },
 }
 
-function ProductMockupSVG({ color, design, side, productType }: {
-  color: string; design: string | null; side: Side; productType: string
+function clientToSVG(svg: SVGSVGElement, clientX: number, clientY: number): DesignPos {
+  const rect = svg.getBoundingClientRect()
+  return {
+    x: ((clientX - rect.left) / rect.width) * 300,
+    y: ((clientY - rect.top) / rect.height) * 340,
+  }
+}
+
+function ProductMockupSVG({ color, design, side, productType, designPos, isDragging, onDesignPointerDown, onSVGPointerMove, onSVGPointerUp, svgRef }: {
+  color: string
+  design: string | null
+  side: Side
+  productType: string
+  designPos?: DesignPos
+  isDragging: boolean
+  onDesignPointerDown?: (e: React.PointerEvent<SVGImageElement>) => void
+  onSVGPointerMove?: (e: React.PointerEvent<SVGElement>) => void
+  onSVGPointerUp?: () => void
+  svgRef?: React.RefObject<SVGSVGElement | null>
 }) {
   const isDark = color === '#1a1a1a' || color === '#1e3a5f' || color === '#6b7c3d'
   const stroke = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'
@@ -114,15 +135,38 @@ function ProductMockupSVG({ color, design, side, productType }: {
   const id     = `clip-${productType}-${side}`
   const cfg    = MOCKUP_CONFIGS[productType] ?? MOCKUP_CONFIGS.tshirt
   const { da } = cfg
+  const ox = designPos?.x ?? 0
+  const oy = designPos?.y ?? 0
 
   return (
-    <svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg" className="custom-shirt-svg">
+    <svg
+      ref={svgRef as React.RefObject<SVGSVGElement>}
+      viewBox="0 0 300 340"
+      xmlns="http://www.w3.org/2000/svg"
+      className="custom-shirt-svg"
+      style={{ touchAction: 'none' }}
+      onPointerMove={onSVGPointerMove as React.PointerEventHandler<SVGSVGElement>}
+      onPointerUp={onSVGPointerUp}
+      onPointerLeave={onSVGPointerUp}
+    >
       <defs><clipPath id={id}><path d={cfg.clipPath}/></clipPath></defs>
 
       {cfg.paths.map((p, i) => <path key={i} d={p} fill={color} stroke={stroke} strokeWidth="1.5"/>)}
 
       {design
-        ? <image href={design} x={da.x} y={da.y} width={da.w} height={da.h} clipPath={`url(#${id})`} preserveAspectRatio="xMidYMid meet"/>
+        ? <image
+            href={design}
+            x={da.x + ox}
+            y={da.y + oy}
+            width={da.w}
+            height={da.h}
+            clipPath={`url(#${id})`}
+            preserveAspectRatio="xMidYMid meet"
+            style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none' }}
+            onPointerDown={onDesignPointerDown}
+            onPointerMove={onSVGPointerMove as React.PointerEventHandler<SVGImageElement>}
+            onPointerUp={onSVGPointerUp}
+          />
         : (
           <g clipPath={`url(#${id})`}>
             <rect x={da.x} y={da.y} width={da.w} height={da.h} fill="none" stroke={hint} strokeWidth="1.2" strokeDasharray="6 4" rx="6"/>
@@ -159,19 +203,29 @@ function formatRp(n: number) {
 }
 
 const EMPTY_FORM = {
-  shirtColor:      '#FFFFFF',
-  selectedSize:    null as string | null,
-  bahan:           '',
-  bahanPrice:      0,
-  bahanCustom:     '',
+  shirtColor:       '#FFFFFF',
+  selectedSize:     null as string | null,
+  bahan:            '',
+  bahanPrice:       0,
+  bahanCustom:      '',
   bahanCustomPrice: 0,
-  jumlah:          12,
-  sablonDepan:     null as SablonOpt,
-  sablonBelakang:  null as SablonOpt,
-  note:            '',
-  frontDesign:     null as string | null,
-  backDesign:      null as string | null,
+  jumlah:           12,
+  sablonDepan:      null as SablonOpt,
+  sablonBelakang:   null as SablonOpt,
+  note:             '',
+  frontDesign:      null as string | null,
+  backDesign:       null as string | null,
+  frontUrl:         null as string | null,
+  backUrl:          null as string | null,
 }
+
+type DragState = {
+  side: Side
+  startSvgX: number
+  startSvgY: number
+  startPosX: number
+  startPosY: number
+} | null
 
 export default function CustomDesignClient({
   bahanOptions,
@@ -183,29 +237,73 @@ export default function CustomDesignClient({
   const { addCustomItem, openCart } = useCart()
 
   const [selectedTab, setSelectedTab] = useState('tshirt')
-  const [form, setForm]         = useState({ ...EMPTY_FORM })
-  const [activeSide, setActiveSide] = useState<Side>('front')
-  const [error, setError]       = useState('')
+  const [form, setForm]               = useState({ ...EMPTY_FORM })
+  const [activeSide, setActiveSide]   = useState<Side>('front')
+  const [error, setError]             = useState('')
+  const [uploadingFront, setUploadingFront] = useState(false)
+  const [uploadingBack, setUploadingBack]   = useState(false)
+  const [frontPos, setFrontPos] = useState<DesignPos>({ x: 0, y: 0 })
+  const [backPos,  setBackPos]  = useState<DesignPos>({ x: 0, y: 0 })
+  const [dragState, setDragState] = useState<DragState>(null)
 
   const [invoiceId]    = useState(() => generateId(6))
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([])
 
   const frontRef = useRef<HTMLInputElement>(null)
   const backRef  = useRef<HTMLInputElement>(null)
+  const svgRef   = useRef<SVGSVGElement>(null)
 
   const set = <K extends keyof typeof EMPTY_FORM>(k: K, v: typeof EMPTY_FORM[K]) =>
     setForm(f => ({ ...f, [k]: v }))
 
-  const handleUpload = (side: Side, file: File) => {
-    const url = URL.createObjectURL(file)
-    if (side === 'front')
-      setForm(f => ({ ...f, frontDesign: url, sablonDepan: f.sablonDepan ?? sablonOptions[0] ?? null }))
-    else
-      setForm(f => ({ ...f, backDesign: url, sablonBelakang: f.sablonBelakang ?? sablonOptions[0] ?? null }))
+  const handleUpload = async (side: Side, file: File) => {
+    const preview = URL.createObjectURL(file)
+    if (side === 'front') {
+      setForm(f => ({ ...f, frontDesign: preview, frontUrl: null, sablonDepan: f.sablonDepan ?? sablonOptions[0] ?? null }))
+      setUploadingFront(true)
+    } else {
+      setForm(f => ({ ...f, backDesign: preview, backUrl: null, sablonBelakang: f.sablonBelakang ?? sablonOptions[0] ?? null }))
+      setUploadingBack(true)
+    }
+
+    const fd = new FormData()
+    fd.set('file', file)
+    const result = await uploadDesignFileAction(fd)
+
+    if (side === 'front') {
+      setUploadingFront(false)
+      if (result.url) setForm(f => ({ ...f, frontUrl: result.url! }))
+    } else {
+      setUploadingBack(false)
+      if (result.url) setForm(f => ({ ...f, backUrl: result.url! }))
+    }
   }
+
+  // Drag handlers
+  const handleDesignPointerDown = (e: React.PointerEvent<SVGImageElement>) => {
+    e.preventDefault()
+    if (!svgRef.current) return
+    const svg = clientToSVG(svgRef.current, e.clientX, e.clientY)
+    const pos = activeSide === 'front' ? frontPos : backPos
+    setDragState({ side: activeSide, startSvgX: svg.x, startSvgY: svg.y, startPosX: pos.x, startPosY: pos.y })
+    ;(e.currentTarget as Element).setPointerCapture(e.pointerId)
+  }
+
+  const handleSVGPointerMove = (e: React.PointerEvent<SVGElement>) => {
+    if (!dragState || !svgRef.current) return
+    const svg = clientToSVG(svgRef.current, e.clientX, e.clientY)
+    const dx = svg.x - dragState.startSvgX
+    const dy = svg.y - dragState.startSvgY
+    const newPos = { x: dragState.startPosX + dx, y: dragState.startPosY + dy }
+    if (dragState.side === 'front') setFrontPos(newPos)
+    else setBackPos(newPos)
+  }
+
+  const handleSVGPointerUp = () => setDragState(null)
 
   const finalBahan   = form.bahan === 'Lainnya' ? form.bahanCustom : form.bahan
   const activeDesign = activeSide === 'front' ? form.frontDesign : form.backDesign
+  const activePos    = activeSide === 'front' ? frontPos : backPos
 
   const bahanPriceVal = form.bahan === 'Lainnya' ? form.bahanCustomPrice : form.bahanPrice
   const autoHarga =
@@ -231,6 +329,8 @@ export default function CustomDesignClient({
       belakang: !!form.backDesign,
       depanPreview:    form.frontDesign  ?? undefined,
       belakangPreview: form.backDesign   ?? undefined,
+      depanUrl:        form.frontUrl     ?? undefined,
+      belakangUrl:     form.backUrl      ?? undefined,
       sablonDepan:    form.frontDesign  ? form.sablonDepan    : null,
       sablonBelakang: form.backDesign   ? form.sablonBelakang : null,
       jumlah:   form.jumlah,
@@ -240,6 +340,8 @@ export default function CustomDesignClient({
 
     setInvoiceItems(prev => [...prev, item])
     setForm(f => ({ ...EMPTY_FORM, shirtColor: f.shirtColor }))
+    setFrontPos({ x: 0, y: 0 })
+    setBackPos({ x: 0, y: 0 })
     setError('')
     setActiveSide('front')
   }
@@ -263,6 +365,8 @@ export default function CustomDesignClient({
         depan:       item.depan,
         belakang:    item.belakang,
         catatan:     item.catatan,
+        depanUrl:    item.depanUrl,
+        belakangUrl: item.belakangUrl,
       })
     })
     setInvoiceItems([])
@@ -383,12 +487,17 @@ export default function CustomDesignClient({
                 onChange={e => { const f = e.target.files?.[0]; if (f) handleUpload('front', f) }} />
               <button type="button"
                 className={`custom-upload-btn${form.frontDesign ? ' custom-upload-btn--done' : ''}`}
+                disabled={uploadingFront}
                 onClick={() => { setActiveSide('front'); frontRef.current?.click() }}>
-                {form.frontDesign ? '✓ Desain Depan Terupload' : '↑ Upload Desain Depan'}
+                {uploadingFront
+                  ? '↑ Mengupload...'
+                  : form.frontDesign
+                    ? form.frontUrl ? '✓ Desain Depan Tersimpan' : '✓ Desain Depan Terupload'
+                    : '↑ Upload Desain Depan'}
               </button>
               {form.frontDesign && (
                 <button type="button" className="custom-remove-btn"
-                  onClick={() => setForm(f => ({ ...f, frontDesign: null, sablonDepan: null }))}>Hapus</button>
+                  onClick={() => { setForm(f => ({ ...f, frontDesign: null, frontUrl: null, sablonDepan: null })); setFrontPos({ x: 0, y: 0 }) }}>Hapus</button>
               )}
             </div>
 
@@ -416,12 +525,17 @@ export default function CustomDesignClient({
                 onChange={e => { const f = e.target.files?.[0]; if (f) handleUpload('back', f) }} />
               <button type="button"
                 className={`custom-upload-btn${form.backDesign ? ' custom-upload-btn--done' : ''}`}
+                disabled={uploadingBack}
                 onClick={() => { setActiveSide('back'); backRef.current?.click() }}>
-                {form.backDesign ? '✓ Desain Belakang Terupload' : '↑ Upload Desain Belakang (opsional)'}
+                {uploadingBack
+                  ? '↑ Mengupload...'
+                  : form.backDesign
+                    ? form.backUrl ? '✓ Desain Belakang Tersimpan' : '✓ Desain Belakang Terupload'
+                    : '↑ Upload Desain Belakang (opsional)'}
               </button>
               {form.backDesign && (
                 <button type="button" className="custom-remove-btn"
-                  onClick={() => setForm(f => ({ ...f, backDesign: null, sablonBelakang: null }))}>Hapus</button>
+                  onClick={() => { setForm(f => ({ ...f, backDesign: null, backUrl: null, sablonBelakang: null })); setBackPos({ x: 0, y: 0 }) }}>Hapus</button>
               )}
             </div>
 
@@ -504,13 +618,23 @@ export default function CustomDesignClient({
               </button>
             </div>
             <div className="custom-shirt-wrap">
-              <ProductMockupSVG color={form.shirtColor} design={activeDesign} side={activeSide} productType={selectedTab} />
+              <ProductMockupSVG
+                color={form.shirtColor}
+                design={activeDesign}
+                side={activeSide}
+                productType={selectedTab}
+                designPos={activePos}
+                isDragging={dragState !== null}
+                onDesignPointerDown={handleDesignPointerDown}
+                onSVGPointerMove={handleSVGPointerMove}
+                onSVGPointerUp={handleSVGPointerUp}
+                svgRef={svgRef}
+              />
             </div>
-            {!activeDesign && (
-              <p className="custom-mockup-hint">
-                Upload desain {activeSide === 'front' ? 'depan' : 'belakang'} untuk preview
-              </p>
-            )}
+            {activeDesign
+              ? <p className="custom-mockup-hint" style={{ opacity: 0.6 }}>Drag desain untuk atur posisi</p>
+              : <p className="custom-mockup-hint">Upload desain {activeSide === 'front' ? 'depan' : 'belakang'} untuk preview</p>
+            }
             <div className="custom-info-pills">
               <span className="custom-info-pill">PNG / JPG / SVG</span>
               <span className="custom-info-pill">Min. 300 DPI</span>

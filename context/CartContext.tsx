@@ -13,6 +13,8 @@ export type CustomSpec = {
   depan: boolean
   belakang: boolean
   catatan?: string
+  depanUrl?: string
+  belakangUrl?: string
 }
 
 export type CartItem = {

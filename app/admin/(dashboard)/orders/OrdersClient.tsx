@@ -316,6 +316,26 @@ export default function OrdersClient({ orders, userMap, allMessages }: Props) {
                             <div className="oh-item-info">
                               <span className="oh-item-name">{item.title}</span>
                               <span className="oh-item-meta">Ukuran <strong>{item.size}</strong> · {item.quantity} pcs</span>
+                              {(item.customDesignDepan || item.customDesignBelakang) && (
+                                <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
+                                  {item.customDesignDepan && (
+                                    <a href={item.customDesignDepan} target="_blank" rel="noopener noreferrer"
+                                      style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', color: '#555', border: '1px solid #e5e5e5', borderRadius: 6, padding: '2px 7px', background: '#fafafa', textDecoration: 'none' }}>
+                                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                                      <img src={item.customDesignDepan} alt="desain depan" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 4 }} />
+                                      Depan ↗
+                                    </a>
+                                  )}
+                                  {item.customDesignBelakang && (
+                                    <a href={item.customDesignBelakang} target="_blank" rel="noopener noreferrer"
+                                      style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', color: '#555', border: '1px solid #e5e5e5', borderRadius: 6, padding: '2px 7px', background: '#fafafa', textDecoration: 'none' }}>
+                                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                                      <img src={item.customDesignBelakang} alt="desain belakang" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 4 }} />
+                                      Belakang ↗
+                                    </a>
+                                  )}
+                                </div>
+                              )}
                             </div>
                             <span className="oh-item-price">
                               Rp {(item.unitPrice * item.quantity).toLocaleString('id-ID')}
