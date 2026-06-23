@@ -20,6 +20,7 @@ export type OrderCustomer = {
   city: string
   postalCode: string
   notes: string
+  kurir?: { name: string; service: string; price: number }
 }
 
 export type Order = {

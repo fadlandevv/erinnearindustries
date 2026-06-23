@@ -83,7 +83,9 @@ export default function Navbar({ user }: NavbarProps) {
           {navLinks.map((link) => {
             const isCustom   = link.href === '/custom'
             const isReseller = link.href === '/reseller'
-            const isActive   = pathname === link.href
+            const isActive   = isCustom
+              ? pathname.startsWith('/custom')
+              : pathname === link.href
             const base = isCustom ? 'nav-custom-link' : isReseller ? 'nav-reseller-link' : ''
             const cls = [
               base,
@@ -189,7 +191,9 @@ export default function Navbar({ user }: NavbarProps) {
           {navLinks.map((link) => {
             const isCustom   = link.href === '/custom'
             const isReseller = link.href === '/reseller'
-            const isActive   = pathname === link.href
+            const isActive   = isCustom
+              ? pathname.startsWith('/custom')
+              : pathname === link.href
             const base = isCustom ? 'nav-custom-link' : isReseller ? 'nav-reseller-link' : ''
             const cls = [
               base,

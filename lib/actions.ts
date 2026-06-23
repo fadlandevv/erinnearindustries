@@ -21,6 +21,7 @@ import { saveManualEntry, deleteManualEntry, type RekapSource } from './rekap'
 import { savePembukuanEntry, deletePembukuanEntry, type EntryType } from './pembukuan'
 import { logAdminAccess } from './access-log'
 import { getPricingItems, upsertPricingItem, insertPricingItem, deletePricingItem } from './pricing'
+import { fetchShippingCost, fetchShippingCostByName, type ShippingOption } from './rajaongkir'
 import { generateId } from './utils'
 import { db } from './db'
 import { getOrderMessages, getMessagesByOrderIds, sendOrderMessage, markMessagesRead, type OrderMessage } from './order-messages'
@@ -340,13 +341,17 @@ export async function createCheckoutOrder(
       ...(i.customSpec?.belakangUrl ? { customDesignBelakang: i.customSpec.belakangUrl } : {}),
     }))
 
-    const totalPrice = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0)
+    const kurirRaw = formData.get('kurir') as string | null
+    const kurir = kurirRaw ? JSON.parse(kurirRaw) as { name: string; service: string; price: number } : undefined
+    const itemsTotal = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0)
+    const totalPrice = itemsTotal + (kurir?.price ?? 0)
     const orderId = generateId(6)
     const customer = {
       name: formData.get('name') as string, email: formData.get('email') as string,
       phone: formData.get('phone') as string, address: formData.get('address') as string,
       city: formData.get('city') as string, postalCode: formData.get('postalCode') as string,
       notes: (formData.get('notes') as string) || '',
+      ...(kurir ? { kurir } : {}),
     }
 
     const snapToken = await createSnapToken(orderId, totalPrice, customer, items)
@@ -1129,3 +1134,32 @@ export async function resellerMarkOrderMessagesReadAction(orderId: string): Prom
   await markMessagesRead(orderId, 'admin')
   revalidatePath('/reseller/dashboard/orders')
 }
+
+// ── RajaOngkir ───────────────────────────────────────────────────
+
+export async function getShippingCostAction(destCityId: string): Promise<ShippingOption[]> {
+  return fetchShippingCost(destCityId)
+}
+
+export async function getShippingCostByNameAction(regencyName: string): Promise<ShippingOption[]> {
+  return fetchShippingCostByName(regencyName)
+}
+
+// ── Wilayah Indonesia (emsifa) ────────────────────────────────────
+
+const EMSIFA = 'http://www.emsifa.com/api-wilayah-indonesia/api'
+type WItem = { id: string; name: string }
+
+async function fetchEmsifa(path: string): Promise<WItem[]> {
+  try {
+    const res = await fetch(`${EMSIFA}/${path}`, { cache: 'force-cache' })
+    if (!res.ok) return []
+    return await res.json()
+  } catch { return [] }
+}
+
+export async function getProvincesAction():                     Promise<WItem[]> { return fetchEmsifa('provinces.json') }
+export async function getRegenciesAction(provinceId: string):  Promise<WItem[]> { return fetchEmsifa(`regencies/${provinceId}.json`) }
+export async function getDistrictsAction(regencyId: string):   Promise<WItem[]> { return fetchEmsifa(`districts/${regencyId}.json`) }
+export async function getVillagesAction(districtId: string):   Promise<WItem[]> { return fetchEmsifa(`villages/${districtId}.json`) }
+
