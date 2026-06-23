@@ -220,3 +220,29 @@ create table if not exists pembukuan (
 );
 
 create index if not exists pembukuan_date_idx on pembukuan (date);
+
+-- ── Custom Products (kartu pilih produk di /custom) ──────────
+
+create table if not exists custom_products (
+  id text primary key,
+  name text not null,
+  sub text not null default '',
+  desc_short text not null default '',
+  href text not null,
+  bg text not null default '#1a1209',
+  image text,
+  icon_svg text not null default '',
+  sort_order integer not null default 0,
+  active boolean not null default true,
+  created_at timestamptz default now()
+);
+
+-- Seed data (6 produk awal dari kode lama)
+insert into custom_products (id, name, sub, desc_short, href, bg, icon_svg, sort_order) values
+  ('tshirt',          'Kaos',   'T-Shirt',    'Sablon bebas depan & belakang', '/custom/tshirt',          '#f5ede0', '<path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/>',            0),
+  ('totebag',         'Totebag','Kanvas',      'Sablon satu atau dua sisi',     '/custom/totebag',         '#e4ede6', '<path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>',                                                                           1),
+  ('amplop-packaging','Amplop', 'Packaging',  'Packaging berlogo produkmu',     '/custom/amplop-packaging','#e0eaf5', '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',                                                                          2),
+  ('coach-jacket',    'Coach',  'Jacket',      'Jaket tipis sablon & bordir',   '/custom/coach-jacket',    '#ede8f5', '<path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/><line x1="12" y1="2" x2="12" y2="22" stroke-dasharray="3 2"/>', 3),
+  ('hoodie',          'Hoodie', 'Fleece',      'Custom depan belakang lengan',  '/custom/hoodie',          '#f5e6e9', '<path d="M20.38 3.46L16 2c0 2.21-1.79 4-4 4S8 4.21 8 2L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/><path d="M9 22v-3a3 3 0 016 0v3" stroke-dasharray="2 1.5"/>', 4),
+  ('jersey',          'Jersey', 'Sublimasi',   'Full-print sesuai desainmu',    '/custom/jersey',          '#e8f0e4', '<path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/><line x1="6" y1="10" x2="6" y2="20"/><line x1="18" y1="10" x2="18" y2="20"/>', 5)
+on conflict (id) do nothing;

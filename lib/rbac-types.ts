@@ -4,11 +4,13 @@ export type Permission =
   | 'dashboard' | 'products' | 'services' | 'content'
   | 'showcase' | 'gallery' | 'orders' | 'rekap' | 'members' | 'roles'
   | 'pricing' | 'access_log' | 'warehouse' | 'reseller' | 'pembukuan'
+  | 'custom_products'
 
 export const ALL_PERMISSIONS: Permission[] = [
   'dashboard', 'products', 'services', 'content',
   'showcase', 'gallery', 'orders', 'rekap', 'members', 'roles',
   'pricing', 'access_log', 'warehouse', 'reseller', 'pembukuan',
+  'custom_products',
 ]
 
 export const PERMISSION_LABELS: Record<Permission, string> = {
@@ -27,6 +29,7 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   warehouse: 'Warehouse',
   reseller: 'Reseller',
   pembukuan: 'Pembukuan',
+  custom_products: 'Custom Products',
 }
 
 export type Role = {

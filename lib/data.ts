@@ -186,6 +186,66 @@ export async function saveShowcase(items: ShowcaseItem[]): Promise<void> {
   }
 }
 
+// ── Custom Products ───────────────────────────────────────────
+
+export type CustomProduct = {
+  id: string
+  name: string
+  sub: string
+  descShort: string
+  href: string
+  bg: string
+  image?: string
+  iconSvg: string
+  sortOrder: number
+  active: boolean
+}
+
+function toCustomProduct(row: Record<string, unknown>): CustomProduct {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    sub: (row.sub as string) ?? '',
+    descShort: (row.desc_short as string) ?? '',
+    href: row.href as string,
+    bg: (row.bg as string) ?? '#1a1209',
+    image: (row.image as string) ?? undefined,
+    iconSvg: (row.icon_svg as string) ?? '',
+    sortOrder: (row.sort_order as number) ?? 0,
+    active: (row.active as boolean) ?? true,
+  }
+}
+
+export async function getCustomProducts(): Promise<CustomProduct[]> {
+  const { data } = await db.from('custom_products').select('*').order('sort_order', { ascending: true })
+  return (data ?? []).map(toCustomProduct)
+}
+
+export async function getCustomProductById(id: string): Promise<CustomProduct | undefined> {
+  const { data } = await db.from('custom_products').select('*').eq('id', id).maybeSingle()
+  return data ? toCustomProduct(data) : undefined
+}
+
+export async function upsertCustomProduct(product: CustomProduct): Promise<void> {
+  const { error } = await db.from('custom_products').upsert({
+    id: product.id,
+    name: product.name,
+    sub: product.sub,
+    desc_short: product.descShort,
+    href: product.href,
+    bg: product.bg,
+    image: product.image ?? null,
+    icon_svg: product.iconSvg,
+    sort_order: product.sortOrder,
+    active: product.active,
+  })
+  if (error) throw new Error(error.message)
+}
+
+export async function deleteCustomProduct(id: string): Promise<void> {
+  await db.from('custom_products').delete().eq('id', id)
+}
+
 // ── Content ──────────────────────────────────────────────────
 
 export async function getContent(): Promise<ContentData> {
