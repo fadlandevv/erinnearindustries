@@ -66,7 +66,6 @@ export default async function ResellerPage() {
       {/* Hero */}
       <div className="reseller-hero">
         <div className="reseller-hero-inner">
-          <span className="pill pill-yellow">✦ Program Reseller</span>
           <h1 className="reseller-hero-title">Jual Produk Kami,<br />Raih Keuntungan Bersama</h1>
           <p className="reseller-hero-sub">
             Bergabunglah dengan 35+ reseller aktif Erinnear Industries dan bangun bisnis fashion-mu sendiri dengan modal minimal dan margin yang menggiurkan.
@@ -109,7 +108,6 @@ export default async function ResellerPage() {
       <section className="reseller-section">
         <div className="reseller-section-inner">
           <div className="reseller-section-header">
-            <span className="pill pill-yellow">✦ Keuntungan</span>
             <h2>Kenapa jadi reseller<br />Erinnear Industries?</h2>
           </div>
           <div className="reseller-benefits-grid">
@@ -128,7 +126,6 @@ export default async function ResellerPage() {
       <section className="reseller-section reseller-section--alt" id="tier">
         <div className="reseller-section-inner">
           <div className="reseller-section-header">
-            <span className="pill pill-yellow">✦ Pilih Program</span>
             <h2>Tier Reseller</h2>
             <p className="reseller-section-sub">Mulai kecil, tumbuh besar. Upgrade tier kapan saja sesuai perkembangan bisnismu.</p>
           </div>
@@ -160,7 +157,6 @@ export default async function ResellerPage() {
       <section className="reseller-section">
         <div className="reseller-section-inner">
           <div className="reseller-section-header">
-            <span className="pill pill-yellow">✦ Cara Kerja</span>
             <h2>Mulai dalam 4 langkah</h2>
           </div>
           <div className="reseller-steps">
@@ -182,7 +178,6 @@ export default async function ResellerPage() {
       <section className="reseller-section reseller-section--alt">
         <div className="reseller-section-inner reseller-section-inner--narrow">
           <div className="reseller-section-header">
-            <span className="pill pill-yellow">✦ FAQ</span>
             <h2>Pertanyaan Umum</h2>
           </div>
           <div className="reseller-faq">
@@ -200,7 +195,6 @@ export default async function ResellerPage() {
       <section className="reseller-section" id="daftar">
         <div className="reseller-section-inner reseller-section-inner--narrow">
           <div className="reseller-register-card">
-            <span className="pill pill-yellow">✦ Daftar Sekarang</span>
             <h2>Siap bergabung?</h2>
             <p>Isi form di bawah atau hubungi kami langsung — tim kami akan merespons dalam 1×24 jam.</p>
             <div className="reseller-register-btns">

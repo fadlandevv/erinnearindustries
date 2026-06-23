@@ -10,7 +10,6 @@ export default function FeatureGrid({ products }: { products: Product[] }) {
     <section className="products-section" id="product">
       <div className="products-inner">
         <div className="products-header">
-          <span className="pill pill-outline">{t.featuredProducts.badge}</span>
           <h2>
             {t.featuredProducts.title.split('\n').map((line, i) => (
               <span key={i}>{line}{i === 0 && <br />}</span>

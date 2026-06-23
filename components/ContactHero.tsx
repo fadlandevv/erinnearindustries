@@ -7,7 +7,6 @@ export default function ContactHero() {
   return (
     <div className="page-hero">
       <div className="page-hero-inner">
-        <span className="pill pill-yellow">✦ {c.badge}</span>
         <h1 className="page-hero-title">
           {c.title.split('\n').map((line: string, i: number) => (
             <span key={i}>{line}{i === 0 && <br />}</span>

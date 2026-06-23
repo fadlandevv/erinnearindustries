@@ -14,6 +14,7 @@ const linkDefs = {
   ],
 }
 
+
 export default function Footer() {
   const { t } = useLanguage()
   return (
@@ -37,6 +38,12 @@ export default function Footer() {
               </ul>
             </div>
           ))}
+          <div className="footer-col">
+            <h5>Konten</h5>
+            <ul>
+              <li><Link href="/berita">Berita & Artikel</Link></li>
+            </ul>
+          </div>
         </div>
       </div>
       <div className="footer-bottom">

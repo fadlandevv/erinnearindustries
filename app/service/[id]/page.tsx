@@ -47,11 +47,6 @@ export default async function ServiceDetailPage({
       <div className="svc-detail-hero">
         <div className="svc-detail-hero-inner">
           <div className="svc-detail-icon">{service.icon}</div>
-          {service.tag && (
-            <span className="pill pill-yellow" style={{ marginBottom: '1rem' }}>
-              {service.tag}
-            </span>
-          )}
           <h1 className="svc-detail-title">{service.title}</h1>
           <p className="svc-detail-sub">{service.desc}</p>
         </div>
@@ -106,7 +101,6 @@ export default async function ServiceDetailPage({
       {/* CTA Banner */}
       <div className="cta-banner">
         <div className="cta-banner-inner">
-          <span className="pill pill-yellow">✦ Mulai Sekarang</span>
           <h2>Siap memulai proyek {service.title}?</h2>
           <p>Ceritakan kebutuhan brand Anda — kami siapkan proposal dalam 48 jam.</p>
           <Link href="/contact" className="btn-dark" style={{ display: 'inline-flex', marginTop: '1.5rem' }}>

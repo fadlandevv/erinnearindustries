@@ -14,7 +14,6 @@ export default function Stats() {
           </div>
           <div>
             <div className="stats-about-avatar" />
-            <button className="btn-about">{about}</button>
           </div>
         </div>
         <div className="stats-grid">

@@ -10,7 +10,6 @@ export default function Service({ services }: { services: ServiceItem[] }) {
     <section className="service-section" id="service">
       <div className="service-inner">
         <div className="service-header">
-          <span className="pill pill-outline">{(t as any).servicesSection.badge}</span>
           <h2>
             {(t as any).servicesSection.title.split('\n').map((line: string, i: number) => (
               <span key={i}>{line}{i === 0 && <br />}</span>

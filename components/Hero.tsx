@@ -18,9 +18,6 @@ export default function Hero() {
     <section className="hero" id="home">
       <div className="hero-inner">
         <div className="hero-text">
-          <span className="pill pill-yellow">
-            <span>✦</span> {t.hero.badge}
-          </span>
           <h1 className="hero-title">
             {renderTitle(t.hero.title)}
           </h1>
@@ -29,7 +26,6 @@ export default function Hero() {
             <button className="btn-dark">
               <span>↗</span> {t.hero.cta}
             </button>
-            <button className="btn-outline">{t.hero.ctaSecondary}</button>
           </div>
         </div>
       </div>

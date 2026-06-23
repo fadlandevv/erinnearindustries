@@ -11,7 +11,6 @@ export default function ProductsClient({ products }: { products: Product[] }) {
     <>
       <div className="page-hero">
         <div className="page-hero-inner">
-          <span className="pill pill-outline">✦ {pp.badge}</span>
           <h1 className="page-hero-title">
             {pp.title.split('\n').map((line, i) => (
               <span key={i}>{line}{i === 0 && <br />}</span>

@@ -11,7 +11,6 @@ export default function ServicePageClient({ services }: { services: ServiceItem[
     <>
       <div className="page-hero">
         <div className="page-hero-inner">
-          <span className="pill pill-outline">{sp.badge}</span>
           <h1 className="page-hero-title">
             {sp.title.split('\n').map((line, i) => (
               <span key={i}>{line}{i === 0 && <br />}</span>
