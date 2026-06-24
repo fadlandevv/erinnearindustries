@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { getAdminById, getRoleById } from '@/lib/rbac'
 import AdminSidebar from '@/components/AdminSidebar'
 import { AdminToastProvider } from '@/context/AdminToastContext'
+import AdminFlash from '@/components/AdminFlash'
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const jar = await cookies()
@@ -16,6 +17,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
   return (
     <AdminToastProvider>
+      <AdminFlash />
       <div className="admin-layout-wrapper">
         <AdminSidebar permissions={permissions} adminName={admin.username} roleName={role?.name ?? ''} isSuperAdmin={role?.locked ?? false} />
         <div className="admin-content">

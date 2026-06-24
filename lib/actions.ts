@@ -126,7 +126,7 @@ export async function createProduct(formData: FormData) {
   })
   await saveProducts(products)
   revalidatePath('/product')
-  redirect('/admin/products')
+  redirect('/admin/products?toast=Produk+berhasil+ditambah')
 }
 
 export async function updateProduct(id: string, formData: FormData) {
@@ -165,7 +165,7 @@ export async function updateProduct(id: string, formData: FormData) {
   await saveProducts(updated)
   revalidatePath('/product')
   revalidatePath(`/product/${id}`)
-  redirect('/admin/products')
+  redirect('/admin/products?toast=Produk+berhasil+diperbarui')
 }
 
 export async function duplicateProduct(id: string) {
@@ -176,14 +176,14 @@ export async function duplicateProduct(id: string) {
   products.push({ ...source, id: newId, title: `${source.title} (Copy)`, image: undefined, images: undefined })
   await saveProducts(products)
   revalidatePath('/product')
-  redirect(`/admin/products/${newId}/edit`)
+  redirect(`/admin/products/${newId}/edit?toast=Produk+berhasil+diduplikat`)
 }
 
 export async function deleteProduct(id: string) {
   const products = await getProducts()
   await saveProducts(products.filter((p) => p.id !== id))
   revalidatePath('/product')
-  redirect('/admin/products')
+  redirect('/admin/products?toast=Produk+berhasil+dihapus&toastType=error')
 }
 
 export async function createService(formData: FormData) {
@@ -202,7 +202,7 @@ export async function createService(formData: FormData) {
   })
   await saveServices(services)
   revalidatePath('/service')
-  redirect('/admin/services')
+  redirect('/admin/services?toast=Layanan+berhasil+ditambah')
 }
 
 export async function updateService(id: string, formData: FormData) {
@@ -224,7 +224,7 @@ export async function updateService(id: string, formData: FormData) {
   await saveServices(updated)
   revalidatePath('/service')
   revalidatePath(`/service/${id}`)
-  redirect('/admin/services')
+  redirect('/admin/services?toast=Layanan+berhasil+diperbarui')
 }
 
 export async function updateShowcaseItem(itemId: string, formData: FormData): Promise<void> {
@@ -256,6 +256,7 @@ export async function updateShowcaseItem(itemId: string, formData: FormData): Pr
 
   await saveShowcase(showcase.map((s) => (s.id === itemId ? item : s)))
   revalidatePath('/')
+  redirect('/admin/showcase?toast=Showcase+berhasil+disimpan')
 }
 
 export async function updateGallerySlot(slotId: string, formData: FormData): Promise<void> {
@@ -287,13 +288,14 @@ export async function updateGallerySlot(slotId: string, formData: FormData): Pro
 
   await saveGallery(gallery.map((g) => (g.id === slotId ? slot : g)))
   revalidatePath('/')
+  redirect('/admin/gallery?toast=Gallery+berhasil+disimpan')
 }
 
 export async function deleteService(id: string) {
   const services = await getServices()
   await saveServices(services.filter((s) => s.id !== id))
   revalidatePath('/service')
-  redirect('/admin/services')
+  redirect('/admin/services?toast=Layanan+berhasil+dihapus&toastType=error')
 }
 
 function parsePrice(str: string): number {
@@ -1189,5 +1191,6 @@ export async function updateCustomProductImageAction(id: string, formData: FormD
   await db.from('content').upsert({ key: 'custom_product_images', value: images })
 
   revalidatePath('/custom')
+  redirect('/admin/custom-products?toast=Foto+berhasil+disimpan')
 }
 
