@@ -452,11 +452,13 @@ export default function CustomDesignClient({
 
   const handleSVGPointerUp = () => setDragState(null)
 
+  const isAmplop = productType === 'amplop-packaging'
+
   const finalBahan   = form.bahan === 'Lainnya' ? form.bahanCustom : form.bahan
   const activeDesign = activeSide === 'front' ? form.frontDesign : form.backDesign
   const activePos    = activeSide === 'front' ? frontPos : backPos
 
-  const bahanPriceVal = form.bahan === 'Lainnya' ? form.bahanCustomPrice : form.bahanPrice
+  const bahanPriceVal = isAmplop ? 0 : (form.bahan === 'Lainnya' ? form.bahanCustomPrice : form.bahanPrice)
   const { depan: effDepan, belakang: effBelakang } = resolveEffectiveSablon(form.sablonDepan, form.sablonBelakang)
   const autoHarga =
     bahanPriceVal +
@@ -464,8 +466,8 @@ export default function CustomDesignClient({
     (effBelakang ? effBelakang.price : 0)
 
   const handleAddToInvoice = () => {
-    if (!form.selectedSize)                        { setError('Pilih ukuran.'); return }
-    if (!finalBahan)                               { setError('Pilih atau isi jenis bahan.'); return }
+    if (!isAmplop && !form.selectedSize)           { setError('Pilih ukuran.'); return }
+    if (!isAmplop && !finalBahan)                  { setError('Pilih atau isi jenis bahan.'); return }
     if (!form.frontDesign && !form.backDesign)     { setError('Upload minimal satu desain.'); return }
     if (form.jumlah < 1)                           { setError('Jumlah minimal 1 pcs.'); return }
 
@@ -475,8 +477,8 @@ export default function CustomDesignClient({
       rowId:    generateId(4),
       warna:    form.shirtColor,
       warnaNama,
-      size:     form.selectedSize,
-      bahan:    finalBahan,
+      size:     form.selectedSize ?? '',
+      bahan:    finalBahan ?? '',
       depan:    !!form.frontDesign,
       belakang: !!form.backDesign,
       depanPreview:    form.frontDesign  ?? undefined,
@@ -576,54 +578,60 @@ export default function CustomDesignClient({
           {/* Controls */}
           <div className="custom-controls">
 
-            {/* Warna + Bahan */}
-            <div className="custom-row-2col">
-              <div className="custom-control-group">
-                <p className="custom-control-label">Warna Baju</p>
-                <ColorDropdown
-                  colors={SHIRT_COLORS}
-                  value={form.shirtColor}
-                  onChange={v => set('shirtColor', v)}
-                />
-              </div>
-              <div className="custom-control-group">
-                <p className="custom-control-label">Jenis Bahan <span className="custom-required">*</span></p>
-                <CustomDropdown
-                  options={[...bahanOptions, { label: 'Lainnya', price: 0 }]}
-                  value={form.bahan}
-                  placeholder="— Pilih bahan —"
-                  onChange={label => {
-                    const opt = bahanOptions.find(b => b.label === label)
-                    setForm(f => ({ ...f, bahan: label, bahanPrice: opt?.price ?? 0 }))
-                  }}
-                />
-              </div>
-            </div>
-            {form.bahan === 'Lainnya' && (
-              <div className="custom-control-group">
-                <input type="text" className="custom-text-input" placeholder="Tulis jenis bahan..."
-                  value={form.bahanCustom} onChange={e => set('bahanCustom', e.target.value)} />
-                <div className="custom-price-row">
-                  <span className="custom-price-prefix">Rp</span>
-                  <input type="number" inputMode="numeric" className="custom-text-input custom-text-input--price"
-                    placeholder="Harga baju/pcs" min={0}
-                    value={form.bahanCustomPrice || ''}
-                    onChange={e => set('bahanCustomPrice', parseInt(e.target.value) || 0)} />
+            {/* Warna + Bahan — hidden for amplop */}
+            {!isAmplop && (
+              <>
+                <div className="custom-row-2col">
+                  <div className="custom-control-group">
+                    <p className="custom-control-label">Warna Baju</p>
+                    <ColorDropdown
+                      colors={SHIRT_COLORS}
+                      value={form.shirtColor}
+                      onChange={v => set('shirtColor', v)}
+                    />
+                  </div>
+                  <div className="custom-control-group">
+                    <p className="custom-control-label">Jenis Bahan <span className="custom-required">*</span></p>
+                    <CustomDropdown
+                      options={[...bahanOptions, { label: 'Lainnya', price: 0 }]}
+                      value={form.bahan}
+                      placeholder="— Pilih bahan —"
+                      onChange={label => {
+                        const opt = bahanOptions.find(b => b.label === label)
+                        setForm(f => ({ ...f, bahan: label, bahanPrice: opt?.price ?? 0 }))
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
+                {form.bahan === 'Lainnya' && (
+                  <div className="custom-control-group">
+                    <input type="text" className="custom-text-input" placeholder="Tulis jenis bahan..."
+                      value={form.bahanCustom} onChange={e => set('bahanCustom', e.target.value)} />
+                    <div className="custom-price-row">
+                      <span className="custom-price-prefix">Rp</span>
+                      <input type="number" inputMode="numeric" className="custom-text-input custom-text-input--price"
+                        placeholder="Harga baju/pcs" min={0}
+                        value={form.bahanCustomPrice || ''}
+                        onChange={e => set('bahanCustomPrice', parseInt(e.target.value) || 0)} />
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
             {/* Ukuran + Jumlah */}
             <div className="custom-row-2col">
-              <div className="custom-control-group">
-                <p className="custom-control-label">Ukuran <span className="custom-required">*</span></p>
-                <CustomDropdown
-                  options={SIZES.map(s => ({ label: s, price: 0 }))}
-                  value={form.selectedSize ?? ''}
-                  placeholder="Pilih ukuran"
-                  onChange={s => set('selectedSize', s)}
-                />
-              </div>
+              {!isAmplop && (
+                <div className="custom-control-group">
+                  <p className="custom-control-label">Ukuran <span className="custom-required">*</span></p>
+                  <CustomDropdown
+                    options={SIZES.map(s => ({ label: s, price: 0 }))}
+                    value={form.selectedSize ?? ''}
+                    placeholder="Pilih ukuran"
+                    onChange={s => set('selectedSize', s)}
+                  />
+                </div>
+              )}
               <div className="custom-control-group">
                 <p className="custom-control-label">Jumlah (pcs) <span className="custom-required">*</span></p>
                 <div className="custom-qty-row">
@@ -716,8 +724,7 @@ export default function CustomDesignClient({
               <div className="custom-price-display">
                 <span className="custom-price-display-label">Harga/pcs</span>
                 <div className="custom-price-breakdown">
-                  <span>Baju ({finalBahan || 'bahan'})</span>
-                  <span>{formatRp(bahanPriceVal)}</span>
+                  {!isAmplop && <><span>Baju ({finalBahan || 'bahan'})</span><span>{formatRp(bahanPriceVal)}</span></>}
                   {form.sablonDepan && (
                     <>
                       <span>Sablon depan ({form.sablonDepan.label})</span>
