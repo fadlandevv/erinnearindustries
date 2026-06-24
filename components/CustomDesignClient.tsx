@@ -413,6 +413,8 @@ export default function CustomDesignClient({
   const [amplopDesignSize, setAmplopDesignSize] = useState<AmplopDesignSize>('sedang')
   const [amplopSize, setAmplopSize] = useState<'A4' | 'A3'>('A4')
   const [amplopPerekat, setAmplopPerekat] = useState<'Pakai Perekat' | 'Tanpa Perekat'>('Pakai Perekat')
+  const [totebagSize, setTotebagSize] = useState<'Sedang (30x40cm)' | 'Besar (40x60cm)'>('Sedang (30x40cm)')
+  const [totebagSleting, setTotebagSleting] = useState<'Pakai Sleting' | 'Tanpa Sleting'>('Tanpa Sleting')
 
   const [invoiceId]    = useState(() => generateId(6))
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([])
@@ -521,7 +523,11 @@ export default function CustomDesignClient({
       sablonBelakang: form.backDesign   ? effBelakang : null,
       jumlah:   form.jumlah,
       hargaPerPcs: autoHarga,
-      catatan:  [isAmplop ? `${amplopSize} · ${amplopPerekat}` : '', form.note].filter(Boolean).join(' — ') || undefined,
+      catatan:  [
+        isAmplop  ? `${amplopSize} · ${amplopPerekat}` : '',
+        isTotebag ? `${totebagSize} · ${totebagSleting}` : '',
+        form.note,
+      ].filter(Boolean).join(' — ') || undefined,
     }
 
     setInvoiceItems(prev => [...prev, item])
@@ -670,6 +676,18 @@ export default function CustomDesignClient({
                     }}
                   />
                 </div>
+              ) : isTotebag ? (
+                <div className="custom-control-group">
+                  <p className="custom-control-label">Ukuran Totebag</p>
+                  <CustomDropdown
+                    options={[
+                      { label: 'Sedang (30x40cm)', price: 0 },
+                      { label: 'Besar (40x60cm)',  price: 0 },
+                    ]}
+                    value={totebagSize}
+                    onChange={v => setTotebagSize(v as typeof totebagSize)}
+                  />
+                </div>
               ) : !noWarnaNoBaju ? (
                 <div className="custom-control-group">
                   <p className="custom-control-label">Ukuran <span className="custom-required">*</span></p>
@@ -696,6 +714,21 @@ export default function CustomDesignClient({
                 </div>
               </div>
             </div>
+
+            {/* Sleting — totebag only */}
+            {isTotebag && (
+              <div className="custom-control-group">
+                <p className="custom-control-label">Seal</p>
+                <CustomDropdown
+                  options={[
+                    { label: 'Tanpa Sleting', price: 0 },
+                    { label: 'Pakai Sleting', price: 0 },
+                  ]}
+                  value={totebagSleting}
+                  onChange={v => setTotebagSleting(v as typeof totebagSleting)}
+                />
+              </div>
+            )}
 
             {/* Perekat — amplop only */}
             {isAmplop && (
