@@ -1183,7 +1183,11 @@ export async function updateCustomProductImageAction(id: string, formData: FormD
   if (error) throw new Error(error.message)
   const { data: { publicUrl } } = db.storage.from('images').getPublicUrl(storagePath)
 
-  await db.from('custom_products').upsert({ id, image: publicUrl }, { onConflict: 'id' })
+  const { data: existing } = await db.from('content').select('value').eq('key', 'custom_product_images').maybeSingle()
+  const images = (existing?.value ?? {}) as Record<string, string>
+  images[id] = publicUrl
+  await db.from('content').upsert({ key: 'custom_product_images', value: images })
+
   revalidatePath('/custom')
 }
 

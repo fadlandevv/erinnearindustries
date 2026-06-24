@@ -247,12 +247,8 @@ export async function deleteCustomProduct(id: string): Promise<void> {
 }
 
 export async function getCustomProductImages(): Promise<Record<string, string>> {
-  const { data } = await db.from('custom_products').select('id, image')
-  const map: Record<string, string> = {}
-  for (const row of data ?? []) {
-    if (row.image) map[row.id as string] = row.image as string
-  }
-  return map
+  const { data } = await db.from('content').select('value').eq('key', 'custom_product_images').maybeSingle()
+  return (data?.value ?? {}) as Record<string, string>
 }
 
 // ── Content ──────────────────────────────────────────────────
