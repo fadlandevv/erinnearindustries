@@ -651,21 +651,6 @@ export default function CustomDesignClient({
               </>
             )}
 
-            {/* Perekat — amplop only */}
-            {isAmplop && (
-              <div className="custom-control-group">
-                <p className="custom-control-label">Perekat</p>
-                <CustomDropdown
-                  options={[
-                    { label: 'Pakai Perekat',  price: 0 },
-                    { label: 'Tanpa Perekat', price: 0 },
-                  ]}
-                  value={amplopPerekat}
-                  onChange={v => setAmplopPerekat(v as typeof amplopPerekat)}
-                />
-              </div>
-            )}
-
             {/* Ukuran + Jumlah */}
             <div className="custom-row-2col">
               {isAmplop ? (
@@ -711,6 +696,21 @@ export default function CustomDesignClient({
                 </div>
               </div>
             </div>
+
+            {/* Perekat — amplop only */}
+            {isAmplop && (
+              <div className="custom-control-group">
+                <p className="custom-control-label">Perekat</p>
+                <CustomDropdown
+                  options={[
+                    { label: 'Pakai Perekat',  price: 0 },
+                    { label: 'Tanpa Perekat', price: 0 },
+                  ]}
+                  value={amplopPerekat}
+                  onChange={v => setAmplopPerekat(v as typeof amplopPerekat)}
+                />
+              </div>
+            )}
 
             {/* Upload Depan + Sablon Depan */}
             <div className="custom-control-group">
