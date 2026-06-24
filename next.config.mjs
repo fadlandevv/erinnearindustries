@@ -21,6 +21,15 @@ const csp = [
 const nextConfig = {
   reactStrictMode: true,
   devIndicators: false,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'bzhwhvjuijofiuoujmgu.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
+  },
   outputFileTracingIncludes: {
     '/**': ['./data/**'],
   },
