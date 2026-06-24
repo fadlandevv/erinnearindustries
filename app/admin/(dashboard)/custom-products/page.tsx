@@ -6,7 +6,7 @@ const PRODUCTS = [
   { id: 'tshirt',           name: 'Kaos',   sub: 'T-Shirt'    },
   { id: 'totebag',          name: 'Totebag', sub: 'Kanvas'     },
   { id: 'amplop-packaging', name: 'Amplop',  sub: 'Packaging'  },
-  { id: 'coach-jacket',     name: 'Coach',   sub: 'Jacket'     },
+  { id: 'coach-jacket',     name: 'Coach Jacket', sub: 'Jacket' },
   { id: 'hoodie',           name: 'Hoodie',  sub: 'Fleece'     },
   { id: 'jersey',           name: 'Jersey',  sub: 'Sublimasi'  },
 ]

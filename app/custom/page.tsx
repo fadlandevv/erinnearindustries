@@ -53,7 +53,7 @@ const PRODUCTS = [
   },
   {
     id: 'coach-jacket',
-    name: 'Coach',
+    name: 'Coach Jacket',
     sub: 'Jacket',
     desc: 'Jaket tipis sablon & bordir',
     href: '/custom/coach-jacket',
