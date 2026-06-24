@@ -399,7 +399,7 @@ export default function CustomDesignClient({
 }) {
   const { addCustomItem, openCart } = useCart()
 
-  const [form, setForm] = useState({ ...EMPTY_FORM, jumlah: productType === 'amplop-packaging' ? 100 : EMPTY_FORM.jumlah })
+  const [form, setForm] = useState({ ...EMPTY_FORM, jumlah: productType === 'amplop-packaging' ? 1500 : EMPTY_FORM.jumlah })
   const [activeSide, setActiveSide]   = useState<Side>('front')
   const [error, setError]             = useState('')
   const [uploadingFront, setUploadingFront] = useState(false)
@@ -468,9 +468,16 @@ export default function CustomDesignClient({
   const handleSVGPointerUp = () => setDragState(null)
 
   const isAmplop     = productType === 'amplop-packaging'
-  const amplopMinQty = amplopSize === 'A3' ? 1500 : 100
+  const amplopMinQty = amplopSize === 'A3'
+    ? 1500
+    : form.backDesign ? 2500 : 1500
   const isTotebag  = productType === 'totebag'
   const noWarnaNoBaju = isAmplop || isTotebag
+
+  useEffect(() => {
+    if (!isAmplop) return
+    setForm(f => ({ ...f, jumlah: Math.max(amplopMinQty, f.jumlah) }))
+  }, [amplopMinQty]) // eslint-disable-line
 
   const finalBahan   = form.bahan === 'Lainnya' ? form.bahanCustom : form.bahan
   const activeDesign = activeSide === 'front' ? form.frontDesign : form.backDesign
