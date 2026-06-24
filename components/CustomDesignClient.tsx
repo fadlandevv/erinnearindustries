@@ -262,6 +262,7 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
   const PHOTO_MOCKUPS: Record<string, { front: string; back: string; vb: string }> = {
     tshirt:            { front: '/mockups/tshirt.png',               back: '/mockups/tshirt-back.png',           vb: '0 0 300 300' },
     totebag:           { front: '/mockups/totebag.png',              back: '/mockups/totebag.png',               vb: '0 0 300 300' },
+    'coach-jacket':    { front: '/mockups/coachjacket.png',          back: '/mockups/coachjacket-belakang.png',  vb: '0 0 300 300' },
     'amplop-packaging':{ front: '/mockups/amplop-packaging.png',     back: '/mockups/amplop-packaging-back.png', vb: '0 0 300 375' },
   }
   const photoMockup = PHOTO_MOCKUPS[productType] ?? null
