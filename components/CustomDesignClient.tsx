@@ -412,6 +412,7 @@ export default function CustomDesignClient({
   const [editDraft, setEditDraft] = useState<Partial<InvoiceItem>>({})
   const [amplopDesignSize, setAmplopDesignSize] = useState<AmplopDesignSize>('sedang')
   const [amplopSize, setAmplopSize] = useState<'A4' | 'A3'>('A4')
+  const [amplopPerekat, setAmplopPerekat] = useState<'Pakai Perekat' | 'Tanpa Perekat'>('Pakai Perekat')
 
   const [invoiceId]    = useState(() => generateId(6))
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([])
@@ -520,7 +521,7 @@ export default function CustomDesignClient({
       sablonBelakang: form.backDesign   ? effBelakang : null,
       jumlah:   form.jumlah,
       hargaPerPcs: autoHarga,
-      catatan:  form.note || undefined,
+      catatan:  [isAmplop ? `${amplopSize} · ${amplopPerekat}` : '', form.note].filter(Boolean).join(' — ') || undefined,
     }
 
     setInvoiceItems(prev => [...prev, item])
@@ -648,6 +649,21 @@ export default function CustomDesignClient({
                   </div>
                 )}
               </>
+            )}
+
+            {/* Perekat — amplop only */}
+            {isAmplop && (
+              <div className="custom-control-group">
+                <p className="custom-control-label">Perekat</p>
+                <CustomDropdown
+                  options={[
+                    { label: 'Pakai Perekat',  price: 0 },
+                    { label: 'Tanpa Perekat', price: 0 },
+                  ]}
+                  value={amplopPerekat}
+                  onChange={v => setAmplopPerekat(v as typeof amplopPerekat)}
+                />
+              </div>
             )}
 
             {/* Ukuran + Jumlah */}
