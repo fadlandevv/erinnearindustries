@@ -251,11 +251,16 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
   const hint   = isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.18)'
   const id     = `clip-${productType}-${side}`
   const cfg    = MOCKUP_CONFIGS[productType] ?? MOCKUP_CONFIGS.tshirt
-  const isPhoto = productType === 'tshirt'
-  const da = isPhoto && designSize ? DESIGN_SIZES[designSize] : cfg.da
+  const PHOTO_MOCKUPS: Record<string, { front: string; back: string; vb: string }> = {
+    tshirt:            { front: '/mockups/tshirt.png',                    back: '/mockups/tshirt-back.png',            vb: '0 0 300 300' },
+    'amplop-packaging':{ front: '/mockups/amplop-packaging.jpg',          back: '/mockups/amplop-packaging-back.jpg',  vb: '0 0 300 375' },
+  }
+  const photoMockup = PHOTO_MOCKUPS[productType] ?? null
+  const isPhoto = photoMockup !== null
+  const da = isPhoto && productType === 'tshirt' && designSize ? DESIGN_SIZES[designSize] : cfg.da
   const ox = designPos?.x ?? 0
   const oy = designPos?.y ?? 0
-  const vb = isPhoto ? '0 0 300 300' : '0 0 300 340'
+  const vb = photoMockup?.vb ?? '0 0 300 340'
   const filterId = `shirt-tint-${side}`
   const [cr, cg, cb] = hexToRgb(color)
   const cm = [
@@ -285,12 +290,12 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
         )}
       </defs>
 
-      {isPhoto ? (
+      {isPhoto && photoMockup ? (
         <image
-          href={side === 'front' ? '/mockups/tshirt.png' : '/mockups/tshirt-back.png'}
-          x="0" y="0" width="300" height="300"
+          href={side === 'front' ? photoMockup.front : photoMockup.back}
+          x="0" y="0" width="300" height={photoMockup.vb.split(' ')[3]}
           preserveAspectRatio="xMidYMid meet"
-          filter={`url(#${filterId})`}
+          filter={productType === 'tshirt' ? `url(#${filterId})` : undefined}
         />
       ) : (
         cfg.paths.map((p, i) => <path key={i} d={p} fill={color} stroke={stroke} strokeWidth="1.5"/>)
@@ -321,7 +326,7 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
         )
       }
 
-      {productType !== 'tshirt' && cfg.paths.map((p, i) => <path key={`o${i}`} d={p} fill="none" stroke={stroke} strokeWidth="1.5"/>)}
+      {!isPhoto && cfg.paths.map((p, i) => <path key={`o${i}`} d={p} fill="none" stroke={stroke} strokeWidth="1.5"/>)}
 
       {productType === 'coach-jacket' && <line x1="150" y1="18" x2="150" y2="340" stroke={stroke} strokeWidth="1" strokeDasharray="5,3"/>}
       {productType === 'hoodie' && <>
@@ -332,7 +337,7 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
         <rect x="52" y="85" width="18" height="135" fill={stroke}/>
         <rect x="230" y="85" width="18" height="135" fill={stroke}/>
       </>}
-      {productType === 'amplop-packaging' && <>
+      {productType === 'amplop-packaging' && !isPhoto && <>
         <path d="M 15,80 L 150,185 L 285,80" fill="none" stroke={stroke} strokeWidth="1.5"/>
         <line x1="15" y1="310" x2="115" y2="195" stroke={stroke} strokeWidth="1" strokeLinecap="round"/>
         <line x1="285" y1="310" x2="185" y2="195" stroke={stroke} strokeWidth="1" strokeLinecap="round"/>
