@@ -2,7 +2,7 @@
 import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { getProducts, saveProducts, getServices, saveServices, getGallery, saveGallery, getShowcase, saveShowcase, saveContent, getCustomProductById, upsertCustomProduct, deleteCustomProduct, type ContentData } from './data'
+import { getProducts, saveProducts, getServices, saveServices, getGallery, saveGallery, getShowcase, saveShowcase, saveContent, type ContentData } from './data'
 import { saveOrder, getOrderById, getOrdersByEmail, deleteOrder, updateOrderStatus, type OrderItem, type Order } from './orders'
 import { createSnapToken } from './midtrans'
 import { getUserByEmail, saveUser, updateUser, deleteUser, hashPassword, verifyPassword, createResetToken, validateAndConsumeResetToken } from './users'
@@ -1165,89 +1165,25 @@ export async function getVillagesAction(districtId: string):   Promise<WItem[]> 
 
 // ── Custom Products CMS ───────────────────────────────────────
 
-export async function createCustomProductAction(formData: FormData) {
+export async function updateCustomProductImageAction(id: string, formData: FormData) {
   const jar = await cookies()
   if (!jar.get('admin-token')) return
-
-  const id = (formData.get('id') as string).trim().toLowerCase().replace(/\s+/g, '-')
-  if (!id) return
 
   const imageFile = formData.get('image') as File | null
-  let image: string | undefined
-  if (imageFile && imageFile.size > 0) {
-    const ext = imageFile.name.split('.').pop()?.toLowerCase() || 'jpg'
-    const storagePath = `custom-products/${id}/bg.${ext}`
-    const { error } = await db.storage
-      .from('images')
-      .upload(storagePath, Buffer.from(await imageFile.arrayBuffer()), {
-        upsert: true,
-        contentType: imageFile.type || `image/${ext}`,
-      })
-    if (error) throw new Error(error.message)
-    const { data: { publicUrl } } = db.storage.from('images').getPublicUrl(storagePath)
-    image = publicUrl
-  }
+  if (!imageFile || imageFile.size === 0) return
 
-  const { getCustomProducts } = await import('./data')
-  const existing = await getCustomProducts()
+  const ext = imageFile.name.split('.').pop()?.toLowerCase() || 'jpg'
+  const storagePath = `custom-products/${id}/bg.${ext}`
+  const { error } = await db.storage
+    .from('images')
+    .upload(storagePath, Buffer.from(await imageFile.arrayBuffer()), {
+      upsert: true,
+      contentType: imageFile.type || `image/${ext}`,
+    })
+  if (error) throw new Error(error.message)
+  const { data: { publicUrl } } = db.storage.from('images').getPublicUrl(storagePath)
 
-  await upsertCustomProduct({
-    id,
-    name: (formData.get('name') as string).trim(),
-    sub: (formData.get('sub') as string).trim(),
-    descShort: (formData.get('descShort') as string).trim(),
-    href: (formData.get('href') as string).trim(),
-    bg: (formData.get('bg') as string).trim() || '#1a1209',
-    image,
-    iconSvg: (formData.get('iconSvg') as string).trim(),
-    sortOrder: existing.length,
-    active: true,
-  })
-
+  await db.from('custom_products').upsert({ id, image: publicUrl }, { onConflict: 'id' })
   revalidatePath('/custom')
-  redirect('/admin/custom-products')
-}
-
-export async function updateCustomProductAction(id: string, formData: FormData) {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return
-
-  const product = await getCustomProductById(id)
-  if (!product) return
-
-  const imageFile = formData.get('image') as File | null
-  if (imageFile && imageFile.size > 0) {
-    const ext = imageFile.name.split('.').pop()?.toLowerCase() || 'jpg'
-    const storagePath = `custom-products/${id}/bg.${ext}`
-    const { error } = await db.storage
-      .from('images')
-      .upload(storagePath, Buffer.from(await imageFile.arrayBuffer()), {
-        upsert: true,
-        contentType: imageFile.type || `image/${ext}`,
-      })
-    if (error) throw new Error(error.message)
-    const { data: { publicUrl } } = db.storage.from('images').getPublicUrl(storagePath)
-    product.image = publicUrl
-  }
-
-  product.name = (formData.get('name') as string).trim() || product.name
-  product.sub = (formData.get('sub') as string).trim()
-  product.descShort = (formData.get('descShort') as string).trim()
-  product.href = (formData.get('href') as string).trim() || product.href
-  product.bg = (formData.get('bg') as string).trim() || product.bg
-  product.iconSvg = (formData.get('iconSvg') as string).trim()
-  product.active = formData.get('active') === 'true'
-
-  await upsertCustomProduct(product)
-  revalidatePath('/custom')
-  redirect('/admin/custom-products')
-}
-
-export async function deleteCustomProductAction(id: string) {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return
-  await deleteCustomProduct(id)
-  revalidatePath('/custom')
-  redirect('/admin/custom-products')
 }
 
