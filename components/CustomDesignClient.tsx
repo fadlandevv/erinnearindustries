@@ -688,17 +688,16 @@ export default function CustomDesignClient({
                 {isAmplop ? (
                   <CustomDropdown
                     options={[
-                      { label: 'Kecil  — 80 × 100 px',  price: 0 },
-                      { label: 'Sedang — 150 × 185 px', price: 0 },
-                      { label: 'Besar  — 230 × 280 px', price: 0 },
+                      { label: 'Kecil',  price: 0 },
+                      { label: 'Sedang', price: 0 },
+                      { label: 'Besar',  price: 0 },
                     ]}
                     value={
-                      amplopDesignSize === 'kecil'  ? 'Kecil  — 80 × 100 px'  :
-                      amplopDesignSize === 'sedang' ? 'Sedang — 150 × 185 px' :
-                                                     'Besar  — 230 × 280 px'
+                      amplopDesignSize === 'kecil'  ? 'Kecil'  :
+                      amplopDesignSize === 'sedang' ? 'Sedang' : 'Besar'
                     }
                     disabled={!form.frontDesign}
-                    onChange={v => setAmplopDesignSize(v.startsWith('Kecil') ? 'kecil' : v.startsWith('Sedang') ? 'sedang' : 'besar')}
+                    onChange={v => setAmplopDesignSize(v === 'Kecil' ? 'kecil' : v === 'Sedang' ? 'sedang' : 'besar')}
                   />
                 ) : (
                   <CustomDropdown
@@ -742,17 +741,16 @@ export default function CustomDesignClient({
                 {isAmplop ? (
                   <CustomDropdown
                     options={[
-                      { label: 'Kecil  — 80 × 100 px',  price: 0 },
-                      { label: 'Sedang — 150 × 185 px', price: 0 },
-                      { label: 'Besar  — 230 × 280 px', price: 0 },
+                      { label: 'Kecil',  price: 0 },
+                      { label: 'Sedang', price: 0 },
+                      { label: 'Besar',  price: 0 },
                     ]}
                     value={
-                      amplopDesignSize === 'kecil'  ? 'Kecil  — 80 × 100 px'  :
-                      amplopDesignSize === 'sedang' ? 'Sedang — 150 × 185 px' :
-                                                     'Besar  — 230 × 280 px'
+                      amplopDesignSize === 'kecil'  ? 'Kecil'  :
+                      amplopDesignSize === 'sedang' ? 'Sedang' : 'Besar'
                     }
                     disabled={!form.backDesign}
-                    onChange={v => setAmplopDesignSize(v.startsWith('Kecil') ? 'kecil' : v.startsWith('Sedang') ? 'sedang' : 'besar')}
+                    onChange={v => setAmplopDesignSize(v === 'Kecil' ? 'kecil' : v === 'Sedang' ? 'sedang' : 'besar')}
                   />
                 ) : (
                   <CustomDropdown
