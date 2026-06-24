@@ -637,17 +637,7 @@ export default function CustomDesignClient({
 
             {/* Ukuran + Jumlah */}
             <div className="custom-row-2col">
-              {isAmplop ? (
-                <CustomDropdown
-                  options={[
-                    { label: 'Kecil',  price: 0 },
-                    { label: 'Sedang', price: 0 },
-                    { label: 'Besar',  price: 0 },
-                  ]}
-                  value={amplopDesignSize.charAt(0).toUpperCase() + amplopDesignSize.slice(1)}
-                  onChange={v => setAmplopDesignSize(v.toLowerCase() as AmplopDesignSize)}
-                />
-              ) : !noWarnaNoBaju ? (
+              {!noWarnaNoBaju ? (
                 <div>
                   <p className="custom-control-label">Ukuran <span className="custom-required">*</span></p>
                   <CustomDropdown
