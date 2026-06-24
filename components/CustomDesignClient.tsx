@@ -150,11 +150,18 @@ function resolveEffectiveSablon(depan: SablonOpt, belakang: SablonOpt): { depan:
 
 type DesignPos = { x: number; y: number }
 type DesignSize = 'logo' | 'a4' | 'a3'
+type AmplopDesignSize = 'kecil' | 'sedang' | 'besar'
 
 const DESIGN_SIZES: Record<DesignSize, { x: number; y: number; w: number; h: number }> = {
   logo: { x: 126, y: 82,  w: 48,  h: 48  },
   a4:   { x: 97,  y: 70,  w: 105, h: 130 },
   a3:   { x: 85,  y: 50,  w: 130, h: 195 },
+}
+
+const AMPLOP_DESIGN_SIZES: Record<AmplopDesignSize, { x: number; y: number; w: number; h: number }> = {
+  kecil:  { x: 110, y: 155, w: 80,  h: 100 },
+  sedang: { x:  75, y: 115, w: 150, h: 185 },
+  besar:  { x:  35, y:  70, w: 230, h: 280 },
 }
 
 function sablonToDesignSize(label?: string): DesignSize {
@@ -233,7 +240,7 @@ function clientToSVG(svg: SVGSVGElement, clientX: number, clientY: number): Desi
   }
 }
 
-function ProductMockupSVG({ color, design, side, productType, designPos, isDragging, onDesignPointerDown, onSVGPointerMove, onSVGPointerUp, svgRef, designSize }: {
+function ProductMockupSVG({ color, design, side, productType, designPos, isDragging, onDesignPointerDown, onSVGPointerMove, onSVGPointerUp, svgRef, designSize, amplopDesignSize }: {
   color: string
   design: string | null
   side: Side
@@ -245,6 +252,7 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
   onSVGPointerUp?: () => void
   svgRef?: React.RefObject<SVGSVGElement | null>
   designSize?: DesignSize
+  amplopDesignSize?: AmplopDesignSize
 }) {
   const isDark = color === '#1a1a1a' || color === '#1e3a5f' || color === '#6b7c3d'
   const stroke = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'
@@ -257,7 +265,11 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
   }
   const photoMockup = PHOTO_MOCKUPS[productType] ?? null
   const isPhoto = photoMockup !== null
-  const da = isPhoto && productType === 'tshirt' && designSize ? DESIGN_SIZES[designSize] : cfg.da
+  const da = productType === 'amplop-packaging' && amplopDesignSize
+    ? AMPLOP_DESIGN_SIZES[amplopDesignSize]
+    : isPhoto && productType === 'tshirt' && designSize
+      ? DESIGN_SIZES[designSize]
+      : cfg.da
   const ox = designPos?.x ?? 0
   const oy = designPos?.y ?? 0
   const vb = photoMockup?.vb ?? '0 0 300 340'
@@ -396,6 +408,7 @@ export default function CustomDesignClient({
   const [dragState, setDragState] = useState<DragState>(null)
   const [editingRowId, setEditingRowId] = useState<string | null>(null)
   const [editDraft, setEditDraft] = useState<Partial<InvoiceItem>>({})
+  const [amplopDesignSize, setAmplopDesignSize] = useState<AmplopDesignSize>('sedang')
 
   const [invoiceId]    = useState(() => generateId(6))
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([])
@@ -645,6 +658,33 @@ export default function CustomDesignClient({
               </div>
             </div>
 
+            {/* Ukuran Desain — amplop only */}
+            {isAmplop && (
+              <div className="custom-control-group">
+                <p className="custom-control-label">Ukuran Desain</p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {(['kecil', 'sedang', 'besar'] as AmplopDesignSize[]).map(sz => (
+                    <button
+                      key={sz}
+                      type="button"
+                      onClick={() => setAmplopDesignSize(sz)}
+                      style={{
+                        flex: 1, padding: '8px 0', borderRadius: 8, border: '1.5px solid',
+                        borderColor: amplopDesignSize === sz ? '#a0722a' : '#e2dbd0',
+                        background: amplopDesignSize === sz ? '#fdf6ec' : '#fff',
+                        color: amplopDesignSize === sz ? '#a0722a' : '#555',
+                        fontWeight: amplopDesignSize === sz ? 600 : 400,
+                        fontSize: '0.82rem', cursor: 'pointer', transition: 'all 0.15s',
+                        textTransform: 'capitalize',
+                      }}
+                    >
+                      {sz.charAt(0).toUpperCase() + sz.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Upload Depan + Sablon Depan */}
             <div className="custom-control-group">
               <p className="custom-control-label">Desain Depan <span className="custom-required">*</span></p>
@@ -792,6 +832,7 @@ export default function CustomDesignClient({
                 onSVGPointerUp={handleSVGPointerUp}
                 svgRef={svgRef}
                 designSize={sablonToDesignSize(activeSide === 'front' ? form.sablonDepan?.label : form.sablonBelakang?.label)}
+                amplopDesignSize={isAmplop ? amplopDesignSize : undefined}
               />
             </div>
             {activeDesign
