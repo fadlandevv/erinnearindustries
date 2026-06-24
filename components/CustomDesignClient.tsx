@@ -634,7 +634,7 @@ export default function CustomDesignClient({
 
             {/* Ukuran + Jumlah */}
             <div className="custom-row-2col">
-              <div className="custom-control-group">
+              <div>
                 {isAmplop ? (
                   <>
                     <p className="custom-control-label">Ukuran Desain</p>
@@ -660,7 +660,7 @@ export default function CustomDesignClient({
                   </>
                 )}
               </div>
-              <div className="custom-control-group">
+              <div>
                 <p className="custom-control-label">Jumlah (pcs) <span className="custom-required">*</span></p>
                 <div className="custom-qty-row">
                   <button type="button" className="custom-qty-btn"
