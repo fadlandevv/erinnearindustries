@@ -1167,12 +1167,15 @@ export async function getVillagesAction(districtId: string):   Promise<WItem[]> 
 
 // ── Custom Products CMS ───────────────────────────────────────
 
-export async function updateCustomProductImageAction(id: string, formData: FormData) {
+export async function updateCustomProductImageAction(
+  id: string,
+  formData: FormData,
+): Promise<{ url: string } | { error: string }> {
   const jar = await cookies()
-  if (!jar.get('admin-token')) return
+  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
 
   const imageFile = formData.get('image') as File | null
-  if (!imageFile || imageFile.size === 0) return
+  if (!imageFile || imageFile.size === 0) return { error: 'File tidak ditemukan' }
 
   const ext = imageFile.name.split('.').pop()?.toLowerCase() || 'jpg'
   const storagePath = `custom-products/${id}/bg.${ext}`
@@ -1182,7 +1185,7 @@ export async function updateCustomProductImageAction(id: string, formData: FormD
       upsert: true,
       contentType: imageFile.type || `image/${ext}`,
     })
-  if (error) throw new Error(error.message)
+  if (error) return { error: error.message }
   const { data: { publicUrl } } = db.storage.from('images').getPublicUrl(storagePath)
 
   const { data: existing } = await db.from('content').select('value').eq('key', 'custom_product_images').maybeSingle()
@@ -1191,7 +1194,6 @@ export async function updateCustomProductImageAction(id: string, formData: FormD
   await db.from('content').upsert({ key: 'custom_product_images', value: images })
 
   revalidatePath('/custom')
-  revalidatePath('/admin/custom-products')
-  redirect('/admin/custom-products?toast=Foto+berhasil+disimpan')
+  return { url: publicUrl }
 }
 
