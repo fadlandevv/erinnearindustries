@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { getGallery } from '@/lib/data'
 import { updateGallerySlot } from '@/lib/actions'
 import AdminToastTrigger from '@/components/AdminToastTrigger'
@@ -28,13 +27,7 @@ export default async function GalleryAdminPage({ searchParams }: { searchParams:
             <div key={slot.id} className="admin-gallery-card">
               <div className="admin-gallery-preview">
                 {slot.image ? (
-                  <Image
-                    src={slot.image}
-                    alt={slot.label}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    sizes="300px"
-                  />
+                  <img src={slot.image} alt={slot.label} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 ) : (
                   <div className="admin-gallery-empty">
                     <span>Belum ada foto</span>

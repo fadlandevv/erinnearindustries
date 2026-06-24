@@ -1,6 +1,5 @@
 'use client'
 import { useRef, useState, useTransition } from 'react'
-import Image from 'next/image'
 import { updateCustomProductImageAction } from '@/lib/actions'
 import { useAdminToast } from '@/context/AdminToastContext'
 
@@ -50,22 +49,11 @@ export default function CustomProductCard({ id, name, sub, savedImage }: Props) 
       {/* Preview area */}
       <div className="admin-showcase-preview">
         {displayed ? (
-          preview ? (
-            // blob URL — pakai <img> biasa supaya langsung tampil
-            <img
-              src={displayed}
-              alt={name}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-            />
-          ) : (
-            <Image
-              src={displayed}
-              alt={name}
-              fill
-              style={{ objectFit: 'cover' }}
-              sizes="500px"
-            />
-          )
+          <img
+            src={displayed}
+            alt={name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
         ) : (
           <div className="admin-gallery-empty" style={{
             flexDirection: 'column', gap: 8,

@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { getShowcase } from '@/lib/data'
 import { updateShowcaseItem } from '@/lib/actions'
 import AdminToastTrigger from '@/components/AdminToastTrigger'
@@ -26,13 +25,7 @@ export default async function ShowcaseAdminPage({ searchParams }: { searchParams
             <div key={item.id} className="admin-form-card">
               <div className="admin-showcase-preview">
                 {item.image ? (
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    sizes="500px"
-                  />
+                  <img src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 ) : (
                   <div className="admin-gallery-empty">
                     <span>Kartu {idx + 1} — belum ada foto</span>
