@@ -662,26 +662,15 @@ export default function CustomDesignClient({
             {isAmplop && (
               <div className="custom-control-group">
                 <p className="custom-control-label">Ukuran Desain</p>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  {(['kecil', 'sedang', 'besar'] as AmplopDesignSize[]).map(sz => (
-                    <button
-                      key={sz}
-                      type="button"
-                      onClick={() => setAmplopDesignSize(sz)}
-                      style={{
-                        flex: 1, padding: '8px 0', borderRadius: 8, border: '1.5px solid',
-                        borderColor: amplopDesignSize === sz ? '#a0722a' : '#e2dbd0',
-                        background: amplopDesignSize === sz ? '#fdf6ec' : '#fff',
-                        color: amplopDesignSize === sz ? '#a0722a' : '#555',
-                        fontWeight: amplopDesignSize === sz ? 600 : 400,
-                        fontSize: '0.82rem', cursor: 'pointer', transition: 'all 0.15s',
-                        textTransform: 'capitalize',
-                      }}
-                    >
-                      {sz.charAt(0).toUpperCase() + sz.slice(1)}
-                    </button>
-                  ))}
-                </div>
+                <CustomDropdown
+                  options={[
+                    { label: 'Kecil',  price: 0 },
+                    { label: 'Sedang', price: 0 },
+                    { label: 'Besar',  price: 0 },
+                  ]}
+                  value={amplopDesignSize.charAt(0).toUpperCase() + amplopDesignSize.slice(1)}
+                  onChange={v => setAmplopDesignSize(v.toLowerCase() as AmplopDesignSize)}
+                />
               </div>
             )}
 
