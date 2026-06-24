@@ -661,6 +661,30 @@ export default function CustomDesignClient({
               </div>
             </div>
 
+            {/* Ukuran Desain — amplop only */}
+            {isAmplop && (
+              <div className="custom-control-group">
+                <p className="custom-control-label">Ukuran Desain</p>
+                <CustomDropdown
+                  options={[
+                    { label: 'Kecil  — 80 × 100 px',  price: 0 },
+                    { label: 'Sedang — 150 × 185 px', price: 0 },
+                    { label: 'Besar  — 230 × 280 px', price: 0 },
+                  ]}
+                  value={
+                    amplopDesignSize === 'kecil'  ? 'Kecil  — 80 × 100 px'  :
+                    amplopDesignSize === 'sedang' ? 'Sedang — 150 × 185 px' :
+                                                   'Besar  — 230 × 280 px'
+                  }
+                  onChange={v => {
+                    if (v.startsWith('Kecil'))  setAmplopDesignSize('kecil')
+                    else if (v.startsWith('Sedang')) setAmplopDesignSize('sedang')
+                    else setAmplopDesignSize('besar')
+                  }}
+                />
+              </div>
+            )}
+
             {/* Upload Depan + Sablon Depan */}
             <div className="custom-control-group">
               <p className="custom-control-label">Desain Depan <span className="custom-required">*</span></p>
