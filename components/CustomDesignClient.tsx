@@ -640,7 +640,7 @@ export default function CustomDesignClient({
             {/* Ukuran + Jumlah */}
             <div className="custom-row-2col">
               {isAmplop ? (
-                <div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <p className="custom-control-label">Ukuran Amplop <span className="custom-required">*</span></p>
                   <CustomDropdown
                     options={[
@@ -667,7 +667,7 @@ export default function CustomDesignClient({
                   />
                 </div>
               ) : null}
-              <div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <p className="custom-control-label">
                   Jumlah (pcs) <span className="custom-required">*</span>
                   {isAmplop && <span style={{ fontWeight: 400, color: '#888', fontSize: '0.78rem', marginLeft: 4 }}>min. {amplopMinQty.toLocaleString('id')}</span>}
