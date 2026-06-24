@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { getCustomProductImages } from '@/lib/data'
 import { updateCustomProductImageAction } from '@/lib/actions'
+import AdminToastTrigger from '@/components/AdminToastTrigger'
 
 const PRODUCTS = [
   { id: 'tshirt',           name: 'Kaos',   sub: 'T-Shirt'    },
@@ -11,11 +12,15 @@ const PRODUCTS = [
   { id: 'jersey',           name: 'Jersey',  sub: 'Sublimasi'  },
 ]
 
-export default async function CustomProductsAdminPage() {
+type SP = Promise<{ toast?: string; toastType?: string }>
+
+export default async function CustomProductsAdminPage({ searchParams }: { searchParams: SP }) {
+  const sp = await searchParams
   const images = await getCustomProductImages()
 
   return (
     <>
+      {sp.toast && <AdminToastTrigger message={decodeURIComponent(sp.toast)} type={(sp.toastType ?? 'success') as 'success' | 'error'} />}
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Custom Products</h1>

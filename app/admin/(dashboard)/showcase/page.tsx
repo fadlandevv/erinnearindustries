@@ -1,12 +1,17 @@
 import Image from 'next/image'
 import { getShowcase } from '@/lib/data'
 import { updateShowcaseItem } from '@/lib/actions'
+import AdminToastTrigger from '@/components/AdminToastTrigger'
 
-export default async function ShowcaseAdminPage() {
+type SP = Promise<{ toast?: string; toastType?: string }>
+
+export default async function ShowcaseAdminPage({ searchParams }: { searchParams: SP }) {
+  const sp = await searchParams
   const items = await getShowcase()
 
   return (
     <>
+      {sp.toast && <AdminToastTrigger message={decodeURIComponent(sp.toast)} type={(sp.toastType ?? 'success') as 'success' | 'error'} />}
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Showcase</h1>

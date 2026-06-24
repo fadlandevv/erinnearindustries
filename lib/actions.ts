@@ -1191,6 +1191,7 @@ export async function updateCustomProductImageAction(id: string, formData: FormD
   await db.from('content').upsert({ key: 'custom_product_images', value: images })
 
   revalidatePath('/custom')
+  revalidatePath('/admin/custom-products')
   redirect('/admin/custom-products?toast=Foto+berhasil+disimpan')
 }
 
