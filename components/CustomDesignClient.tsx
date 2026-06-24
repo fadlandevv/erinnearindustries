@@ -399,7 +399,7 @@ export default function CustomDesignClient({
 }) {
   const { addCustomItem, openCart } = useCart()
 
-  const [form, setForm] = useState({ ...EMPTY_FORM })
+  const [form, setForm] = useState({ ...EMPTY_FORM, jumlah: productType === 'amplop-packaging' ? 100 : EMPTY_FORM.jumlah })
   const [activeSide, setActiveSide]   = useState<Side>('front')
   const [error, setError]             = useState('')
   const [uploadingFront, setUploadingFront] = useState(false)
@@ -410,6 +410,7 @@ export default function CustomDesignClient({
   const [editingRowId, setEditingRowId] = useState<string | null>(null)
   const [editDraft, setEditDraft] = useState<Partial<InvoiceItem>>({})
   const [amplopDesignSize, setAmplopDesignSize] = useState<AmplopDesignSize>('sedang')
+  const [amplopSize, setAmplopSize] = useState<'A4' | 'A3'>('A4')
 
   const [invoiceId]    = useState(() => generateId(6))
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([])
@@ -466,7 +467,8 @@ export default function CustomDesignClient({
 
   const handleSVGPointerUp = () => setDragState(null)
 
-  const isAmplop   = productType === 'amplop-packaging'
+  const isAmplop     = productType === 'amplop-packaging'
+  const amplopMinQty = amplopSize === 'A3' ? 1500 : 100
   const isTotebag  = productType === 'totebag'
   const noWarnaNoBaju = isAmplop || isTotebag
 
@@ -637,7 +639,24 @@ export default function CustomDesignClient({
 
             {/* Ukuran + Jumlah */}
             <div className="custom-row-2col">
-              {!noWarnaNoBaju ? (
+              {isAmplop ? (
+                <div>
+                  <p className="custom-control-label">Ukuran Amplop <span className="custom-required">*</span></p>
+                  <CustomDropdown
+                    options={[
+                      { label: 'A4', price: 0 },
+                      { label: 'A3', price: 0 },
+                    ]}
+                    value={amplopSize}
+                    onChange={v => {
+                      const size = v as 'A4' | 'A3'
+                      const minQty = size === 'A3' ? 1500 : 100
+                      setAmplopSize(size)
+                      setForm(f => ({ ...f, jumlah: Math.max(minQty, f.jumlah) }))
+                    }}
+                  />
+                </div>
+              ) : !noWarnaNoBaju ? (
                 <div>
                   <p className="custom-control-label">Ukuran <span className="custom-required">*</span></p>
                   <CustomDropdown
@@ -649,12 +668,15 @@ export default function CustomDesignClient({
                 </div>
               ) : null}
               <div>
-                <p className="custom-control-label">Jumlah (pcs) <span className="custom-required">*</span></p>
+                <p className="custom-control-label">
+                  Jumlah (pcs) <span className="custom-required">*</span>
+                  {isAmplop && <span style={{ fontWeight: 400, color: '#888', fontSize: '0.78rem', marginLeft: 4 }}>min. {amplopMinQty.toLocaleString('id')}</span>}
+                </p>
                 <div className="custom-qty-row">
                   <button type="button" className="custom-qty-btn"
-                    onClick={() => set('jumlah', Math.max(1, form.jumlah - 1))}>−</button>
-                  <input type="number" className="custom-qty-input" min={1} value={form.jumlah}
-                    onChange={e => set('jumlah', Math.max(1, parseInt(e.target.value) || 1))} />
+                    onClick={() => set('jumlah', Math.max(isAmplop ? amplopMinQty : 1, form.jumlah - 1))}>−</button>
+                  <input type="number" className="custom-qty-input" min={isAmplop ? amplopMinQty : 1} value={form.jumlah}
+                    onChange={e => set('jumlah', Math.max(isAmplop ? amplopMinQty : 1, parseInt(e.target.value) || (isAmplop ? amplopMinQty : 1)))} />
                   <button type="button" className="custom-qty-btn"
                     onClick={() => set('jumlah', form.jumlah + 1)}>+</button>
                 </div>
