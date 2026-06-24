@@ -620,15 +620,17 @@ export default function CustomDesignClient({
             {!noWarnaNoBaju && (
               <>
                 <div className="custom-row-2col">
-                  <div>
-                    <p className="custom-control-label">Warna Baju</p>
+                  <div className="custom-control-group">
+                    <p className="custom-control-label">
+                      {productType === 'coach-jacket' ? 'Warna Jacket' : 'Warna Baju'}
+                    </p>
                     <ColorDropdown
                       colors={SHIRT_COLORS}
                       value={form.shirtColor}
                       onChange={v => set('shirtColor', v)}
                     />
                   </div>
-                  <div>
+                  <div className="custom-control-group">
                     <p className="custom-control-label">Jenis Bahan <span className="custom-required">*</span></p>
                     <CustomDropdown
                       options={[...bahanOptions, { label: 'Lainnya', price: 0 }]}
