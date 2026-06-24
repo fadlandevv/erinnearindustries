@@ -634,17 +634,32 @@ export default function CustomDesignClient({
 
             {/* Ukuran + Jumlah */}
             <div className="custom-row-2col">
-              {!isAmplop && (
-                <div className="custom-control-group">
-                  <p className="custom-control-label">Ukuran <span className="custom-required">*</span></p>
-                  <CustomDropdown
-                    options={SIZES.map(s => ({ label: s, price: 0 }))}
-                    value={form.selectedSize ?? ''}
-                    placeholder="Pilih ukuran"
-                    onChange={s => set('selectedSize', s)}
-                  />
-                </div>
-              )}
+              <div className="custom-control-group">
+                {isAmplop ? (
+                  <>
+                    <p className="custom-control-label">Ukuran Desain</p>
+                    <CustomDropdown
+                      options={[
+                        { label: 'Kecil',  price: 0 },
+                        { label: 'Sedang', price: 0 },
+                        { label: 'Besar',  price: 0 },
+                      ]}
+                      value={amplopDesignSize.charAt(0).toUpperCase() + amplopDesignSize.slice(1)}
+                      onChange={v => setAmplopDesignSize(v.toLowerCase() as AmplopDesignSize)}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <p className="custom-control-label">Ukuran <span className="custom-required">*</span></p>
+                    <CustomDropdown
+                      options={SIZES.map(s => ({ label: s, price: 0 }))}
+                      value={form.selectedSize ?? ''}
+                      placeholder="Pilih ukuran"
+                      onChange={s => set('selectedSize', s)}
+                    />
+                  </>
+                )}
+              </div>
               <div className="custom-control-group">
                 <p className="custom-control-label">Jumlah (pcs) <span className="custom-required">*</span></p>
                 <div className="custom-qty-row">
@@ -657,19 +672,6 @@ export default function CustomDesignClient({
                 </div>
               </div>
             </div>
-
-            {/* Ukuran Desain — amplop only */}
-            {isAmplop && (
-              <CustomDropdown
-                options={[
-                  { label: 'Kecil',  price: 0 },
-                  { label: 'Sedang', price: 0 },
-                  { label: 'Besar',  price: 0 },
-                ]}
-                value={amplopDesignSize.charAt(0).toUpperCase() + amplopDesignSize.slice(1)}
-                onChange={v => setAmplopDesignSize(v.toLowerCase() as AmplopDesignSize)}
-              />
-            )}
 
             {/* Upload Depan + Sablon Depan */}
             <div className="custom-control-group">
