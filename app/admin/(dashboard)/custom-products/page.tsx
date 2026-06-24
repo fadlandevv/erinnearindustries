@@ -1,7 +1,6 @@
-import Image from 'next/image'
 import { getCustomProductImages } from '@/lib/data'
-import { updateCustomProductImageAction } from '@/lib/actions'
 import AdminToastTrigger from '@/components/AdminToastTrigger'
+import CustomProductCard from '@/components/CustomProductCard'
 
 const PRODUCTS = [
   { id: 'tshirt',           name: 'Kaos',   sub: 'T-Shirt'    },
@@ -20,7 +19,12 @@ export default async function CustomProductsAdminPage({ searchParams }: { search
 
   return (
     <>
-      {sp.toast && <AdminToastTrigger message={decodeURIComponent(sp.toast)} type={(sp.toastType ?? 'success') as 'success' | 'error'} />}
+      {sp.toast && (
+        <AdminToastTrigger
+          message={decodeURIComponent(sp.toast)}
+          type={(sp.toastType ?? 'success') as 'success' | 'error'}
+        />
+      )}
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Custom Products</h1>
@@ -29,42 +33,15 @@ export default async function CustomProductsAdminPage({ searchParams }: { search
       </div>
 
       <div className="admin-showcase-grid">
-        {PRODUCTS.map((p) => {
-          const action = updateCustomProductImageAction.bind(null, p.id)
-          const image = images[p.id]
-          return (
-            <div key={p.id} className="admin-form-card">
-              <div className="admin-showcase-preview">
-                {image ? (
-                  <Image
-                    src={image}
-                    alt={p.name}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    sizes="500px"
-                  />
-                ) : (
-                  <div className="admin-gallery-empty">
-                    <span>{p.name} ({p.sub}) — belum ada foto</span>
-                  </div>
-                )}
-              </div>
-
-              <form action={action} encType="multipart/form-data">
-                <div style={{ padding: '0 0 4px', fontWeight: 600, fontSize: '0.9rem' }}>
-                  {p.name} <span style={{ fontWeight: 400, color: '#888' }}>· {p.sub}</span>
-                </div>
-                <div className="admin-form-group" style={{ marginTop: 10 }}>
-                  <label>Upload Foto Background</label>
-                  <input type="file" name="image" accept="image/*" className="admin-gallery-file-input" required />
-                </div>
-                <div className="admin-form-actions">
-                  <button type="submit" className="btn-admin-primary">Simpan</button>
-                </div>
-              </form>
-            </div>
-          )
-        })}
+        {PRODUCTS.map((p) => (
+          <CustomProductCard
+            key={p.id}
+            id={p.id}
+            name={p.name}
+            sub={p.sub}
+            savedImage={images[p.id]}
+          />
+        ))}
       </div>
     </>
   )
