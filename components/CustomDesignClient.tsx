@@ -399,7 +399,7 @@ export default function CustomDesignClient({
 }) {
   const { addCustomItem, openCart } = useCart()
 
-  const [form, setForm] = useState({ ...EMPTY_FORM, jumlah: productType === 'amplop-packaging' ? 1500 : EMPTY_FORM.jumlah })
+  const [form, setForm] = useState({ ...EMPTY_FORM, jumlah: productType === 'amplop-packaging' ? 1500 : productType === 'totebag' ? 100 : EMPTY_FORM.jumlah })
   const [activeSide, setActiveSide]   = useState<Side>('front')
   const [error, setError]             = useState('')
   const [uploadingFront, setUploadingFront] = useState(false)
@@ -468,16 +468,19 @@ export default function CustomDesignClient({
   const handleSVGPointerUp = () => setDragState(null)
 
   const isAmplop     = productType === 'amplop-packaging'
+  const isTotebag    = productType === 'totebag'
+  const noWarnaNoBaju = isAmplop || isTotebag
+
   const amplopMinQty = amplopSize === 'A3'
     ? 1500
     : form.backDesign ? 2500 : 1500
-  const isTotebag  = productType === 'totebag'
-  const noWarnaNoBaju = isAmplop || isTotebag
+  const totebagMinQty = form.backDesign ? 200 : 100
+  const minQty = isAmplop ? amplopMinQty : isTotebag ? totebagMinQty : 1
 
   useEffect(() => {
-    if (!isAmplop) return
-    setForm(f => ({ ...f, jumlah: Math.max(amplopMinQty, f.jumlah) }))
-  }, [amplopMinQty]) // eslint-disable-line
+    if (!isAmplop && !isTotebag) return
+    setForm(f => ({ ...f, jumlah: Math.max(minQty, f.jumlah) }))
+  }, [minQty]) // eslint-disable-line
 
   const finalBahan   = form.bahan === 'Lainnya' ? form.bahanCustom : form.bahan
   const activeDesign = activeSide === 'front' ? form.frontDesign : form.backDesign
@@ -657,9 +660,9 @@ export default function CustomDesignClient({
                     value={amplopSize}
                     onChange={v => {
                       const size = v as 'A4' | 'A3'
-                      const minQty = size === 'A3' ? 1500 : 100
+                      const newMin = size === 'A3' ? 1500 : (form.backDesign ? 2500 : 1500)
                       setAmplopSize(size)
-                      setForm(f => ({ ...f, jumlah: Math.max(minQty, f.jumlah) }))
+                      setForm(f => ({ ...f, jumlah: Math.max(newMin, f.jumlah) }))
                     }}
                   />
                 </div>
@@ -677,13 +680,13 @@ export default function CustomDesignClient({
               <div className="custom-control-group">
                 <p className="custom-control-label">
                   Jumlah (pcs) <span className="custom-required">*</span>
-                  {isAmplop && <span style={{ fontWeight: 400, color: '#888', fontSize: '0.78rem', marginLeft: 4 }}>min. {amplopMinQty.toLocaleString('id')}</span>}
+                  {minQty > 1 && <span style={{ fontWeight: 400, color: '#888', fontSize: '0.78rem', marginLeft: 4 }}>min. {minQty.toLocaleString('id')}</span>}
                 </p>
                 <div className="custom-qty-row">
                   <button type="button" className="custom-qty-btn"
-                    onClick={() => set('jumlah', Math.max(isAmplop ? amplopMinQty : 1, form.jumlah - 1))}>−</button>
-                  <input type="number" className="custom-qty-input" min={isAmplop ? amplopMinQty : 1} value={form.jumlah}
-                    onChange={e => set('jumlah', Math.max(isAmplop ? amplopMinQty : 1, parseInt(e.target.value) || (isAmplop ? amplopMinQty : 1)))} />
+                    onClick={() => set('jumlah', Math.max(minQty, form.jumlah - 1))}>−</button>
+                  <input type="number" className="custom-qty-input" min={minQty} value={form.jumlah}
+                    onChange={e => set('jumlah', Math.max(minQty, parseInt(e.target.value) || minQty))} />
                   <button type="button" className="custom-qty-btn"
                     onClick={() => set('jumlah', form.jumlah + 1)}>+</button>
                 </div>
