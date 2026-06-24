@@ -595,7 +595,7 @@ export default function CustomDesignClient({
             {!isAmplop && (
               <>
                 <div className="custom-row-2col">
-                  <div className="custom-control-group">
+                  <div>
                     <p className="custom-control-label">Warna Baju</p>
                     <ColorDropdown
                       colors={SHIRT_COLORS}
@@ -603,7 +603,7 @@ export default function CustomDesignClient({
                       onChange={v => set('shirtColor', v)}
                     />
                   </div>
-                  <div className="custom-control-group">
+                  <div>
                     <p className="custom-control-label">Jenis Bahan <span className="custom-required">*</span></p>
                     <CustomDropdown
                       options={[...bahanOptions, { label: 'Lainnya', price: 0 }]}
