@@ -399,7 +399,7 @@ export default function CustomDesignClient({
 }) {
   const { addCustomItem, openCart } = useCart()
 
-  const [form, setForm] = useState({ ...EMPTY_FORM, jumlah: productType === 'amplop-packaging' ? 1500 : productType === 'totebag' ? 100 : EMPTY_FORM.jumlah })
+  const [form, setForm] = useState({ ...EMPTY_FORM, jumlah: productType === 'amplop-packaging' ? 1500 : productType === 'totebag' ? 24 : EMPTY_FORM.jumlah })
   const [activeSide, setActiveSide]   = useState<Side>('front')
   const [error, setError]             = useState('')
   const [uploadingFront, setUploadingFront] = useState(false)
@@ -474,7 +474,8 @@ export default function CustomDesignClient({
   const amplopMinQty = amplopSize === 'A3'
     ? 1500
     : form.backDesign ? 2500 : 1500
-  const totebagMinQty = form.backDesign ? 200 : 100
+  const totebagMinQty = 24
+  const totebagHarga  = form.backDesign ? 45000 : 30000
   const minQty = isAmplop ? amplopMinQty : isTotebag ? totebagMinQty : 1
 
   useEffect(() => {
@@ -488,10 +489,11 @@ export default function CustomDesignClient({
 
   const bahanPriceVal = noWarnaNoBaju ? 0 : (form.bahan === 'Lainnya' ? form.bahanCustomPrice : form.bahanPrice)
   const { depan: effDepan, belakang: effBelakang } = resolveEffectiveSablon(form.sablonDepan, form.sablonBelakang)
-  const autoHarga =
-    bahanPriceVal +
-    (effDepan    ? effDepan.price    : 0) +
-    (effBelakang ? effBelakang.price : 0)
+  const autoHarga = isTotebag
+    ? totebagHarga
+    : bahanPriceVal +
+      (effDepan    ? effDepan.price    : 0) +
+      (effBelakang ? effBelakang.price : 0)
 
   const handleAddToInvoice = () => {
     if (!noWarnaNoBaju && !form.selectedSize)      { setError('Pilih ukuran.'); return }
@@ -800,18 +802,24 @@ export default function CustomDesignClient({
             </div>
 
             {/* Auto price display */}
-            {bahanPriceVal > 0 && (
+            {(bahanPriceVal > 0 || isTotebag) && (
               <div className="custom-price-display">
                 <span className="custom-price-display-label">Harga/pcs</span>
                 <div className="custom-price-breakdown">
                   {!noWarnaNoBaju && <><span>Baju ({finalBahan || 'bahan'})</span><span>{formatRp(bahanPriceVal)}</span></>}
-                  {form.sablonDepan && (
+                  {isTotebag && (
+                    <>
+                      <span>Sablon {form.backDesign ? 'depan + belakang' : 'depan'}</span>
+                      <span>{formatRp(totebagHarga)}</span>
+                    </>
+                  )}
+                  {!isTotebag && form.sablonDepan && (
                     <>
                       <span>Sablon depan ({form.sablonDepan.label})</span>
                       <span>{formatRp(form.sablonDepan.price)}</span>
                     </>
                   )}
-                  {form.sablonBelakang && (
+                  {!isTotebag && form.sablonBelakang && (
                     <>
                       <span>Sablon belakang ({form.sablonBelakang.label})</span>
                       <span>{formatRp(form.sablonBelakang.price)}</span>
