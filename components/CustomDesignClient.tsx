@@ -661,30 +661,6 @@ export default function CustomDesignClient({
               </div>
             </div>
 
-            {/* Ukuran Desain — amplop only */}
-            {isAmplop && (
-              <div className="custom-control-group">
-                <p className="custom-control-label">Ukuran Desain</p>
-                <CustomDropdown
-                  options={[
-                    { label: 'Kecil  — 80 × 100 px',  price: 0 },
-                    { label: 'Sedang — 150 × 185 px', price: 0 },
-                    { label: 'Besar  — 230 × 280 px', price: 0 },
-                  ]}
-                  value={
-                    amplopDesignSize === 'kecil'  ? 'Kecil  — 80 × 100 px'  :
-                    amplopDesignSize === 'sedang' ? 'Sedang — 150 × 185 px' :
-                                                   'Besar  — 230 × 280 px'
-                  }
-                  onChange={v => {
-                    if (v.startsWith('Kecil'))  setAmplopDesignSize('kecil')
-                    else if (v.startsWith('Sedang')) setAmplopDesignSize('sedang')
-                    else setAmplopDesignSize('besar')
-                  }}
-                />
-              </div>
-            )}
-
             {/* Upload Depan + Sablon Depan */}
             <div className="custom-control-group">
               <p className="custom-control-label">Desain Depan <span className="custom-required">*</span></p>
@@ -709,16 +685,33 @@ export default function CustomDesignClient({
                     </>
                   )}
                 </button>
-                <CustomDropdown
-                  options={sablonOptions}
-                  value={form.sablonDepan?.label ?? ''}
-                  placeholder="Pilih ukuran sablon"
-                  disabled={!form.frontDesign}
-                  onChange={label => {
-                    const opt = sablonOptions.find(o => o.label === label)
-                    if (opt) set('sablonDepan', opt)
-                  }}
-                />
+                {isAmplop ? (
+                  <CustomDropdown
+                    options={[
+                      { label: 'Kecil  — 80 × 100 px',  price: 0 },
+                      { label: 'Sedang — 150 × 185 px', price: 0 },
+                      { label: 'Besar  — 230 × 280 px', price: 0 },
+                    ]}
+                    value={
+                      amplopDesignSize === 'kecil'  ? 'Kecil  — 80 × 100 px'  :
+                      amplopDesignSize === 'sedang' ? 'Sedang — 150 × 185 px' :
+                                                     'Besar  — 230 × 280 px'
+                    }
+                    disabled={!form.frontDesign}
+                    onChange={v => setAmplopDesignSize(v.startsWith('Kecil') ? 'kecil' : v.startsWith('Sedang') ? 'sedang' : 'besar')}
+                  />
+                ) : (
+                  <CustomDropdown
+                    options={sablonOptions}
+                    value={form.sablonDepan?.label ?? ''}
+                    placeholder="Pilih ukuran sablon"
+                    disabled={!form.frontDesign}
+                    onChange={label => {
+                      const opt = sablonOptions.find(o => o.label === label)
+                      if (opt) set('sablonDepan', opt)
+                    }}
+                  />
+                )}
               </div>
             </div>
 
@@ -746,16 +739,33 @@ export default function CustomDesignClient({
                     </>
                   )}
                 </button>
-                <CustomDropdown
-                  options={sablonOptions}
-                  value={form.sablonBelakang?.label ?? ''}
-                  placeholder="Pilih ukuran sablon"
-                  disabled={!form.backDesign}
-                  onChange={label => {
-                    const opt = sablonOptions.find(o => o.label === label)
-                    if (opt) set('sablonBelakang', opt)
-                  }}
-                />
+                {isAmplop ? (
+                  <CustomDropdown
+                    options={[
+                      { label: 'Kecil  — 80 × 100 px',  price: 0 },
+                      { label: 'Sedang — 150 × 185 px', price: 0 },
+                      { label: 'Besar  — 230 × 280 px', price: 0 },
+                    ]}
+                    value={
+                      amplopDesignSize === 'kecil'  ? 'Kecil  — 80 × 100 px'  :
+                      amplopDesignSize === 'sedang' ? 'Sedang — 150 × 185 px' :
+                                                     'Besar  — 230 × 280 px'
+                    }
+                    disabled={!form.backDesign}
+                    onChange={v => setAmplopDesignSize(v.startsWith('Kecil') ? 'kecil' : v.startsWith('Sedang') ? 'sedang' : 'besar')}
+                  />
+                ) : (
+                  <CustomDropdown
+                    options={sablonOptions}
+                    value={form.sablonBelakang?.label ?? ''}
+                    placeholder="Pilih ukuran sablon"
+                    disabled={!form.backDesign}
+                    onChange={label => {
+                      const opt = sablonOptions.find(o => o.label === label)
+                      if (opt) set('sablonBelakang', opt)
+                    }}
+                  />
+                )}
               </div>
             </div>
 
