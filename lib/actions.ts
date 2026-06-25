@@ -309,10 +309,12 @@ export async function uploadDesignFileAction(
     const file = formData.get('file') as File | null
     if (!file || file.size === 0) return { error: 'File kosong.' }
     const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+    const isPdf = ext === 'pdf'
+    const contentType = isPdf ? 'application/pdf' : (file.type || `image/${ext}`)
     const path = `custom-designs/${Date.now()}-${generateId(8)}.${ext}`
     const buf = Buffer.from(await file.arrayBuffer())
     const { error } = await db.storage.from('images').upload(path, buf, {
-      upsert: false, contentType: file.type || `image/${ext}`,
+      upsert: false, contentType,
     })
     if (error) return { error: error.message }
     const { data: { publicUrl } } = db.storage.from('images').getPublicUrl(path)

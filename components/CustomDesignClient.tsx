@@ -760,7 +760,7 @@ export default function CustomDesignClient({
             {/* Upload Depan + Sablon Depan */}
             <div className="custom-control-group">
               <p className="custom-control-label">Desain Depan <span className="custom-required">*</span></p>
-              <input ref={frontRef} type="file" accept="image/jpeg,image/png,image/jpg,application/pdf" style={{ display: 'none' }}
+              <input ref={frontRef} type="file" accept=".jpg,.jpeg,.png,.pdf" style={{ display: 'none' }}
                 onChange={e => { const f = e.target.files?.[0]; if (f) handleUpload('front', f) }} />
               <div className="custom-upload-row">
                 <button type="button"
@@ -813,7 +813,7 @@ export default function CustomDesignClient({
             {/* Upload Belakang + Sablon Belakang */}
             <div className="custom-control-group">
               <p className="custom-control-label">Desain Belakang</p>
-              <input ref={backRef} type="file" accept="image/jpeg,image/png,image/jpg,application/pdf" style={{ display: 'none' }}
+              <input ref={backRef} type="file" accept=".jpg,.jpeg,.png,.pdf" style={{ display: 'none' }}
                 onChange={e => { const f = e.target.files?.[0]; if (f) handleUpload('back', f) }} />
               <div className="custom-upload-row">
                 <button type="button"
