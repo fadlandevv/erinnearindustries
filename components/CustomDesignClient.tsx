@@ -317,19 +317,27 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
       )}
 
       {design
-        ? <image
-            href={design}
-            x={da.x + ox}
-            y={da.y + oy}
-            width={da.w}
-            height={da.h}
-            clipPath={isPhoto ? undefined : `url(#${id})`}
-            preserveAspectRatio="xMidYMid meet"
-            style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none' }}
-            onPointerDown={onDesignPointerDown}
-            onPointerMove={onSVGPointerMove as React.PointerEventHandler<SVGImageElement>}
-            onPointerUp={onSVGPointerUp}
-          />
+        ? design.startsWith('__pdf__:')
+          ? (
+            <g clipPath={isPhoto ? undefined : `url(#${id})`}>
+              <rect x={da.x} y={da.y} width={da.w} height={da.h} fill="rgba(220,38,38,0.08)" stroke="rgba(220,38,38,0.35)" strokeWidth="1.2" strokeDasharray="6 4" rx="6"/>
+              <text x={da.x + da.w / 2} y={da.y + da.h / 2 - 8} textAnchor="middle" fontSize="11" fill="rgba(220,38,38,0.7)" fontFamily="inherit" fontWeight="600">PDF</text>
+              <text x={da.x + da.w / 2} y={da.y + da.h / 2 + 8} textAnchor="middle" fontSize="9" fill="rgba(220,38,38,0.5)" fontFamily="inherit">{design.replace('__pdf__:', '').slice(0, 20)}</text>
+            </g>
+          )
+          : <image
+              href={design}
+              x={da.x + ox}
+              y={da.y + oy}
+              width={da.w}
+              height={da.h}
+              clipPath={isPhoto ? undefined : `url(#${id})`}
+              preserveAspectRatio="xMidYMid meet"
+              style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none' }}
+              onPointerDown={onDesignPointerDown}
+              onPointerMove={onSVGPointerMove as React.PointerEventHandler<SVGImageElement>}
+              onPointerUp={onSVGPointerUp}
+            />
         : (
           <g clipPath={isPhoto ? undefined : `url(#${id})`}>
             <rect x={da.x} y={da.y} width={da.w} height={da.h} fill="none" stroke={hint} strokeWidth="1.2" strokeDasharray="6 4" rx="6"/>
@@ -428,7 +436,8 @@ export default function CustomDesignClient({
     setForm(f => ({ ...f, [k]: v }))
 
   const handleUpload = async (side: Side, file: File) => {
-    const preview = URL.createObjectURL(file)
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
+    const preview = isPdf ? `__pdf__:${file.name}` : URL.createObjectURL(file)
     if (side === 'front') {
       setForm(f => ({ ...f, frontDesign: preview, frontUrl: null, sablonDepan: f.sablonDepan ?? sablonOptions[0] ?? null }))
       setUploadingFront(true)
@@ -751,7 +760,7 @@ export default function CustomDesignClient({
             {/* Upload Depan + Sablon Depan */}
             <div className="custom-control-group">
               <p className="custom-control-label">Desain Depan <span className="custom-required">*</span></p>
-              <input ref={frontRef} type="file" accept="image/*" style={{ display: 'none' }}
+              <input ref={frontRef} type="file" accept="image/jpeg,image/png,image/jpg,application/pdf" style={{ display: 'none' }}
                 onChange={e => { const f = e.target.files?.[0]; if (f) handleUpload('front', f) }} />
               <div className="custom-upload-row">
                 <button type="button"
@@ -804,7 +813,7 @@ export default function CustomDesignClient({
             {/* Upload Belakang + Sablon Belakang */}
             <div className="custom-control-group">
               <p className="custom-control-label">Desain Belakang</p>
-              <input ref={backRef} type="file" accept="image/*" style={{ display: 'none' }}
+              <input ref={backRef} type="file" accept="image/jpeg,image/png,image/jpg,application/pdf" style={{ display: 'none' }}
                 onChange={e => { const f = e.target.files?.[0]; if (f) handleUpload('back', f) }} />
               <div className="custom-upload-row">
                 <button type="button"
@@ -941,7 +950,7 @@ export default function CustomDesignClient({
               : <p className="custom-mockup-hint">Upload desain {activeSide === 'front' ? 'depan' : 'belakang'} untuk preview</p>
             }
             <div className="custom-info-pills">
-              <span className="custom-info-pill">PNG / JPG / SVG</span>
+              <span className="custom-info-pill">PNG / JPG / PDF</span>
               <span className="custom-info-pill">Min. 300 DPI</span>
               <span className="custom-info-pill">Background transparan</span>
             </div>
