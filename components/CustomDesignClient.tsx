@@ -264,6 +264,7 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
     totebag:           { front: '/mockups/totebag.png',              back: '/mockups/totebag.png',               vb: '0 0 300 300' },
     'coach-jacket':    { front: '/mockups/coachjacket.png',          back: '/mockups/coachjacket-belakang.png',  vb: '0 0 300 300' },
     hoodie:            { front: '/mockups/hoodiedepan.png',          back: '/mockups/hoodiebelakang.png',         vb: '0 0 300 300' },
+    jersey:            { front: '/mockups/jerseydepan.png',          back: '/mockups/jerseybelakang.png',         vb: '0 0 300 300' },
     'amplop-packaging':{ front: '/mockups/amplop-packaging.png',     back: '/mockups/amplop-packaging-back.png', vb: '0 0 300 375' },
   }
   const photoMockup = PHOTO_MOCKUPS[productType] ?? null
