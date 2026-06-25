@@ -771,8 +771,8 @@ export default function CustomDesignClient({
                     <>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                       <span>{uploadingFront ? 'Mengupload...' : 'Tersimpan'}</span>
-                      <button type="button" className="custom-upload-remove-x"
-                        onClick={e => { e.stopPropagation(); setForm(f => ({ ...f, frontDesign: null, frontUrl: null, sablonDepan: null })); setFrontPos({ x: 0, y: 0 }) }}>×</button>
+                      <span role="button" className="custom-upload-remove-x"
+                        onClick={e => { e.stopPropagation(); setForm(f => ({ ...f, frontDesign: null, frontUrl: null, sablonDepan: null })); setFrontPos({ x: 0, y: 0 }) }}>×</span>
                     </>
                   ) : (
                     <>
@@ -824,8 +824,8 @@ export default function CustomDesignClient({
                     <>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                       <span>{uploadingBack ? 'Mengupload...' : 'Tersimpan'}</span>
-                      <button type="button" className="custom-upload-remove-x"
-                        onClick={e => { e.stopPropagation(); setForm(f => ({ ...f, backDesign: null, backUrl: null, sablonBelakang: null })); setBackPos({ x: 0, y: 0 }) }}>×</button>
+                      <span role="button" className="custom-upload-remove-x"
+                        onClick={e => { e.stopPropagation(); setForm(f => ({ ...f, backDesign: null, backUrl: null, sablonBelakang: null })); setBackPos({ x: 0, y: 0 }) }}>×</span>
                     </>
                   ) : (
                     <>
