@@ -135,10 +135,6 @@ const LOGO_COMBO_PRICE = 10000
 type PriceOption = { label: string; price: number }
 type SablonOpt = PriceOption | null
 
-function hexToRgb(hex: string): [number, number, number] {
-  const h = hex.replace('#', '')
-  return [parseInt(h.slice(0,2),16)/255, parseInt(h.slice(2,4),16)/255, parseInt(h.slice(4,6),16)/255]
-}
 
 function resolveEffectiveSablon(depan: SablonOpt, belakang: SablonOpt): { depan: SablonOpt; belakang: SablonOpt } {
   const both = !!depan && !!belakang
@@ -191,46 +187,6 @@ type InvoiceItem = {
   catatan?: string
 }
 
-const MOCKUP_CONFIGS: Record<string, {
-  paths: string[]
-  clipPath: string
-  da: { x: number; y: number; w: number; h: number }
-}> = {
-  tshirt: {
-    paths: ['M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 Q 176,50 150,55 Q 124,50 118,0 Z'],
-    clipPath: 'M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 Q 176,50 150,55 Q 124,50 118,0 Z',
-    da: { x: 90, y: 90, w: 120, h: 120 },
-  },
-  totebag: {
-    paths: [
-      'M 40,100 L 20,330 L 280,330 L 260,100 Z',
-      'M 80,0 L 80,100 L 110,100 L 110,0 Z',
-      'M 190,0 L 190,100 L 220,100 L 220,0 Z',
-    ],
-    clipPath: 'M 40,100 L 20,330 L 280,330 L 260,100 Z',
-    da: { x: 75, y: 130, w: 150, h: 150 },
-  },
-  'amplop-packaging': {
-    paths: ['M 15,80 L 15,310 L 285,310 L 285,80 Z'],
-    clipPath: 'M 15,80 L 15,310 L 285,310 L 285,80 Z',
-    da: { x: 60, y: 105, w: 180, h: 155 },
-  },
-  'coach-jacket': {
-    paths: ['M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 L 162,26 L 150,18 L 138,26 Z'],
-    clipPath: 'M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 L 162,26 L 150,18 L 138,26 Z',
-    da: { x: 90, y: 100, w: 120, h: 120 },
-  },
-  hoodie: {
-    paths: ['M 108,68 L 52,80 L 0,122 L 0,158 L 52,138 L 52,340 L 248,340 L 248,138 L 300,158 L 300,122 L 248,80 L 192,68 C 182,18 150,4 150,4 C 150,4 118,18 108,68 Z'],
-    clipPath: 'M 108,68 L 52,80 L 0,122 L 0,158 L 52,138 L 52,340 L 248,340 L 248,138 L 300,158 L 300,122 L 248,80 L 192,68 C 182,18 150,4 150,4 C 150,4 118,18 108,68 Z',
-    da: { x: 90, y: 118, w: 120, h: 110 },
-  },
-  jersey: {
-    paths: ['M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 L 150,56 L 118,0 Z'],
-    clipPath: 'M 118,0 L 52,22 L 0,68 L 0,105 L 52,85 L 52,340 L 248,340 L 248,85 L 300,105 L 300,68 L 248,22 L 182,0 L 150,56 L 118,0 Z',
-    da: { x: 90, y: 90, w: 120, h: 120 },
-  },
-}
 
 function clientToSVG(svg: SVGSVGElement, clientX: number, clientY: number): DesignPos {
   const rect = svg.getBoundingClientRect()
@@ -254,42 +210,28 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
   designSize?: DesignSize
   amplopDesignSize?: AmplopDesignSize
 }) {
-  const isDark = color === '#1a1a1a' || color === '#1e3a5f' || color === '#6b7c3d'
-  const stroke = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'
-  const hint   = isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.18)'
-  const id     = `clip-${productType}-${side}`
-  const cfg    = MOCKUP_CONFIGS[productType] ?? MOCKUP_CONFIGS.tshirt
-  const PHOTO_MOCKUPS: Record<string, { front: string; back: string; vb: string }> = {
-    tshirt:            { front: '/mockups/tshirt.png',               back: '/mockups/tshirt-back.png',           vb: '0 0 300 300' },
-    totebag:           { front: '/mockups/totebag.png',              back: '/mockups/totebag.png',               vb: '0 0 300 300' },
-    'coach-jacket':    { front: '/mockups/coachjacket.png',          back: '/mockups/coachjacket-belakang.png',  vb: '0 0 300 300' },
-    hoodie:            { front: '/mockups/hoodiedepan.png',          back: '/mockups/hoodiebelakang.png',         vb: '0 0 300 300' },
-    jersey:            { front: '/mockups/jerseydepan.png',          back: '/mockups/jerseybelakang.png',         vb: '0 0 300 300' },
-    'amplop-packaging':{ front: '/mockups/amplop-packaging.png',     back: '/mockups/amplop-packaging-back.png', vb: '0 0 300 375' },
+  const PHOTO_MOCKUPS: Record<string, { front: string; back: string; vb: string; da: { x: number; y: number; w: number; h: number } }> = {
+    tshirt:            { front: '/mockups/tshirt.png',               back: '/mockups/tshirt-back.png',           vb: '0 0 300 300', da: { x: 90, y: 90,  w: 120, h: 120 } },
+    totebag:           { front: '/mockups/totebag.png',              back: '/mockups/totebag.png',               vb: '0 0 300 300', da: { x: 75, y: 130, w: 150, h: 150 } },
+    'coach-jacket':    { front: '/mockups/coachjacket.png',          back: '/mockups/coachjacket-belakang.png',  vb: '0 0 300 300', da: { x: 90, y: 100, w: 120, h: 120 } },
+    hoodie:            { front: '/mockups/hoodiedepan.png',          back: '/mockups/hoodiebelakang.png',        vb: '0 0 300 300', da: { x: 90, y: 118, w: 120, h: 110 } },
+    jersey:            { front: '/mockups/jerseydepan.png',          back: '/mockups/jerseybelakang.png',        vb: '0 0 300 300', da: { x: 90, y: 90,  w: 120, h: 120 } },
+    'amplop-packaging':{ front: '/mockups/amplop-packaging.png',     back: '/mockups/amplop-packaging-back.png', vb: '0 0 300 375', da: { x: 75, y: 115, w: 150, h: 185 } },
   }
-  const photoMockup = PHOTO_MOCKUPS[productType] ?? null
-  const isPhoto = photoMockup !== null
+  const photoCfg = PHOTO_MOCKUPS[productType] ?? PHOTO_MOCKUPS.tshirt
   const da = productType === 'amplop-packaging' && amplopDesignSize
     ? AMPLOP_DESIGN_SIZES[amplopDesignSize]
-    : isPhoto && productType === 'tshirt' && designSize
+    : productType === 'tshirt' && designSize
       ? DESIGN_SIZES[designSize]
-      : cfg.da
+      : photoCfg.da
   const ox = designPos?.x ?? 0
   const oy = designPos?.y ?? 0
-  const vb = photoMockup?.vb ?? '0 0 300 340'
-  const filterId = `shirt-tint-${side}`
-  const [cr, cg, cb] = hexToRgb(color)
-  const cm = [
-    cr*0.299, cr*0.587, cr*0.114, 0, 0,
-    cg*0.299, cg*0.587, cg*0.114, 0, 0,
-    cb*0.299, cb*0.587, cb*0.114, 0, 0,
-    0, 0, 0, 1, 0,
-  ].join(' ')
+  const hint = 'rgba(255,255,255,0.6)'
 
   return (
     <svg
       ref={svgRef as React.RefObject<SVGSVGElement>}
-      viewBox={vb}
+      viewBox={photoCfg.vb}
       xmlns="http://www.w3.org/2000/svg"
       className="custom-shirt-svg"
       style={{ touchAction: 'none' }}
@@ -297,30 +239,16 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
       onPointerUp={onSVGPointerUp}
       onPointerLeave={onSVGPointerUp}
     >
-      <defs>
-        {!isPhoto && <clipPath id={id}><path d={cfg.clipPath}/></clipPath>}
-        {isPhoto && (
-          <filter id={filterId} colorInterpolationFilters="sRGB">
-            <feColorMatrix type="matrix" values={cm}/>
-          </filter>
-        )}
-      </defs>
-
-      {isPhoto && photoMockup ? (
-        <image
-          href={side === 'front' ? photoMockup.front : photoMockup.back}
-          x="0" y="0" width="300" height={photoMockup.vb.split(' ')[3]}
-          preserveAspectRatio="xMidYMid meet"
-          filter={productType === 'tshirt' ? `url(#${filterId})` : undefined}
-        />
-      ) : (
-        cfg.paths.map((p, i) => <path key={i} d={p} fill={color} stroke={stroke} strokeWidth="1.5"/>)
-      )}
+      <image
+        href={side === 'front' ? photoCfg.front : photoCfg.back}
+        x="0" y="0" width="300" height={photoCfg.vb.split(' ')[3]}
+        preserveAspectRatio="xMidYMid meet"
+      />
 
       {design
         ? design.startsWith('__pdf__:')
           ? (
-            <g clipPath={isPhoto ? undefined : `url(#${id})`}>
+            <g>
               <rect x={da.x} y={da.y} width={da.w} height={da.h} fill="rgba(220,38,38,0.08)" stroke="rgba(220,38,38,0.35)" strokeWidth="1.2" strokeDasharray="6 4" rx="6"/>
               <text x={da.x + da.w / 2} y={da.y + da.h / 2 - 8} textAnchor="middle" fontSize="11" fill="rgba(220,38,38,0.7)" fontFamily="inherit" fontWeight="600">PDF</text>
               <text x={da.x + da.w / 2} y={da.y + da.h / 2 + 8} textAnchor="middle" fontSize="9" fill="rgba(220,38,38,0.5)" fontFamily="inherit">{design.replace('__pdf__:', '').slice(0, 20)}</text>
@@ -332,7 +260,6 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
               y={da.y + oy}
               width={da.w}
               height={da.h}
-              clipPath={isPhoto ? undefined : `url(#${id})`}
               preserveAspectRatio="xMidYMid meet"
               style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none' }}
               onPointerDown={onDesignPointerDown}
@@ -340,7 +267,7 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
               onPointerUp={onSVGPointerUp}
             />
         : (
-          <g clipPath={isPhoto ? undefined : `url(#${id})`}>
+          <g>
             <rect x={da.x} y={da.y} width={da.w} height={da.h} fill="none" stroke={hint} strokeWidth="1.2" strokeDasharray="6 4" rx="6"/>
             <text x={da.x + da.w / 2} y={da.y + da.h / 2 - 7} textAnchor="middle" fontSize="10" fill={hint} fontFamily="inherit">
               {side === 'front' ? 'Desain Depan' : 'Desain Belakang'}
@@ -349,23 +276,6 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
           </g>
         )
       }
-
-      {!isPhoto && cfg.paths.map((p, i) => <path key={`o${i}`} d={p} fill="none" stroke={stroke} strokeWidth="1.5"/>)}
-
-      {productType === 'coach-jacket' && <line x1="150" y1="18" x2="150" y2="340" stroke={stroke} strokeWidth="1" strokeDasharray="5,3"/>}
-      {productType === 'hoodie' && <>
-        <line x1="150" y1="68" x2="150" y2="210" stroke={stroke} strokeWidth="1" strokeDasharray="5,3"/>
-        <rect x="108" y="268" width="84" height="48" rx="8" fill="none" stroke={stroke} strokeWidth="1.2"/>
-      </>}
-      {productType === 'jersey' && <>
-        <rect x="52" y="85" width="18" height="135" fill={stroke}/>
-        <rect x="230" y="85" width="18" height="135" fill={stroke}/>
-      </>}
-      {productType === 'amplop-packaging' && !isPhoto && <>
-        <path d="M 15,80 L 150,185 L 285,80" fill="none" stroke={stroke} strokeWidth="1.5"/>
-        <line x1="15" y1="310" x2="115" y2="195" stroke={stroke} strokeWidth="1" strokeLinecap="round"/>
-        <line x1="285" y1="310" x2="185" y2="195" stroke={stroke} strokeWidth="1" strokeLinecap="round"/>
-      </>}
     </svg>
   )
 }
