@@ -310,7 +310,7 @@ export default function CustomDesignClient({
 }) {
   const { addCustomItem, openCart } = useCart()
 
-  const [form, setForm] = useState({ ...EMPTY_FORM, jumlah: productType === 'amplop-packaging' ? 1500 : productType === 'totebag' ? 24 : EMPTY_FORM.jumlah })
+  const [form, setForm] = useState({ ...EMPTY_FORM, jumlah: productType === 'amplop-packaging' ? 100 : productType === 'totebag' ? 24 : EMPTY_FORM.jumlah })
   const [activeSide, setActiveSide]   = useState<Side>('front')
   const [error, setError]             = useState('')
   const [uploadingFront, setUploadingFront] = useState(false)
@@ -387,9 +387,7 @@ export default function CustomDesignClient({
   const isTotebag    = productType === 'totebag'
   const noWarnaNoBaju = isAmplop || isTotebag
 
-  const amplopMinQty = amplopSize === 'A3'
-    ? 1500
-    : form.backDesign ? 2500 : 1500
+  const amplopMinQty = amplopSize === 'A3' ? 500 : 100
   const totebagMinQty = 24
   const totebagHarga  = form.backDesign ? 45000 : 30000
   const minQty = isAmplop ? amplopMinQty : isTotebag ? totebagMinQty : 1
@@ -584,7 +582,7 @@ export default function CustomDesignClient({
                     value={amplopSize}
                     onChange={v => {
                       const size = v as 'A4' | 'A3'
-                      const newMin = size === 'A3' ? 1500 : (form.backDesign ? 2500 : 1500)
+                      const newMin = size === 'A3' ? 500 : 100
                       setAmplopSize(size)
                       setForm(f => ({ ...f, jumlah: Math.max(newMin, f.jumlah) }))
                     }}
