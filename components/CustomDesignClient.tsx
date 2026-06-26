@@ -390,6 +390,8 @@ export default function CustomDesignClient({
   const amplopMinQty = amplopSize === 'A3' ? 500 : 100
   const totebagMinQty = 24
   const totebagHarga  = form.backDesign ? 45000 : 30000
+  const amplopSizeSurcharge = amplopSize === 'A3' ? 1100 : 0
+  const amplopHarga   = (form.backDesign ? 2200 : 1500) + amplopSizeSurcharge + (amplopPerekat === 'Pakai Perekat' ? 300 : 0)
   const minQty = isAmplop ? amplopMinQty : isTotebag ? totebagMinQty : 1
 
   useEffect(() => {
@@ -405,9 +407,11 @@ export default function CustomDesignClient({
   const { depan: effDepan, belakang: effBelakang } = resolveEffectiveSablon(form.sablonDepan, form.sablonBelakang)
   const autoHarga = isTotebag
     ? totebagHarga
-    : bahanPriceVal +
-      (effDepan    ? effDepan.price    : 0) +
-      (effBelakang ? effBelakang.price : 0)
+    : isAmplop
+      ? amplopHarga
+      : bahanPriceVal +
+        (effDepan    ? effDepan.price    : 0) +
+        (effBelakang ? effBelakang.price : 0)
 
   const handleAddToInvoice = () => {
     if (!noWarnaNoBaju && !form.selectedSize)      { setError('Pilih ukuran.'); return }
@@ -779,7 +783,7 @@ export default function CustomDesignClient({
             </div>
 
             {/* Auto price display */}
-            {(bahanPriceVal > 0 || isTotebag) && (
+            {(bahanPriceVal > 0 || isTotebag || isAmplop) && (
               <div className="custom-price-display">
                 <span className="custom-price-display-label">Harga/pcs</span>
                 <div className="custom-price-breakdown">
@@ -788,6 +792,18 @@ export default function CustomDesignClient({
                     <>
                       <span>Sablon {form.backDesign ? 'depan + belakang' : 'depan'}</span>
                       <span>{formatRp(totebagHarga)}</span>
+                    </>
+                  )}
+                  {isAmplop && (
+                    <>
+                      <span>Cetak {form.backDesign ? 'depan + belakang' : 'depan'} ({amplopSize})</span>
+                      <span>{formatRp((form.backDesign ? 2200 : 1500) + amplopSizeSurcharge)}</span>
+                      {amplopPerekat === 'Pakai Perekat' && (
+                        <>
+                          <span>Perekat</span>
+                          <span>{formatRp(300)}</span>
+                        </>
+                      )}
                     </>
                   )}
                   {!isTotebag && form.sablonDepan && (
