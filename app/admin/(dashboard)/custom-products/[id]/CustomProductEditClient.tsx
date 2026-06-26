@@ -156,9 +156,7 @@ function FotoCard({ productId, savedImage }: { productId: string; savedImage?: s
   }
 
   return (
-    <div className="admin-form-card">
-      <p className="admin-form-section-title">Foto Background</p>
-      <form ref={formRef} onSubmit={handleSubmit} encType="multipart/form-data" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+    <form ref={formRef} onSubmit={handleSubmit} encType="multipart/form-data" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', border: '1.5px dashed #d4ccbf', borderRadius: 10, cursor: 'pointer', background: fileName ? '#faf8f5' : '#fff', flex: 1 }}
           onClick={() => inputRef.current?.click()}>
           {displayed ? (
@@ -180,11 +178,36 @@ function FotoCard({ productId, savedImage }: { productId: string; savedImage?: s
           {isPending ? '…' : currentImage && !preview ? 'Ganti Foto' : 'Simpan Foto'}
         </button>
       </form>
-    </div>
   )
 }
 
 const hint = (text: string) => <p className="admin-form-hint" style={{ marginBottom: 8 }}>Default: {text}</p>
+
+function CollapsibleCard({ title, children }: { title: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="admin-form-card" style={{ padding: 0, overflow: 'hidden' }}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.85rem 1.1rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+      >
+        <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{title}</span>
+        <svg
+          width="14" height="14" viewBox="0 0 10 10" fill="none"
+          style={{ transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', flexShrink: 0 }}
+        >
+          <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+      {open && (
+        <div style={{ padding: '0 1.1rem 1rem' }}>
+          {children}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function CustomProductEditClient({
   productId, hasColors, hasBahan, hasSizes, savedImage, options, defaults,
@@ -192,11 +215,12 @@ export default function CustomProductEditClient({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-      <FotoCard productId={productId} savedImage={savedImage} />
+      <CollapsibleCard title="Foto Background">
+        <FotoCard productId={productId} savedImage={savedImage} />
+      </CollapsibleCard>
 
       {hasColors && (
-        <div className="admin-form-card">
-          <p className="admin-form-section-title">Warna</p>
+        <CollapsibleCard title="Warna">
           {options.colors.length === 0 && hint(defaults.colors.map(c => c.label).join(', '))}
           {options.colors.length > 0 && (
             <div className="admin-table-wrap">
@@ -220,12 +244,11 @@ export default function CustomProductEditClient({
             </div>
           )}
           <AddColorForm productType={productId} />
-        </div>
+        </CollapsibleCard>
       )}
 
       {hasBahan && (
-        <div className="admin-form-card">
-          <p className="admin-form-section-title">Jenis Bahan</p>
+        <CollapsibleCard title="Jenis Bahan">
           {options.bahans.length === 0 && hint(defaults.bahans.map(b => b.label).join(', '))}
           {options.bahans.length > 0 && (
             <div className="admin-table-wrap">
@@ -245,12 +268,11 @@ export default function CustomProductEditClient({
             </div>
           )}
           <AddBahanForm productType={productId} />
-        </div>
+        </CollapsibleCard>
       )}
 
       {hasSizes && (
-        <div className="admin-form-card">
-          <p className="admin-form-section-title">Ukuran</p>
+        <CollapsibleCard title="Ukuran">
           {options.sizes.length === 0 && hint(defaults.sizes.map(s => s.label).join(', '))}
           {options.sizes.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
@@ -263,11 +285,11 @@ export default function CustomProductEditClient({
             </div>
           )}
           <AddSizeForm productType={productId} />
-        </div>
+        </CollapsibleCard>
       )}
 
       {!hasColors && !hasBahan && !hasSizes && (
-        <div className="admin-form-card" style={{ color: '#aaa', fontSize: '0.82rem' }}>
+        <div className="admin-form-card" style={{ color: '#aaa', fontSize: '0.82rem', padding: '1rem 1.1rem' }}>
           Tidak ada opsi yang bisa dikonfigurasi untuk produk ini.
         </div>
       )}
