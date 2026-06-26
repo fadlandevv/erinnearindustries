@@ -242,6 +242,9 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
         x="0" y="0" width="300" height={photoCfg.vb.split(' ')[3]}
         preserveAspectRatio="xMidYMid meet"
       />
+      {productType === 'amplop-packaging' && side === 'back' && (
+        <rect x="147" y="0" width="6" height="375" fill="rgba(255,255,255,0.35)"/>
+      )}
 
       {design
         ? design.startsWith('__pdf__:')
