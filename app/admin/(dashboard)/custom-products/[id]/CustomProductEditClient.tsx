@@ -7,7 +7,9 @@ import {
   deleteCustomProductOptionAction,
   updateCustomProductOptionPriceAction,
   updateCustomProductImageAction,
+  updatePricingAction,
 } from '@/lib/actions'
+import type { PricingItem } from '@/lib/pricing'
 import { useAdminToast } from '@/context/AdminToastContext'
 
 type ColorItem = { id: string; label: string; value: string }
@@ -21,8 +23,10 @@ type Props = {
   hasColors: boolean
   hasBahan:  boolean
   hasSizes:  boolean
+  hasSablon: boolean
   savedImage?: string
-  options:  { colors: ColorItem[]; bahans: BahanItem[]; sizes: SizeItem[] }
+  options:    { colors: ColorItem[]; bahans: BahanItem[]; sizes: SizeItem[] }
+  sablonItems: PricingItem[]
   defaults: { colors: { label: string; value: string }[]; bahans: { label: string }[]; sizes: { label: string }[] }
 }
 
@@ -185,6 +189,38 @@ function FotoCard({ productId, savedImage }: { productId: string; savedImage?: s
 
 const hint = (text: string) => <p className="admin-form-hint" style={{ marginBottom: 8 }}>Default: {text}</p>
 
+function SablonSection({ items }: { items: PricingItem[] }) {
+  const [saveState, saveAction, savePending] = useActionState(updatePricingAction, {})
+
+  return (
+    <form action={saveAction}>
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead><tr><th>Ukuran</th><th style={{ width: 200 }}>Harga/sisi</th><th style={{ width: 140 }}>Nilai saat ini</th></tr></thead>
+          <tbody>
+            {items.map(item => (
+              <tr key={item.id}>
+                <td style={{ fontWeight: 600 }}>{item.label}</td>
+                <td>
+                  <input type="number" name={`price-${item.id}`} defaultValue={item.price}
+                    min={1000} step={500} className="admin-form-input" style={{ width: 130 }} />
+                </td>
+                <td style={{ color: '#999', fontSize: '0.78rem' }}>{'Rp ' + item.price.toLocaleString('id-ID')}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {saveState.ok && <p style={{ fontSize: '0.78rem', color: '#16a34a', marginTop: 6 }}>Harga disimpan.</p>}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
+        <button type="submit" className="btn-admin-primary" disabled={savePending}>
+          {savePending ? 'Menyimpan…' : 'Simpan Harga Sablon'}
+        </button>
+      </div>
+    </form>
+  )
+}
+
 function CollapsibleCard({ title, open, onToggle, children }: { title: string; open: boolean; onToggle: () => void; children: React.ReactNode }) {
   return (
     <div className="admin-form-card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -211,9 +247,9 @@ function CollapsibleCard({ title, open, onToggle, children }: { title: string; o
 }
 
 export default function CustomProductEditClient({
-  productId, productName, productSub, hasColors, hasBahan, hasSizes, savedImage, options, defaults,
+  productId, productName, productSub, hasColors, hasBahan, hasSizes, hasSablon, savedImage, options, sablonItems, defaults,
 }: Props) {
-  const sections = ['foto', ...(hasColors ? ['warna'] : []), ...(hasBahan ? ['bahan'] : []), ...(hasSizes ? ['ukuran'] : [])]
+  const sections = ['foto', ...(hasColors ? ['warna'] : []), ...(hasBahan ? ['bahan'] : []), ...(hasSizes ? ['ukuran'] : []), ...(hasSablon ? ['sablon'] : [])]
   const [openMap, setOpenMap] = useState<Record<string, boolean>>({})
 
   const toggle = (key: string) => setOpenMap(p => ({ ...p, [key]: !p[key] }))
@@ -310,7 +346,13 @@ export default function CustomProductEditClient({
         </CollapsibleCard>
       )}
 
-      {!hasColors && !hasBahan && !hasSizes && (
+      {hasSablon && (
+        <CollapsibleCard title="Harga Sablon" open={!!openMap['sablon']} onToggle={() => toggle('sablon')}>
+          <SablonSection items={sablonItems} />
+        </CollapsibleCard>
+      )}
+
+      {!hasColors && !hasBahan && !hasSizes && !hasSablon && (
         <div className="admin-form-card" style={{ color: '#aaa', fontSize: '0.82rem', padding: '1rem 1.1rem' }}>
           Tidak ada opsi yang bisa dikonfigurasi untuk produk ini.
         </div>
