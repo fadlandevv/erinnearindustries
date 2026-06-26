@@ -67,17 +67,17 @@
 }
 
 /* ===== SCROLLBAR ===== */
-.admin-layout-wrapper *::-webkit-scrollbar        { width: 4px; height: 4px; }
+.admin-layout-wrapper *::-webkit-scrollbar        { width: 2px; height: 2px; }
 .admin-layout-wrapper *::-webkit-scrollbar-track  { background: transparent; }
-.admin-layout-wrapper *::-webkit-scrollbar-thumb  { background: #e0ddd8; border-radius: 99px; }
-.admin-layout-wrapper *::-webkit-scrollbar-thumb:hover { background: #c8c4be; }
+.admin-layout-wrapper *::-webkit-scrollbar-thumb  { background: #d8d4ce; border-radius: 99px; }
+.admin-layout-wrapper *::-webkit-scrollbar-thumb:hover { background: #bbb7b2; }
 
 /* Sidebar — dark bg variant */
 .admin-sidebar::-webkit-scrollbar-thumb          { background: rgba(255,255,255,0.12); }
 .admin-sidebar::-webkit-scrollbar-thumb:hover    { background: rgba(255,255,255,0.25); }
 
 /* Firefox */
-.admin-layout-wrapper * { scrollbar-width: thin; scrollbar-color: #e0ddd8 transparent; }
+.admin-layout-wrapper * { scrollbar-width: thin; scrollbar-color: #d8d4ce transparent; }
 .admin-sidebar          { scrollbar-color: rgba(255,255,255,0.12) transparent; }
 
 /* ===== LAYOUT ===== */
@@ -519,8 +519,13 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 28px;
   gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #f5f4f1;
+  margin: -32px -40px 28px;
+  padding: 32px 40px 20px;
 }
 .admin-page-title {
   font-size: 24px;
@@ -933,7 +938,8 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
-    margin-bottom: 20px;
+    margin: -20px -20px 20px;
+    padding: 20px 20px 16px;
   }
   .admin-page-title { font-size: 20px; }
 
@@ -962,6 +968,7 @@
   .admin-main { padding: 16px; }
   .admin-form-card { padding: 18px; }
   .admin-login-card { padding: 28px; }
+  .admin-page-header { margin: -16px -16px 16px; padding: 16px 16px 14px; }
 
   /* Stats 1 col */
   .admin-stats-grid { grid-template-columns: 1fr; }
@@ -1249,6 +1256,7 @@
 [data-theme="dark"] .admin-sidebar { border-right: 1px solid #1e1e1e; }
 
 /* Page header */
+[data-theme="dark"] .admin-page-header { background: #0b0b0b; }
 [data-theme="dark"] .admin-page-title { color: #f0ede8; }
 [data-theme="dark"] .admin-page-subtitle { color: #888; }
 
