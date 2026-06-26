@@ -206,9 +206,9 @@ export default function CustomProductEditClient({
   productId, hasColors, hasBahan, hasSizes, savedImage, options, defaults,
 }: Props) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: 860 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: 900 }}>
 
-      {/* Row 1: Foto + Warna */}
+      {/* Row 1: Foto | Warna */}
       <div style={col2}>
         <FotoCard productId={productId} savedImage={savedImage} />
 
@@ -246,7 +246,7 @@ export default function CustomProductEditClient({
         )}
       </div>
 
-      {/* Row 2: Bahan + Ukuran */}
+      {/* Row 2: Bahan | Ukuran */}
       <div style={col2}>
         {hasBahan ? (
           <div className="admin-form-card">
@@ -255,7 +255,7 @@ export default function CustomProductEditClient({
             {options.bahans.length > 0 && (
               <div className="admin-table-wrap">
                 <table className="admin-table">
-                  <thead><tr><th>Label</th><th style={{ width: 180 }}>Harga/pcs</th><th style={{ width: 110 }}>Nilai</th><th style={{ width: 80 }}></th></tr></thead>
+                  <thead><tr><th>Label</th><th style={{ width: 175 }}>Harga/pcs</th><th style={{ width: 90 }}>Nilai</th><th style={{ width: 80 }}></th></tr></thead>
                   <tbody>
                     {options.bahans.map(b => (
                       <tr key={b.id}>
