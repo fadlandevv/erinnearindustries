@@ -67,18 +67,8 @@
 }
 
 /* ===== SCROLLBAR ===== */
-.admin-layout-wrapper *::-webkit-scrollbar        { width: 2px; height: 2px; }
-.admin-layout-wrapper *::-webkit-scrollbar-track  { background: transparent; }
-.admin-layout-wrapper *::-webkit-scrollbar-thumb  { background: #d8d4ce; border-radius: 99px; }
-.admin-layout-wrapper *::-webkit-scrollbar-thumb:hover { background: #bbb7b2; }
-
-/* Sidebar — dark bg variant */
-.admin-sidebar::-webkit-scrollbar-thumb          { background: rgba(255,255,255,0.12); }
-.admin-sidebar::-webkit-scrollbar-thumb:hover    { background: rgba(255,255,255,0.25); }
-
-/* Firefox */
-.admin-layout-wrapper * { scrollbar-width: thin; scrollbar-color: #d8d4ce transparent; }
-.admin-sidebar          { scrollbar-color: rgba(255,255,255,0.12) transparent; }
+.admin-layout-wrapper *::-webkit-scrollbar { display: none; }
+.admin-layout-wrapper * { scrollbar-width: none; }
 
 /* ===== LAYOUT ===== */
 .admin-layout-wrapper {
