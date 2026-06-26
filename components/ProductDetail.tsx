@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Product } from '@/lib/data'
 import { useCart } from '@/context/CartContext'
 import { useLanguage } from '@/context/LanguageContext'
@@ -100,11 +101,14 @@ export default function ProductDetail({
             style={{ background: product.bg }}
           >
             {mainImg ? (
-              <img
+              <Image
                 key={mainImg}
                 src={mainImg}
                 alt={product.title}
+                fill
                 className="product-gallery-img"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
               />
             ) : (
               <>
@@ -127,7 +131,7 @@ export default function ProductDetail({
                   onClick={() => setMainIdx(i)}
                   aria-label={`Photo ${i + 1}`}
                 >
-                  <img src={img} alt={`${product.title} ${i + 1}`} />
+                  <Image src={img} alt={`${product.title} ${i + 1}`} fill style={{ objectFit: 'cover' }} sizes="80px" />
                 </button>
               ))}
             </div>

@@ -16,8 +16,12 @@ export async function generateMetadata({
   const service = await getServiceById(id)
   if (!service) return {}
   return {
-    title: `${service.title} — Erinnear Industries`,
+    title: service.title,
     description: service.desc,
+    openGraph: {
+      title: service.title,
+      description: service.desc,
+    },
   }
 }
 

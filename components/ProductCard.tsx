@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Product } from '@/lib/data'
 
 export default function ProductCard({ product: p }: { product: Product }) {
@@ -10,7 +11,7 @@ export default function ProductCard({ product: p }: { product: Product }) {
     <Link href={`/product/${p.id}`} className="product-card">
       <div className="product-card-img" style={{ background: p.image ? '#f0ede8' : p.bg }}>
         {p.image && (
-          <img src={p.image} alt={p.title} className="product-card-photo" />
+          <Image src={p.image} alt={p.title} fill className="product-card-photo" sizes="(max-width: 768px) 50vw, 33vw" />
         )}
       </div>
       <div className="product-card-body">
