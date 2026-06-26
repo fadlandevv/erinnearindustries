@@ -251,6 +251,55 @@ export async function getCustomProductImages(): Promise<Record<string, string>> 
   return (data?.value ?? {}) as Record<string, string>
 }
 
+// ── Custom Product Options ────────────────────────────────────
+
+export type CustomProductOption = {
+  id: string
+  product_type: string
+  category: string
+  label: string
+  value: string
+  price: number
+  sort_order: number
+}
+
+export type ProductOptionMap = {
+  colors:  { id: string; label: string; value: string }[]
+  bahans:  { id: string; label: string; price: number }[]
+  sizes:   { id: string; label: string }[]
+}
+
+export async function getCustomProductOptions(productType: string): Promise<ProductOptionMap> {
+  const { data } = await db
+    .from('custom_product_options')
+    .select('*')
+    .eq('product_type', productType)
+    .order('sort_order')
+  const rows = (data ?? []) as CustomProductOption[]
+  return {
+    colors: rows.filter(r => r.category === 'color').map(r => ({ id: r.id, label: r.label, value: r.value })),
+    bahans: rows.filter(r => r.category === 'bahan').map(r => ({ id: r.id, label: r.label, price: r.price })),
+    sizes:  rows.filter(r => r.category === 'size').map(r => ({ id: r.id, label: r.label })),
+  }
+}
+
+export async function getAllCustomProductOptions(): Promise<Record<string, ProductOptionMap>> {
+  const { data } = await db
+    .from('custom_product_options')
+    .select('*')
+    .order('sort_order')
+  const rows = (data ?? []) as CustomProductOption[]
+  const result: Record<string, ProductOptionMap> = {}
+  for (const row of rows) {
+    if (!result[row.product_type]) result[row.product_type] = { colors: [], bahans: [], sizes: [] }
+    const m = result[row.product_type]
+    if (row.category === 'color') m.colors.push({ id: row.id, label: row.label, value: row.value })
+    else if (row.category === 'bahan') m.bahans.push({ id: row.id, label: row.label, price: row.price })
+    else if (row.category === 'size')  m.sizes.push({ id: row.id, label: row.label })
+  }
+  return result
+}
+
 // ── Content ──────────────────────────────────────────────────
 
 export async function getContent(): Promise<ContentData> {

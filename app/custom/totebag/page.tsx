@@ -2,15 +2,17 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import CustomDesignClient from '@/components/CustomDesignClient'
 import { getPricingItems } from '@/lib/pricing'
+import { getCustomProductOptions } from '@/lib/data'
+import { DEFAULT_BAHANS } from '@/lib/custom-defaults'
 
 export const metadata: Metadata = {
   title: 'Custom Totebag — Erinnear Industries',
 }
 
 export default async function CustomTotebagPage() {
-  const pricingItems = await getPricingItems()
-  const bahanOptions  = pricingItems.filter(i => i.type === 'bahan').map(i => ({ label: i.label, price: i.price }))
+  const [pricingItems, opts] = await Promise.all([getPricingItems(), getCustomProductOptions('totebag')])
   const sablonOptions = pricingItems.filter(i => i.type === 'sablon').map(i => ({ label: i.label, price: i.price }))
+  const bahanOptions  = opts.bahans.length > 0 ? opts.bahans : (DEFAULT_BAHANS['totebag'] ?? [])
 
   return (
     <>
@@ -19,7 +21,11 @@ export default async function CustomTotebagPage() {
           <Link href="/custom" className="svc-detail-back">← Pilih Produk</Link>
         </div>
       </div>
-      <CustomDesignClient bahanOptions={bahanOptions} sablonOptions={sablonOptions} productType="totebag" />
+      <CustomDesignClient
+        bahanOptions={bahanOptions}
+        sablonOptions={sablonOptions}
+        productType="totebag"
+      />
     </>
   )
 }

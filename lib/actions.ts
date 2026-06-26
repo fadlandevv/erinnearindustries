@@ -302,6 +302,37 @@ function parsePrice(str: string): number {
   return parseInt(str.replace(/[^\d]/g, '')) || 0
 }
 
+// ── Custom Product Options ────────────────────────────────────
+
+export async function addCustomProductOptionAction(
+  _: Record<string, unknown>,
+  formData: FormData
+): Promise<{ ok?: boolean; error?: string }> {
+  const productType = (formData.get('product_type') as string)?.trim()
+  const category    = (formData.get('category') as string)?.trim()
+  const label       = (formData.get('label') as string)?.trim()
+  const value       = (formData.get('value') as string) ?? ''
+  const price       = parseInt(formData.get('price') as string) || 0
+  if (!productType || !category || !label) return { error: 'Data tidak lengkap.' }
+  const { error } = await db.from('custom_product_options').insert({
+    product_type: productType, category, label, value, price, sort_order: Date.now(),
+  })
+  if (error) return { error: error.message }
+  return { ok: true }
+}
+
+export async function deleteCustomProductOptionAction(id: string): Promise<void> {
+  await db.from('custom_product_options').delete().eq('id', id)
+}
+
+export async function updateCustomProductOptionPriceAction(
+  id: string, price: number
+): Promise<{ ok?: boolean; error?: string }> {
+  const { error } = await db.from('custom_product_options').update({ price }).eq('id', id)
+  if (error) return { error: error.message }
+  return { ok: true }
+}
+
 export async function uploadDesignFileAction(
   formData: FormData
 ): Promise<{ url?: string; error?: string }> {

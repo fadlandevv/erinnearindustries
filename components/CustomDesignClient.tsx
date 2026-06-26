@@ -303,10 +303,14 @@ export default function CustomDesignClient({
   bahanOptions,
   sablonOptions,
   productType = 'tshirt',
+  colorOptions,
+  sizeOptions,
 }: {
-  bahanOptions:  PriceOption[]
-  sablonOptions: PriceOption[]
-  productType?:  string
+  bahanOptions:   PriceOption[]
+  sablonOptions:  PriceOption[]
+  productType?:   string
+  colorOptions?:  { label: string; value: string }[]
+  sizeOptions?:   string[]
 }) {
   const { addCustomItem, openCart } = useCart()
 
@@ -420,7 +424,8 @@ export default function CustomDesignClient({
     if (!form.frontDesign && !form.backDesign)     { setError('Upload minimal satu desain.'); return }
     if (form.jumlah < 1)                           { setError('Jumlah minimal 1 pcs.'); return }
 
-    const warnaNama = SHIRT_COLORS.find(c => c.value === form.shirtColor)?.label ?? form.shirtColor
+    const colors = colorOptions ?? SHIRT_COLORS
+    const warnaNama = colors.find(c => c.value === form.shirtColor)?.label ?? form.shirtColor
 
     const item: InvoiceItem = {
       rowId:    generateId(4),
@@ -478,7 +483,7 @@ export default function CustomDesignClient({
     const basePcs = item.hargaPerPcs - (item.sablonDepan?.price ?? 0) - (item.sablonBelakang?.price ?? 0)
     const newHarga = basePcs + (effD?.price ?? 0) + (effB?.price ?? 0)
     setInvoiceItems(prev => prev.map(i => i.rowId === item.rowId
-      ? { ...i, ...editDraft, sablonDepan: effD, sablonBelakang: effB, warnaNama: SHIRT_COLORS.find(c => c.value === editDraft.warna)?.label ?? editDraft.warnaNama ?? i.warnaNama, hargaPerPcs: newHarga }
+      ? { ...i, ...editDraft, sablonDepan: effD, sablonBelakang: effB, warnaNama: (colorOptions ?? SHIRT_COLORS).find(c => c.value === editDraft.warna)?.label ?? editDraft.warnaNama ?? i.warnaNama, hargaPerPcs: newHarga }
       : i
     ))
     setEditingRowId(null)
@@ -540,7 +545,7 @@ export default function CustomDesignClient({
                       {productType === 'coach-jacket' ? 'Warna Jacket' : 'Warna Baju'}
                     </p>
                     <ColorDropdown
-                      colors={SHIRT_COLORS}
+                      colors={colorOptions ?? SHIRT_COLORS}
                       value={form.shirtColor}
                       onChange={v => set('shirtColor', v)}
                     />
@@ -548,31 +553,7 @@ export default function CustomDesignClient({
                   <div className="custom-control-group">
                     <p className="custom-control-label">Jenis Bahan <span className="custom-required">*</span></p>
                     <CustomDropdown
-                      options={productType === 'coach-jacket'
-                        ? [
-                            { label: 'Taslan',    price: 0 },
-                            { label: 'Parasut',   price: 0 },
-                            { label: 'Polyester', price: 0 },
-                            { label: 'Nylon',     price: 0 },
-                            { label: 'Lainnya',   price: 0 },
-                          ]
-                        : productType === 'hoodie'
-                        ? [
-                            { label: 'Fleece',        price: 0 },
-                            { label: 'Baby Terry',    price: 0 },
-                            { label: 'French Terry',  price: 0 },
-                            { label: 'Cotton Fleece', price: 0 },
-                            { label: 'Lainnya',       price: 0 },
-                          ]
-                        : productType === 'jersey'
-                        ? [
-                            { label: 'Drifit',           price: 0 },
-                            { label: 'Polyester',        price: 0 },
-                            { label: 'Micro Polyester',  price: 0 },
-                            { label: 'Hyget',            price: 0 },
-                            { label: 'Lainnya',          price: 0 },
-                          ]
-                        : [...bahanOptions, { label: 'Lainnya', price: 0 }]}
+                      options={[...bahanOptions, { label: 'Lainnya', price: 0 }]}
                       value={form.bahan}
                       placeholder="— Pilih bahan —"
                       onChange={label => {
@@ -634,7 +615,7 @@ export default function CustomDesignClient({
                 <div className="custom-control-group">
                   <p className="custom-control-label">Ukuran <span className="custom-required">*</span></p>
                   <CustomDropdown
-                    options={SIZES.map(s => ({ label: s, price: 0 }))}
+                    options={(sizeOptions ?? SIZES).map(s => ({ label: s, price: 0 }))}
                     value={form.selectedSize ?? ''}
                     placeholder="Pilih ukuran"
                     onChange={s => set('selectedSize', s)}
@@ -1022,7 +1003,7 @@ export default function CustomDesignClient({
                                 <div className="invoice-edit-field">
                                   <label className="invoice-edit-label">Warna</label>
                                   <ColorDropdown
-                                    colors={SHIRT_COLORS}
+                                    colors={colorOptions ?? SHIRT_COLORS}
                                     value={editDraft.warna ?? item.warna}
                                     onChange={v => setEditDraft(d => ({ ...d, warna: v }))}
                                   />
@@ -1030,7 +1011,7 @@ export default function CustomDesignClient({
                                 <div className="invoice-edit-field">
                                   <label className="invoice-edit-label">Ukuran</label>
                                   <CustomDropdown
-                                    options={SIZES.map(s => ({ label: s, price: 0 }))}
+                                    options={(sizeOptions ?? SIZES).map(s => ({ label: s, price: 0 }))}
                                     value={editDraft.size ?? item.size}
                                     onChange={s => setEditDraft(d => ({ ...d, size: s }))}
                                   />

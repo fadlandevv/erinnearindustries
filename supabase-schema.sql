@@ -108,6 +108,19 @@ create table if not exists custom_pricing (
   updated_at timestamptz default now()
 );
 
+create table if not exists custom_product_options (
+  id uuid primary key default gen_random_uuid(),
+  product_type text not null,
+  category text not null check (category in ('color','bahan','size')),
+  label text not null,
+  value text not null default '',
+  price integer not null default 0,
+  sort_order integer not null default 0,
+  created_at timestamptz default now()
+);
+create index if not exists custom_product_options_idx
+  on custom_product_options(product_type, category, sort_order);
+
 create table if not exists admin_access_log (
   id text primary key,
   admin_id text not null default '',

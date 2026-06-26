@@ -8,8 +8,7 @@ export const metadata: Metadata = {
 }
 
 export default async function CustomAmplopPage() {
-  const pricingItems = await getPricingItems()
-  const bahanOptions  = pricingItems.filter(i => i.type === 'bahan').map(i => ({ label: i.label, price: i.price }))
+  const pricingItems  = await getPricingItems()
   const sablonOptions = pricingItems.filter(i => i.type === 'sablon').map(i => ({ label: i.label, price: i.price }))
 
   return (
@@ -19,7 +18,11 @@ export default async function CustomAmplopPage() {
           <Link href="/custom" className="svc-detail-back">← Pilih Produk</Link>
         </div>
       </div>
-      <CustomDesignClient bahanOptions={bahanOptions} sablonOptions={sablonOptions} productType="amplop-packaging" />
+      <CustomDesignClient
+        bahanOptions={[]}
+        sablonOptions={sablonOptions}
+        productType="amplop-packaging"
+      />
     </>
   )
 }
