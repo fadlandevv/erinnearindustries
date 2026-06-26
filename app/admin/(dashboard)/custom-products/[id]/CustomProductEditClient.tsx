@@ -91,7 +91,9 @@ function AddBahanForm({ productType }: { productType: string }) {
       <input type="hidden" name="product_type" value={productType} />
       <input type="hidden" name="category" value="bahan" />
       <input type="text" name="label" placeholder="Nama bahan baru…" className="admin-form-input" style={{ flex: 1, minWidth: 130 }} required />
-      <input type="number" name="price" placeholder="Harga/pcs" className="admin-form-input" style={{ width: 140 }} min={0} step={1000} defaultValue={0} />
+      <input type="number" name="price" placeholder="Harga/pcs" className="admin-form-input" style={{ width: 140 }} min={0} step={1000} defaultValue={0}
+        onFocus={e => { if (e.target.value === '0') e.target.value = '' }}
+        onBlur={e => { if (e.target.value === '') e.target.value = '0' }} />
       <button type="submit" className="btn-admin-primary" disabled={pending} style={{ whiteSpace: 'nowrap' }}>
         {pending ? '…' : '+ Tambah'}
       </button>
@@ -110,7 +112,9 @@ function AddSizeForm({ productType }: { productType: string }) {
       <input type="hidden" name="product_type" value={productType} />
       <input type="hidden" name="category" value="size" />
       <input type="text" name="label" placeholder="Ukuran baru (misal: XXXL)" className="admin-form-input" style={{ flex: 1, minWidth: 130 }} required />
-      <input type="number" name="price" placeholder="Surcharge (Rp)" className="admin-form-input" style={{ width: 150 }} min={0} step={1000} defaultValue={0} />
+      <input type="number" name="price" placeholder="Surcharge (Rp)" className="admin-form-input" style={{ width: 150 }} min={0} step={1000} defaultValue={0}
+        onFocus={e => { if (e.target.value === '0') e.target.value = '' }}
+        onBlur={e => { if (e.target.value === '') e.target.value = '0' }} />
       <button type="submit" className="btn-admin-primary" disabled={pending} style={{ whiteSpace: 'nowrap' }}>
         {pending ? '…' : '+ Tambah'}
       </button>
@@ -129,7 +133,9 @@ function PriceCell({ item, productType, category }: { item: BahanItem; productTy
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <input type="number" value={price} min={0} step={1000}
         className="admin-form-input" style={{ width: 120 }}
-        onChange={e => setPrice(parseInt(e.target.value) || 0)} />
+        onFocus={e => { e.target.select(); if (price === 0) setPrice('' as unknown as number) }}
+        onBlur={e => { if (e.target.value === '') setPrice(0) }}
+        onChange={e => setPrice(e.target.value === '' ? '' as unknown as number : parseInt(e.target.value) || 0)} />
       {price !== item.price && (
         <button type="button" className="btn-admin-primary"
           style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}
