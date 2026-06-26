@@ -6,6 +6,7 @@ import {
   addCustomProductOptionAction,
   deleteCustomProductOptionAction,
   updateCustomProductOptionPriceAction,
+  updateCustomProductOptionAction,
   upsertCustomProductOptionPriceAction,
   updateCustomProductImageAction,
   updatePricingAction,
@@ -157,6 +158,65 @@ function PriceCell({ item, productType, category }: { item: BahanItem; productTy
         </button>
       )}
     </div>
+  )
+}
+
+function EditableRow({
+  item, category, productType, onDone,
+}: {
+  item: BahanItem | SizeItem
+  category: 'bahan' | 'size'
+  productType: string
+  onDone: () => void
+}) {
+  const router = useRouter()
+  const { toast } = useAdminToast()
+  const [label, setLabel] = useState(item.label)
+  const [price, setPrice] = useState(item.price)
+  const [saving, setSaving] = useState(false)
+  const isVirtual = item.id.startsWith('__new__:')
+
+  async function handleSave() {
+    setSaving(true)
+    const res = isVirtual
+      ? await upsertCustomProductOptionPriceAction(productType, category, label, price, item.sortOrder)
+      : await updateCustomProductOptionAction(item.id, label, price)
+    setSaving(false)
+    if (res?.ok) { toast(`${label} diperbarui`); onDone(); router.refresh() }
+    else toast(res?.error ?? 'Gagal menyimpan', 'error')
+  }
+
+  return (
+    <tr style={{ background: '#faf9f7' }}>
+      <td>
+        <input value={label} onChange={e => setLabel(e.target.value)}
+          className="admin-form-input" style={{ width: '100%', minWidth: 120 }} />
+      </td>
+      <td>
+        <input type="number" value={price} min={0} step={1000}
+          className="admin-form-input" style={{ width: 120 }}
+          onFocus={e => { e.target.select(); if (price === 0) setPrice('' as unknown as number) }}
+          onBlur={e => { if (e.target.value === '') setPrice(0) }}
+          onChange={e => setPrice(e.target.value === '' ? '' as unknown as number : parseInt(e.target.value) || 0)} />
+      </td>
+      <td style={{ color: '#999', fontSize: '0.78rem' }}>
+        {category === 'size' ? (price > 0 ? `+${formatRp(price as number)}` : '—') : formatRp(price as number)}
+      </td>
+      <td>
+        <div style={{ display: 'flex', gap: 4 }}>
+          <button type="button" className="btn-admin-primary"
+            style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}
+            disabled={saving} onClick={handleSave}>
+            {saving ? '…' : 'Simpan'}
+          </button>
+          <button type="button" className="btn-admin-secondary"
+            style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}
+            onClick={onDone}>
+            Batal
+          </button>
+        </div>
+      </td>
+    </tr>
   )
 }
 
@@ -348,7 +408,8 @@ export default function CustomProductEditClient({
     ...(hasSablon  ? ['sablon'] : []),
     ...(hasConfig  ? ['config'] : []),
   ]
-  const [openMap, setOpenMap] = useState<Record<string, boolean>>({})
+  const [openMap, setOpenMap]   = useState<Record<string, boolean>>({})
+  const [editingId, setEditingId] = useState<string | null>(null)
 
   const toggle = (key: string) => setOpenMap(p => ({ ...p, [key]: !p[key] }))
   const allOpen = sections.every(s => openMap[s])
@@ -407,16 +468,28 @@ export default function CustomProductEditClient({
         <CollapsibleCard title="Jenis Bahan" open={!!openMap['bahan']} onToggle={() => toggle('bahan')}>
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Label</th><th style={{ width: 200 }}>Harga/pcs</th><th style={{ width: 120 }}>Nilai</th><th style={{ width: 80 }}></th></tr></thead>
+              <thead><tr><th>Label</th><th style={{ width: 200 }}>Harga/pcs</th><th style={{ width: 120 }}>Nilai</th><th style={{ width: 160 }}></th></tr></thead>
               <tbody>
                 {options.bahans.map(b => {
                   const isVirtual = b.id.startsWith('__new__:')
+                  if (editingId === b.id) {
+                    return <EditableRow key={b.id} item={b} category="bahan" productType={productId} onDone={() => setEditingId(null)} />
+                  }
                   return (
                     <tr key={b.id}>
                       <td style={{ fontWeight: 600 }}>{b.label}</td>
                       <td><PriceCell item={b} productType={productId} category="bahan" /></td>
                       <td style={{ color: '#999', fontSize: '0.78rem' }}>{formatRp(b.price)}</td>
-                      <td>{!isVirtual && <DeleteBtn id={b.id} label={b.label} />}</td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 4 }}>
+                          <button type="button" className="btn-admin-secondary"
+                            style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}
+                            onClick={() => setEditingId(b.id)}>
+                            Edit
+                          </button>
+                          {!isVirtual && <DeleteBtn id={b.id} label={b.label} />}
+                        </div>
+                      </td>
                     </tr>
                   )
                 })}
@@ -436,18 +509,30 @@ export default function CustomProductEditClient({
                   <th>Ukuran</th>
                   <th style={{ width: 200 }}>Surcharge/pcs</th>
                   <th style={{ width: 120 }}>Nilai</th>
-                  <th style={{ width: 80 }}></th>
+                  <th style={{ width: 160 }}></th>
                 </tr>
               </thead>
               <tbody>
                 {options.sizes.map(s => {
                   const isVirtual = s.id.startsWith('__new__:')
+                  if (editingId === s.id) {
+                    return <EditableRow key={s.id} item={s} category="size" productType={productId} onDone={() => setEditingId(null)} />
+                  }
                   return (
                     <tr key={s.id}>
                       <td style={{ fontWeight: 600 }}>{s.label}</td>
                       <td><PriceCell item={s} productType={productId} category="size" /></td>
                       <td style={{ color: '#999', fontSize: '0.78rem' }}>{s.price > 0 ? `+${formatRp(s.price)}` : '—'}</td>
-                      <td>{!isVirtual && <DeleteBtn id={s.id} label={s.label} />}</td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 4 }}>
+                          <button type="button" className="btn-admin-secondary"
+                            style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}
+                            onClick={() => setEditingId(s.id)}>
+                            Edit
+                          </button>
+                          {!isVirtual && <DeleteBtn id={s.id} label={s.label} />}
+                        </div>
+                      </td>
                     </tr>
                   )
                 })}

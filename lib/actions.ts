@@ -363,6 +363,14 @@ export async function updateCustomProductOptionPriceAction(
   return { ok: true }
 }
 
+export async function updateCustomProductOptionAction(
+  id: string, label: string, price: number
+): Promise<{ ok?: boolean; error?: string }> {
+  const { error } = await db.from('custom_product_options').update({ label, price }).eq('id', id)
+  if (error) return { error: error.message }
+  return { ok: true }
+}
+
 // Upsert by (product_type, category, label) — inserts if not yet in DB, updates if exists.
 // sortOrder is the fixed position from the defaults array (keeps display order stable).
 export async function upsertCustomProductOptionPriceAction(
