@@ -160,8 +160,8 @@ const AMPLOP_DESIGN_SIZES: Record<AmplopDesignSize, { x: number; y: number; w: n
   besar:  { x:  35, y:  70, w: 230, h: 280 },
 }
 
-function sablonToDesignSize(label?: string): DesignSize {
-  if (!label) return 'a4'
+function sablonToDesignSize(label?: string): DesignSize | undefined {
+  if (!label) return undefined
   const l = label.toLowerCase()
   if (l.includes('logo')) return 'logo'
   if (l.includes('a3'))   return 'a3'
@@ -212,7 +212,7 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
 }) {
   const PHOTO_MOCKUPS: Record<string, { front: string; back: string; vb: string; da: { x: number; y: number; w: number; h: number } }> = {
     tshirt:            { front: '/mockups/tshirt.png',               back: '/mockups/tshirt-back.png',           vb: '0 0 300 300', da: { x: 90, y: 90,  w: 120, h: 120 } },
-    totebag:           { front: '/mockups/totebag.png',              back: '/mockups/totebag.png',               vb: '0 0 300 300', da: { x: 75, y: 130, w: 150, h: 150 } },
+    totebag:           { front: '/mockups/totebag.png',              back: '/mockups/totebag.png',               vb: '0 0 300 300', da: { x: 85, y: 110, w: 130, h: 130 } },
     'coach-jacket':    { front: '/mockups/coachjacket.png',          back: '/mockups/coachjacket-belakang.png',  vb: '0 0 300 300', da: { x: 90, y: 100, w: 120, h: 120 } },
     hoodie:            { front: '/mockups/hoodiedepan.png',          back: '/mockups/hoodiebelakang.png',        vb: '0 0 300 300', da: { x: 90, y: 118, w: 120, h: 110 } },
     jersey:            { front: '/mockups/jerseydepan.png',          back: '/mockups/jerseybelakang.png',        vb: '0 0 300 300', da: { x: 90, y: 90,  w: 120, h: 120 } },

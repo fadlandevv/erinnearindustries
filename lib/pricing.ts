@@ -17,8 +17,8 @@ export const PRICING_DEFAULTS: Omit<PricingItem, 'updatedAt' | 'isDefault'>[] = 
   { id: 'bahan-linen',  type: 'bahan',  label: 'Linen',              price: 70000 },
   { id: 'bahan-fleece', type: 'bahan',  label: 'Fleece',             price: 80000 },
   { id: 'sablon-logo',  type: 'sablon', label: 'Logo',               price: 15000 },
-  { id: 'sablon-a4',    type: 'sablon', label: 'A4 — 21×30 cm',      price: 35000 },
-  { id: 'sablon-a3',    type: 'sablon', label: 'A3 — 30×42 cm',      price: 35000 },
+  { id: 'sablon-a4',    type: 'sablon', label: 'A4',                 price: 35000 },
+  { id: 'sablon-a3',    type: 'sablon', label: 'A3',                 price: 35000 },
 ]
 
 const DEFAULT_IDS = new Set(PRICING_DEFAULTS.map(d => d.id))
