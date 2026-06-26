@@ -556,6 +556,14 @@ export default function CustomDesignClient({
                             { label: 'Nylon',     price: 0 },
                             { label: 'Lainnya',   price: 0 },
                           ]
+                        : productType === 'hoodie'
+                        ? [
+                            { label: 'Fleece',        price: 0 },
+                            { label: 'Baby Terry',    price: 0 },
+                            { label: 'French Terry',  price: 0 },
+                            { label: 'Cotton Fleece', price: 0 },
+                            { label: 'Lainnya',       price: 0 },
+                          ]
                         : [...bahanOptions, { label: 'Lainnya', price: 0 }]}
                       value={form.bahan}
                       placeholder="— Pilih bahan —"
