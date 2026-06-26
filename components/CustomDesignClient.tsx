@@ -717,7 +717,7 @@ export default function CustomDesignClient({
                   />
                 ) : (
                   <CustomDropdown
-                    options={sablonOptions}
+                    options={productType === 'coach-jacket' ? sablonOptions.filter(o => o.label === 'Logo') : sablonOptions}
                     value={form.sablonDepan?.label ?? ''}
                     placeholder="Pilih ukuran sablon"
                     disabled={!form.frontDesign}
