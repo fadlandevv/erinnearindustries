@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { getCustomProductOptions } from '@/lib/data'
+import { getCustomProductOptions, getCustomProductImages } from '@/lib/data'
 import { DEFAULT_COLORS, DEFAULT_BAHANS, DEFAULT_SIZES } from '@/lib/custom-defaults'
 import CustomProductEditClient from './CustomProductEditClient'
 
@@ -29,7 +29,7 @@ export default async function CustomProductEditPage({ params }: { params: Params
   const product = PRODUCTS[id]
   if (!product) notFound()
 
-  const opts = await getCustomProductOptions(id)
+  const [opts, images] = await Promise.all([getCustomProductOptions(id), getCustomProductImages()])
 
   return (
     <>
@@ -39,7 +39,7 @@ export default async function CustomProductEditPage({ params }: { params: Params
             ← Custom Products
           </Link>
           <h1 className="admin-page-title">{product.name} <span style={{ color: '#aaa', fontWeight: 400 }}>· {product.sub}</span></h1>
-          <p className="admin-page-subtitle">Kelola warna, bahan, dan ukuran untuk produk ini</p>
+          <p className="admin-page-subtitle">Kelola foto, warna, bahan, dan ukuran untuk produk ini</p>
         </div>
       </div>
 
@@ -49,6 +49,7 @@ export default async function CustomProductEditPage({ params }: { params: Params
         hasColors={product.hasColors}
         hasBahan={product.hasBahan}
         hasSizes={product.hasSizes}
+        savedImage={images[id]}
         options={opts}
         defaults={{
           colors: DEFAULT_COLORS,
