@@ -564,6 +564,14 @@ export default function CustomDesignClient({
                             { label: 'Cotton Fleece', price: 0 },
                             { label: 'Lainnya',       price: 0 },
                           ]
+                        : productType === 'jersey'
+                        ? [
+                            { label: 'Drifit',           price: 0 },
+                            { label: 'Polyester',        price: 0 },
+                            { label: 'Micro Polyester',  price: 0 },
+                            { label: 'Hyget',            price: 0 },
+                            { label: 'Lainnya',          price: 0 },
+                          ]
                         : [...bahanOptions, { label: 'Lainnya', price: 0 }]}
                       value={form.bahan}
                       placeholder="— Pilih bahan —"
