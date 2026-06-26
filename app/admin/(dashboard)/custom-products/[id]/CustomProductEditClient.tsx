@@ -15,8 +15,8 @@ import type { PricingItem } from '@/lib/pricing'
 import { useAdminToast } from '@/context/AdminToastContext'
 
 type ColorItem = { id: string; label: string; value: string }
-type BahanItem = { id: string; label: string; price: number }
-type SizeItem  = { id: string; label: string; price: number }
+type BahanItem = { id: string; label: string; price: number; sortOrder: number }
+type SizeItem  = { id: string; label: string; price: number; sortOrder: number }
 
 type Props = {
   productId: string
@@ -137,7 +137,7 @@ function PriceCell({ item, productType, category }: { item: BahanItem; productTy
           onClick={async () => {
             setSaving(true)
             const res = isVirtual
-              ? await upsertCustomProductOptionPriceAction(productType, category, item.label, price)
+              ? await upsertCustomProductOptionPriceAction(productType, category, item.label, price, item.sortOrder)
               : await updateCustomProductOptionPriceAction(item.id, price)
             setSaving(false)
             if (res?.ok) {

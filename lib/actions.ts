@@ -363,18 +363,19 @@ export async function updateCustomProductOptionPriceAction(
   return { ok: true }
 }
 
-// Upsert by (product_type, category, label) — inserts if not yet in DB, updates if exists
+// Upsert by (product_type, category, label) — inserts if not yet in DB, updates if exists.
+// sortOrder is the fixed position from the defaults array (keeps display order stable).
 export async function upsertCustomProductOptionPriceAction(
-  productType: string, category: string, label: string, price: number
+  productType: string, category: string, label: string, price: number, sortOrder: number
 ): Promise<{ ok?: boolean; error?: string }> {
   const { data } = await db.from('custom_product_options')
     .select('id').eq('product_type', productType).eq('category', category).eq('label', label).maybeSingle()
   if (data) {
-    const { error } = await db.from('custom_product_options').update({ price }).eq('id', data.id)
+    const { error } = await db.from('custom_product_options').update({ price, sort_order: sortOrder }).eq('id', data.id)
     if (error) return { error: error.message }
   } else {
     const { error } = await db.from('custom_product_options').insert({
-      product_type: productType, category, label, value: '', price, sort_order: Math.floor(Date.now() / 1000),
+      product_type: productType, category, label, value: '', price, sort_order: sortOrder,
     })
     if (error) return { error: error.message }
   }

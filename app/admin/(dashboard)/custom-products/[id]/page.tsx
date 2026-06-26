@@ -5,16 +5,37 @@ import { getPricingItems } from '@/lib/pricing'
 import { getProductConfig, PRODUCT_CONFIG_DEFAULTS } from '@/lib/product-config'
 import CustomProductEditClient from './CustomProductEditClient'
 
-// Merge DB items with defaults — missing defaults show as virtual rows (id = '__new__:label')
+// Merge DB items with defaults, always in defaults order.
+// - DB items get sortOrder from their position in defaults (fixes old timestamp-based sort_order)
+// - Missing defaults appear as virtual rows (id = '__new__:label') with their correct sortOrder
+// - Custom additions (not in defaults) are appended at the end
 function mergeWithDefaults(
   dbItems: { id: string; label: string; price: number }[],
   defaults: { label: string; price: number }[]
-) {
-  const dbLabels = new Set(dbItems.map(i => i.label))
-  const missing = defaults
-    .filter(d => !dbLabels.has(d.label))
-    .map(d => ({ id: `__new__:${d.label}`, label: d.label, price: d.price }))
-  return [...dbItems, ...missing]
+): { id: string; label: string; price: number; sortOrder: number }[] {
+  const defaultOrder = new Map(defaults.map((d, i) => [d.label, i]))
+  const dbMap = new Map(dbItems.map(i => [i.label, i]))
+
+  const result: { id: string; label: string; price: number; sortOrder: number }[] = []
+
+  // Defaults first, in order
+  for (const [idx, d] of defaults.entries()) {
+    const db = dbMap.get(d.label)
+    if (db) {
+      result.push({ ...db, sortOrder: idx })
+    } else {
+      result.push({ id: `__new__:${d.label}`, label: d.label, price: d.price, sortOrder: idx })
+    }
+  }
+
+  // Custom additions (not in defaults) appended at the end
+  for (const item of dbItems) {
+    if (!defaultOrder.has(item.label)) {
+      result.push({ ...item, sortOrder: 1000 + result.length })
+    }
+  }
+
+  return result
 }
 
 const PRODUCTS: Record<string, {
