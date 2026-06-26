@@ -158,32 +158,27 @@ function FotoCard({ productId, savedImage }: { productId: string; savedImage?: s
   return (
     <div className="admin-form-card">
       <p className="admin-form-section-title">Foto Background</p>
-      <form ref={formRef} onSubmit={handleSubmit} encType="multipart/form-data">
-        <div className="admin-form-group">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', border: '1.5px dashed #d4ccbf', borderRadius: 10, cursor: 'pointer', background: fileName ? '#faf8f5' : '#fff' }}
-            onClick={() => inputRef.current?.click()}>
-            {displayed ? (
-              <img src={displayed} alt="bg" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 6, flexShrink: 0, border: '1px solid #e5e0d8' }} />
-            ) : (
-              <div style={{ width: 40, height: 40, borderRadius: 6, background: '#f0ede8', border: '1px dashed #d4ccbf', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>
-                </svg>
-              </div>
-            )}
-            <span style={{ fontSize: '0.82rem', color: fileName ? '#0d0d0d' : currentImage ? '#555' : '#aaa', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-              {fileName ?? (currentImage ? 'Foto terpasang — klik untuk ganti' : 'Klik untuk pilih foto…')}
-            </span>
-            {fileName && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><polyline points="20 6 9 17 4 12"/></svg>}
-            {!fileName && currentImage && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><polyline points="20 6 9 17 4 12"/></svg>}
-          </div>
-          <input ref={inputRef} type="file" name="image" accept="image/*" required={!currentImage} onChange={handleFileChange} style={{ display: 'none' }} />
+      <form ref={formRef} onSubmit={handleSubmit} encType="multipart/form-data" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', border: '1.5px dashed #d4ccbf', borderRadius: 10, cursor: 'pointer', background: fileName ? '#faf8f5' : '#fff', flex: 1 }}
+          onClick={() => inputRef.current?.click()}>
+          {displayed ? (
+            <img src={displayed} alt="bg" style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 5, flexShrink: 0, border: '1px solid #e5e0d8' }} />
+          ) : (
+            <div style={{ width: 32, height: 32, borderRadius: 5, background: '#f0ede8', border: '1px dashed #d4ccbf', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>
+              </svg>
+            </div>
+          )}
+          <span style={{ fontSize: '0.82rem', color: fileName ? '#0d0d0d' : currentImage ? '#555' : '#aaa', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+            {fileName ?? (currentImage ? 'Foto terpasang — klik untuk ganti' : 'Klik untuk pilih foto…')}
+          </span>
+          {(fileName || currentImage) && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><polyline points="20 6 9 17 4 12"/></svg>}
         </div>
-        <div className="admin-form-actions">
-          <button type="submit" className="btn-admin-primary" style={{ width: '100%' }} disabled={isPending || (!preview && !fileName)}>
-            {isPending ? 'Menyimpan…' : currentImage && !preview ? 'Ganti Foto' : 'Simpan Foto'}
-          </button>
-        </div>
+        <input ref={inputRef} type="file" name="image" accept="image/*" required={!currentImage} onChange={handleFileChange} style={{ display: 'none' }} />
+        <button type="submit" className="btn-admin-primary" style={{ whiteSpace: 'nowrap' }} disabled={isPending || (!preview && !fileName)}>
+          {isPending ? '…' : currentImage && !preview ? 'Ganti Foto' : 'Simpan Foto'}
+        </button>
       </form>
     </div>
   )
