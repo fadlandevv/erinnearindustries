@@ -18,12 +18,13 @@ export const DEFAULT_SIZES: Record<string, string[]> = {
 }
 
 export const DEFAULT_BAHANS: Record<string, PriceOption[]> = {
-  tshirt:         [
-    { label: 'Cotton Combed',    price: 65000 },
-    { label: 'Cotton Bamboo',    price: 65000 },
-    { label: 'Drifit Polyester', price: 50000 },
-    { label: 'Fleece',           price: 80000 },
-    { label: 'Linen',            price: 70000 },
+  tshirt: [
+    { label: 'Cotton Combed 30s', price: 48000 },
+    { label: 'Cotton Combed 24s', price: 53000 },
+    { label: 'Cotton Bamboo',     price: 65000 },
+    { label: 'Drifit Polyester',  price: 50000 },
+    { label: 'Fleece',            price: 80000 },
+    { label: 'Linen',             price: 70000 },
   ],
   'coach-jacket': [
     { label: 'Taslan',    price: 0 },

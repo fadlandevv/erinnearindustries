@@ -3,6 +3,7 @@ import { getCustomProductOptions, getCustomProductImages } from '@/lib/data'
 import { DEFAULT_COLORS, DEFAULT_BAHANS, DEFAULT_SIZES } from '@/lib/custom-defaults'
 import { getPricingItems } from '@/lib/pricing'
 import { getProductConfig, PRODUCT_CONFIG_DEFAULTS } from '@/lib/product-config'
+import { seedDefaultBahansAction } from '@/lib/actions'
 import CustomProductEditClient from './CustomProductEditClient'
 
 const PRODUCTS: Record<string, {
@@ -36,6 +37,12 @@ export default async function CustomProductEditPage({ params }: { params: Params
     getPricingItems(),
     getProductConfig(id),
   ])
+
+  // Auto-seed bahan defaults into DB on first visit so admin can edit/delete them
+  if (product.hasBahan && opts.bahans.length === 0 && DEFAULT_BAHANS[id]?.length) {
+    await seedDefaultBahansAction(id, DEFAULT_BAHANS[id])
+    opts.bahans = await getCustomProductOptions(id).then(o => o.bahans)
+  }
 
   const allSablon = pricingItems.filter(i => i.type === 'sablon')
   // Filter sablon sesuai yang dipakai di halaman website per produk

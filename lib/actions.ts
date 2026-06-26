@@ -325,6 +325,21 @@ export async function deleteCustomProductOptionAction(id: string): Promise<void>
   await db.from('custom_product_options').delete().eq('id', id)
 }
 
+export async function seedDefaultBahansAction(
+  productType: string,
+  bahans: { label: string; price: number }[]
+): Promise<void> {
+  const rows = bahans.map((b, i) => ({
+    product_type: productType,
+    category: 'bahan',
+    label: b.label,
+    value: '',
+    price: b.price,
+    sort_order: Date.now() + i,
+  }))
+  await db.from('custom_product_options').insert(rows)
+}
+
 export async function updateCustomProductOptionPriceAction(
   id: string, price: number
 ): Promise<{ ok?: boolean; error?: string }> {

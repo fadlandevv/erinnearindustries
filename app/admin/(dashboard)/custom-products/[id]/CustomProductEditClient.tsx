@@ -35,14 +35,20 @@ type Props = {
 
 function formatRp(n: number) { return 'Rp ' + n.toLocaleString('id-ID') }
 
-function DeleteBtn({ id }: { id: string }) {
+function DeleteBtn({ id, label }: { id: string; label?: string }) {
   const router = useRouter()
+  const { toast } = useAdminToast()
   const [busy, setBusy] = useState(false)
   return (
     <button type="button" className="btn-admin-danger"
       style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}
       disabled={busy}
-      onClick={async () => { setBusy(true); await deleteCustomProductOptionAction(id); router.refresh() }}>
+      onClick={async () => {
+        setBusy(true)
+        await deleteCustomProductOptionAction(id)
+        toast(label ? `${label} dihapus` : 'Dihapus', 'error')
+        router.refresh()
+      }}>
       Hapus
     </button>
   )
@@ -72,9 +78,13 @@ function AddColorForm({ productType }: { productType: string }) {
 
 function AddBahanForm({ productType }: { productType: string }) {
   const router = useRouter()
+  const { toast } = useAdminToast()
   const ref = useRef<HTMLFormElement>(null)
   const [state, action, pending] = useActionState(addCustomProductOptionAction, {})
-  useEffect(() => { if (state.ok) { ref.current?.reset(); router.refresh() } }, [state.ok, router])
+  useEffect(() => {
+    if (state.ok) { ref.current?.reset(); toast('Bahan berhasil ditambahkan'); router.refresh() }
+    if (state.error) toast(state.error, 'error')
+  }, [state.ok, state.error, router])
   return (
     <form ref={ref} action={action} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.75rem', flexWrap: 'wrap' }}>
       <input type="hidden" name="product_type" value={productType} />
@@ -109,6 +119,7 @@ function AddSizeForm({ productType }: { productType: string }) {
 
 function PriceCell({ item }: { item: BahanItem }) {
   const router = useRouter()
+  const { toast } = useAdminToast()
   const [price, setPrice] = useState(item.price)
   const [saving, setSaving] = useState(false)
   return (
@@ -122,8 +133,14 @@ function PriceCell({ item }: { item: BahanItem }) {
           disabled={saving}
           onClick={async () => {
             setSaving(true)
-            await updateCustomProductOptionPriceAction(item.id, price)
-            setSaving(false); router.refresh()
+            const res = await updateCustomProductOptionPriceAction(item.id, price)
+            setSaving(false)
+            if (res?.ok) {
+              toast(`Harga ${item.label} disimpan`)
+              router.refresh()
+            } else {
+              toast(res?.error ?? 'Gagal menyimpan harga', 'error')
+            }
           }}>
           {saving ? '…' : 'Simpan'}
         </button>
@@ -364,7 +381,7 @@ export default function CustomProductEditClient({
                           <span style={{ fontSize: '0.75rem', color: '#888' }}>{c.value}</span>
                         </div>
                       </td>
-                      <td><DeleteBtn id={c.id} /></td>
+                      <td><DeleteBtn id={c.id} label={c.label} /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -388,7 +405,7 @@ export default function CustomProductEditClient({
                       <td style={{ fontWeight: 600 }}>{b.label}</td>
                       <td><PriceCell item={b} /></td>
                       <td style={{ color: '#999', fontSize: '0.78rem' }}>{formatRp(b.price)}</td>
-                      <td><DeleteBtn id={b.id} /></td>
+                      <td><DeleteBtn id={b.id} label={b.label} /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -407,7 +424,7 @@ export default function CustomProductEditClient({
               {options.sizes.map(s => (
                 <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f5f5f0', borderRadius: 8, padding: '5px 12px', fontSize: '0.85rem' }}>
                   <span style={{ fontWeight: 600 }}>{s.label}</span>
-                  <DeleteBtn id={s.id} />
+                  <DeleteBtn id={s.id} label={s.label} />
                 </div>
               ))}
             </div>
