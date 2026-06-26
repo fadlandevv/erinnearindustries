@@ -226,8 +226,6 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
       : photoCfg.da
   const ox = designPos?.x ?? 0
   const oy = designPos?.y ?? 0
-  const hint = 'rgba(255,255,255,0.6)'
-
   return (
     <svg
       ref={svgRef as React.RefObject<SVGSVGElement>}
@@ -266,15 +264,7 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
               onPointerMove={onSVGPointerMove as React.PointerEventHandler<SVGImageElement>}
               onPointerUp={onSVGPointerUp}
             />
-        : (
-          <g>
-            <rect x={da.x} y={da.y} width={da.w} height={da.h} fill="none" stroke={hint} strokeWidth="1.2" strokeDasharray="6 4" rx="6"/>
-            <text x={da.x + da.w / 2} y={da.y + da.h / 2 - 7} textAnchor="middle" fontSize="10" fill={hint} fontFamily="inherit">
-              {side === 'front' ? 'Desain Depan' : 'Desain Belakang'}
-            </text>
-            <text x={da.x + da.w / 2} y={da.y + da.h / 2 + 8} textAnchor="middle" fontSize="9" fill={hint} fontFamily="inherit">Upload di kiri</text>
-          </g>
-        )
+        : null
       }
     </svg>
   )
