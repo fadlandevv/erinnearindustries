@@ -391,7 +391,8 @@ export default function CustomDesignClient({
   const totebagMinQty = 24
   const totebagHarga  = form.backDesign ? 45000 : 30000
   const amplopSizeSurcharge = amplopSize === 'A3' ? 1100 : 0
-  const amplopHarga   = (form.backDesign ? 2200 : 1500) + amplopSizeSurcharge + (amplopPerekat === 'Pakai Perekat' ? 300 : 0)
+  const amplopPerekatPrice = amplopPerekat === 'Pakai Perekat' ? (amplopSize === 'A3' ? 500 : 300) : 0
+  const amplopHarga   = (form.backDesign ? 2200 : 1500) + amplopSizeSurcharge + amplopPerekatPrice
   const minQty = isAmplop ? amplopMinQty : isTotebag ? totebagMinQty : 1
 
   useEffect(() => {
@@ -801,7 +802,7 @@ export default function CustomDesignClient({
                       {amplopPerekat === 'Pakai Perekat' && (
                         <>
                           <span>Perekat</span>
-                          <span>{formatRp(300)}</span>
+                          <span>{formatRp(amplopPerekatPrice)}</span>
                         </>
                       )}
                     </>
