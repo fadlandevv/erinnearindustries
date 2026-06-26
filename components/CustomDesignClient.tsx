@@ -548,7 +548,15 @@ export default function CustomDesignClient({
                   <div className="custom-control-group">
                     <p className="custom-control-label">Jenis Bahan <span className="custom-required">*</span></p>
                     <CustomDropdown
-                      options={[...bahanOptions, { label: 'Lainnya', price: 0 }]}
+                      options={productType === 'coach-jacket'
+                        ? [
+                            { label: 'Taslan',    price: 0 },
+                            { label: 'Parasut',   price: 0 },
+                            { label: 'Polyester', price: 0 },
+                            { label: 'Nylon',     price: 0 },
+                            { label: 'Lainnya',   price: 0 },
+                          ]
+                        : [...bahanOptions, { label: 'Lainnya', price: 0 }]}
                       value={form.bahan}
                       placeholder="— Pilih bahan —"
                       onChange={label => {
