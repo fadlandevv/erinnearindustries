@@ -199,7 +199,6 @@ function FotoCard({ productId, savedImage }: { productId: string; savedImage?: s
   )
 }
 
-const col2 = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', alignItems: 'start' } as const
 const hint = (text: string) => <p className="admin-form-hint" style={{ marginBottom: 8 }}>Default: {text}</p>
 
 export default function CustomProductEditClient({
@@ -208,97 +207,85 @@ export default function CustomProductEditClient({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-      {/* Row 1: Foto | Warna */}
-      <div style={col2}>
-        <FotoCard productId={productId} savedImage={savedImage} />
+      <FotoCard productId={productId} savedImage={savedImage} />
 
-        {hasColors ? (
-          <div className="admin-form-card">
-            <p className="admin-form-section-title">Warna</p>
-            {options.colors.length === 0 && hint(defaults.colors.map(c => c.label).join(', '))}
-            {options.colors.length > 0 && (
-              <div className="admin-table-wrap">
-                <table className="admin-table">
-                  <thead><tr><th>Nama</th><th style={{ width: 110 }}>Warna</th><th style={{ width: 80 }}></th></tr></thead>
-                  <tbody>
-                    {options.colors.map(c => (
-                      <tr key={c.id}>
-                        <td style={{ fontWeight: 600 }}>{c.label}</td>
-                        <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{ width: 20, height: 20, borderRadius: 4, background: c.value, border: '1px solid #ddd', flexShrink: 0 }} />
-                            <span style={{ fontSize: '0.75rem', color: '#888' }}>{c.value}</span>
-                          </div>
-                        </td>
-                        <td><DeleteBtn id={c.id} /></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-            <AddColorForm productType={productId} />
-          </div>
-        ) : (
-          <div className="admin-form-card" style={{ color: '#aaa', fontSize: '0.82rem' }}>
-            Produk ini tidak menggunakan pilihan warna.
-          </div>
-        )}
-      </div>
+      {hasColors && (
+        <div className="admin-form-card">
+          <p className="admin-form-section-title">Warna</p>
+          {options.colors.length === 0 && hint(defaults.colors.map(c => c.label).join(', '))}
+          {options.colors.length > 0 && (
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead><tr><th>Nama</th><th style={{ width: 140 }}>Warna</th><th style={{ width: 80 }}></th></tr></thead>
+                <tbody>
+                  {options.colors.map(c => (
+                    <tr key={c.id}>
+                      <td style={{ fontWeight: 600 }}>{c.label}</td>
+                      <td>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div style={{ width: 20, height: 20, borderRadius: 4, background: c.value, border: '1px solid #ddd', flexShrink: 0 }} />
+                          <span style={{ fontSize: '0.75rem', color: '#888' }}>{c.value}</span>
+                        </div>
+                      </td>
+                      <td><DeleteBtn id={c.id} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <AddColorForm productType={productId} />
+        </div>
+      )}
 
-      {/* Row 2: Bahan | Ukuran */}
-      <div style={col2}>
-        {hasBahan ? (
-          <div className="admin-form-card">
-            <p className="admin-form-section-title">Jenis Bahan</p>
-            {options.bahans.length === 0 && hint(defaults.bahans.map(b => b.label).join(', '))}
-            {options.bahans.length > 0 && (
-              <div className="admin-table-wrap">
-                <table className="admin-table">
-                  <thead><tr><th>Label</th><th style={{ width: 175 }}>Harga/pcs</th><th style={{ width: 90 }}>Nilai</th><th style={{ width: 80 }}></th></tr></thead>
-                  <tbody>
-                    {options.bahans.map(b => (
-                      <tr key={b.id}>
-                        <td style={{ fontWeight: 600 }}>{b.label}</td>
-                        <td><PriceCell item={b} /></td>
-                        <td style={{ color: '#999', fontSize: '0.78rem' }}>{formatRp(b.price)}</td>
-                        <td><DeleteBtn id={b.id} /></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-            <AddBahanForm productType={productId} />
-          </div>
-        ) : (
-          <div className="admin-form-card" style={{ color: '#aaa', fontSize: '0.82rem' }}>
-            Produk ini tidak menggunakan pilihan bahan.
-          </div>
-        )}
+      {hasBahan && (
+        <div className="admin-form-card">
+          <p className="admin-form-section-title">Jenis Bahan</p>
+          {options.bahans.length === 0 && hint(defaults.bahans.map(b => b.label).join(', '))}
+          {options.bahans.length > 0 && (
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead><tr><th>Label</th><th style={{ width: 200 }}>Harga/pcs</th><th style={{ width: 120 }}>Nilai</th><th style={{ width: 80 }}></th></tr></thead>
+                <tbody>
+                  {options.bahans.map(b => (
+                    <tr key={b.id}>
+                      <td style={{ fontWeight: 600 }}>{b.label}</td>
+                      <td><PriceCell item={b} /></td>
+                      <td style={{ color: '#999', fontSize: '0.78rem' }}>{formatRp(b.price)}</td>
+                      <td><DeleteBtn id={b.id} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <AddBahanForm productType={productId} />
+        </div>
+      )}
 
-        {hasSizes ? (
-          <div className="admin-form-card">
-            <p className="admin-form-section-title">Ukuran</p>
-            {options.sizes.length === 0 && hint(defaults.sizes.map(s => s.label).join(', '))}
-            {options.sizes.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
-                {options.sizes.map(s => (
-                  <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f5f5f0', borderRadius: 8, padding: '5px 12px', fontSize: '0.85rem' }}>
-                    <span style={{ fontWeight: 600 }}>{s.label}</span>
-                    <DeleteBtn id={s.id} />
-                  </div>
-                ))}
-              </div>
-            )}
-            <AddSizeForm productType={productId} />
-          </div>
-        ) : (
-          <div className="admin-form-card" style={{ color: '#aaa', fontSize: '0.82rem' }}>
-            Produk ini tidak menggunakan pilihan ukuran.
-          </div>
-        )}
-      </div>
+      {hasSizes && (
+        <div className="admin-form-card">
+          <p className="admin-form-section-title">Ukuran</p>
+          {options.sizes.length === 0 && hint(defaults.sizes.map(s => s.label).join(', '))}
+          {options.sizes.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
+              {options.sizes.map(s => (
+                <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f5f5f0', borderRadius: 8, padding: '5px 12px', fontSize: '0.85rem' }}>
+                  <span style={{ fontWeight: 600 }}>{s.label}</span>
+                  <DeleteBtn id={s.id} />
+                </div>
+              ))}
+            </div>
+          )}
+          <AddSizeForm productType={productId} />
+        </div>
+      )}
+
+      {!hasColors && !hasBahan && !hasSizes && (
+        <div className="admin-form-card" style={{ color: '#aaa', fontSize: '0.82rem' }}>
+          Tidak ada opsi yang bisa dikonfigurasi untuk produk ini.
+        </div>
+      )}
     </div>
   )
 }
