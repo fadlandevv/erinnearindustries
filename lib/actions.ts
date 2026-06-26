@@ -315,7 +315,7 @@ export async function addCustomProductOptionAction(
   const price       = parseInt(formData.get('price') as string) || 0
   if (!productType || !category || !label) return { error: 'Data tidak lengkap.' }
   const { error } = await db.from('custom_product_options').insert({
-    product_type: productType, category, label, value, price, sort_order: Date.now(),
+    product_type: productType, category, label, value, price, sort_order: Math.floor(Date.now() / 1000),
   })
   if (error) return { error: error.message }
   return { ok: true }
@@ -335,7 +335,7 @@ export async function seedDefaultBahansAction(
     label: b.label,
     value: '',
     price: b.price,
-    sort_order: Date.now() + i,
+    sort_order: Math.floor(Date.now() / 1000) + i,
   }))
   await db.from('custom_product_options').insert(rows)
 }
@@ -350,7 +350,7 @@ export async function seedDefaultSizesAction(
     label: s.label,
     value: '',
     price: s.price,
-    sort_order: Date.now() + i,
+    sort_order: Math.floor(Date.now() / 1000) + i,
   }))
   await db.from('custom_product_options').insert(rows)
 }
@@ -374,7 +374,7 @@ export async function upsertCustomProductOptionPriceAction(
     if (error) return { error: error.message }
   } else {
     const { error } = await db.from('custom_product_options').insert({
-      product_type: productType, category, label, value: '', price, sort_order: Date.now(),
+      product_type: productType, category, label, value: '', price, sort_order: Math.floor(Date.now() / 1000),
     })
     if (error) return { error: error.message }
   }
