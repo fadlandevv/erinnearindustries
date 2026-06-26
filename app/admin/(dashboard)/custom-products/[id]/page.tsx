@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation'
-import Link from 'next/link'
 import { getCustomProductOptions, getCustomProductImages } from '@/lib/data'
 import { DEFAULT_COLORS, DEFAULT_BAHANS, DEFAULT_SIZES } from '@/lib/custom-defaults'
 import CustomProductEditClient from './CustomProductEditClient'
@@ -32,31 +31,20 @@ export default async function CustomProductEditPage({ params }: { params: Params
   const [opts, images] = await Promise.all([getCustomProductOptions(id), getCustomProductImages()])
 
   return (
-    <>
-      <div className="admin-page-header">
-        <div>
-          <Link href="/admin/custom-products" style={{ fontSize: '0.82rem', color: '#888', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
-            ← Custom Products
-          </Link>
-          <h1 className="admin-page-title">{product.name} <span style={{ color: '#aaa', fontWeight: 400 }}>· {product.sub}</span></h1>
-          <p className="admin-page-subtitle">Kelola foto, warna, bahan, dan ukuran untuk produk ini</p>
-        </div>
-      </div>
-
-      <CustomProductEditClient
-        productId={id}
-        productName={product.name}
-        hasColors={product.hasColors}
-        hasBahan={product.hasBahan}
-        hasSizes={product.hasSizes}
-        savedImage={images[id]}
-        options={opts}
-        defaults={{
-          colors: DEFAULT_COLORS,
-          bahans: DEFAULT_BAHANS[id] ?? [],
-          sizes:  (DEFAULT_SIZES[id] ?? []).map(s => ({ label: s })),
-        }}
-      />
-    </>
+    <CustomProductEditClient
+      productId={id}
+      productName={product.name}
+      productSub={product.sub}
+      hasColors={product.hasColors}
+      hasBahan={product.hasBahan}
+      hasSizes={product.hasSizes}
+      savedImage={images[id]}
+      options={opts}
+      defaults={{
+        colors: DEFAULT_COLORS,
+        bahans: DEFAULT_BAHANS[id] ?? [],
+        sizes:  (DEFAULT_SIZES[id] ?? []).map(s => ({ label: s })),
+      }}
+    />
   )
 }

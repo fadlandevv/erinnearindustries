@@ -1,6 +1,7 @@
 'use client'
 import { useActionState, useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import {
   addCustomProductOptionAction,
   deleteCustomProductOptionAction,
@@ -16,6 +17,7 @@ type SizeItem  = { id: string; label: string }
 type Props = {
   productId: string
   productName: string
+  productSub: string
   hasColors: boolean
   hasBahan:  boolean
   hasSizes:  boolean
@@ -209,7 +211,7 @@ function CollapsibleCard({ title, open, onToggle, children }: { title: string; o
 }
 
 export default function CustomProductEditClient({
-  productId, hasColors, hasBahan, hasSizes, savedImage, options, defaults,
+  productId, productName, productSub, hasColors, hasBahan, hasSizes, savedImage, options, defaults,
 }: Props) {
   const sections = ['foto', ...(hasColors ? ['warna'] : []), ...(hasBahan ? ['bahan'] : []), ...(hasSizes ? ['ukuran'] : [])]
   const [openMap, setOpenMap] = useState<Record<string, boolean>>({})
@@ -220,16 +222,18 @@ export default function CustomProductEditClient({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+      <div className="admin-page-header">
+        <div>
+          <Link href="/admin/custom-products" style={{ fontSize: '0.82rem', color: '#888', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
+            ← Custom Products
+          </Link>
+          <h1 className="admin-page-title">{productName} <span style={{ color: '#aaa', fontWeight: 400 }}>· {productSub}</span></h1>
+          <p className="admin-page-subtitle">Kelola foto, warna, bahan, dan ukuran untuk produk ini</p>
+        </div>
         <button type="button" className="btn-admin-secondary"
-          style={{ fontSize: '0.8rem', padding: '0.35rem 0.8rem' }}
-          onClick={() => setOpenMap(Object.fromEntries(sections.map(s => [s, true])))}>
-          Show All
-        </button>
-        <button type="button" className="btn-admin-secondary"
-          style={{ fontSize: '0.8rem', padding: '0.35rem 0.8rem' }}
-          onClick={() => setOpenMap({})}>
-          Hide All
+          style={{ fontSize: '0.82rem', alignSelf: 'center' }}
+          onClick={() => setOpenMap(allOpen ? {} : Object.fromEntries(sections.map(s => [s, true])))}>
+          {allOpen ? 'Hide All' : 'Show All'}
         </button>
       </div>
 
