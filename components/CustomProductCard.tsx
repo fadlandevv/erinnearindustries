@@ -1,204 +1,21 @@
 'use client'
-import { useRef, useState, useTransition, useActionState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { updateCustomProductImageAction, addCustomProductOptionAction, deleteCustomProductOptionAction, updateCustomProductOptionPriceAction } from '@/lib/actions'
+import { useRef, useState, useTransition } from 'react'
+import Link from 'next/link'
+import { updateCustomProductImageAction } from '@/lib/actions'
 import { useAdminToast } from '@/context/AdminToastContext'
-
-type ColorItem = { id: string; label: string; value: string }
-type BahanItem = { id: string; label: string; price: number }
-type SizeItem  = { id: string; label: string }
 
 type Props = {
   id: string
   name: string
   sub: string
   savedImage?: string
-  hasColors: boolean
-  hasBahan:  boolean
-  hasSizes:  boolean
-  options:  { colors: ColorItem[]; bahans: BahanItem[]; sizes: SizeItem[] }
-  defaults: { colors: { label: string; value: string }[]; bahans: { label: string }[]; sizes: { label: string }[] }
 }
 
-function formatRp(n: number) { return 'Rp ' + n.toLocaleString('id-ID') }
-
-function DeleteBtn({ id }: { id: string }) {
-  const router = useRouter()
-  const [busy, setBusy] = useState(false)
-  return (
-    <button type="button" className="btn-admin-danger"
-      style={{ padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}
-      disabled={busy}
-      onClick={async () => { setBusy(true); await deleteCustomProductOptionAction(id); router.refresh() }}>
-      ×
-    </button>
-  )
-}
-
-function AddColorForm({ productType }: { productType: string }) {
-  const router = useRouter()
-  const ref = useRef<HTMLFormElement>(null)
-  const [state, action, pending] = useActionState(addCustomProductOptionAction, {})
-  useEffect(() => { if (state.ok) { ref.current?.reset(); router.refresh() } }, [state.ok, router])
-  return (
-    <form ref={ref} action={action} style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 8, flexWrap: 'wrap' }}>
-      <input type="hidden" name="product_type" value={productType} />
-      <input type="hidden" name="category" value="color" />
-      <input type="text" name="label" placeholder="Nama warna…" className="admin-form-input" style={{ flex: 1, minWidth: 100 }} required />
-      <input type="color" name="value" defaultValue="#ffffff" style={{ width: 36, height: 30, padding: 2, border: '1px solid #ddd', borderRadius: 6, cursor: 'pointer' }} />
-      <button type="submit" className="btn-admin-primary" disabled={pending} style={{ whiteSpace: 'nowrap', padding: '0.3rem 0.7rem', fontSize: '0.78rem' }}>
-        {pending ? '…' : '+ Tambah'}
-      </button>
-      {state.error && <span style={{ fontSize: '0.72rem', color: '#ef4444' }}>{state.error}</span>}
-    </form>
-  )
-}
-
-function AddBahanForm({ productType }: { productType: string }) {
-  const router = useRouter()
-  const ref = useRef<HTMLFormElement>(null)
-  const [state, action, pending] = useActionState(addCustomProductOptionAction, {})
-  useEffect(() => { if (state.ok) { ref.current?.reset(); router.refresh() } }, [state.ok, router])
-  return (
-    <form ref={ref} action={action} style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 8, flexWrap: 'wrap' }}>
-      <input type="hidden" name="product_type" value={productType} />
-      <input type="hidden" name="category" value="bahan" />
-      <input type="text" name="label" placeholder="Nama bahan…" className="admin-form-input" style={{ flex: 1, minWidth: 100 }} required />
-      <input type="number" name="price" placeholder="Harga" className="admin-form-input" style={{ width: 100 }} min={0} step={1000} defaultValue={0} />
-      <button type="submit" className="btn-admin-primary" disabled={pending} style={{ whiteSpace: 'nowrap', padding: '0.3rem 0.7rem', fontSize: '0.78rem' }}>
-        {pending ? '…' : '+ Tambah'}
-      </button>
-      {state.error && <span style={{ fontSize: '0.72rem', color: '#ef4444' }}>{state.error}</span>}
-    </form>
-  )
-}
-
-function AddSizeForm({ productType }: { productType: string }) {
-  const router = useRouter()
-  const ref = useRef<HTMLFormElement>(null)
-  const [state, action, pending] = useActionState(addCustomProductOptionAction, {})
-  useEffect(() => { if (state.ok) { ref.current?.reset(); router.refresh() } }, [state.ok, router])
-  return (
-    <form ref={ref} action={action} style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 8 }}>
-      <input type="hidden" name="product_type" value={productType} />
-      <input type="hidden" name="category" value="size" />
-      <input type="text" name="label" placeholder="Ukuran baru…" className="admin-form-input" style={{ flex: 1 }} required />
-      <button type="submit" className="btn-admin-primary" disabled={pending} style={{ whiteSpace: 'nowrap', padding: '0.3rem 0.7rem', fontSize: '0.78rem' }}>
-        {pending ? '…' : '+ Tambah'}
-      </button>
-      {state.error && <span style={{ fontSize: '0.72rem', color: '#ef4444' }}>{state.error}</span>}
-    </form>
-  )
-}
-
-function BahanPriceCell({ item }: { item: BahanItem }) {
-  const router = useRouter()
-  const [price, setPrice] = useState(item.price)
-  const [saving, setSaving] = useState(false)
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-      <input type="number" value={price} min={0} step={1000}
-        className="admin-form-input" style={{ width: 90, fontSize: '0.78rem' }}
-        onChange={e => setPrice(parseInt(e.target.value) || 0)} />
-      {price !== item.price && (
-        <button type="button" className="btn-admin-primary"
-          style={{ padding: '0.2rem 0.5rem', fontSize: '0.72rem' }}
-          disabled={saving}
-          onClick={async () => {
-            setSaving(true)
-            await updateCustomProductOptionPriceAction(item.id, price)
-            setSaving(false); router.refresh()
-          }}>
-          {saving ? '…' : 'OK'}
-        </button>
-      )}
-    </div>
-  )
-}
-
-function DetailSection({ id, hasColors, hasBahan, hasSizes, options, defaults }: {
-  id: string
-  hasColors: boolean; hasBahan: boolean; hasSizes: boolean
-  options: Props['options']; defaults: Props['defaults']
-}) {
-  const hint = { fontSize: '0.72rem', color: '#999', marginBottom: 4 }
-  const secTitle = { fontWeight: 600, fontSize: '0.78rem', color: '#555', marginBottom: 6, marginTop: 14, display: 'block' as const }
-
-  return (
-    <div style={{ borderTop: '1px solid #eee', paddingTop: 12, marginTop: 12 }}>
-
-      {hasColors && (
-        <div>
-          <span style={secTitle}>Warna</span>
-          {options.colors.length === 0
-            ? <p style={hint}>Default: {defaults.colors.map(c => c.label).join(', ')}</p>
-            : <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 4 }}>
-                {options.colors.map(c => (
-                  <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#f5f5f0', borderRadius: 6, padding: '3px 8px', fontSize: '0.78rem' }}>
-                    <div style={{ width: 14, height: 14, borderRadius: 3, background: c.value, border: '1px solid #ddd', flexShrink: 0 }} />
-                    <span>{c.label}</span>
-                    <DeleteBtn id={c.id} />
-                  </div>
-                ))}
-              </div>
-          }
-          <AddColorForm productType={id} />
-        </div>
-      )}
-
-      {hasBahan && (
-        <div>
-          <span style={secTitle}>Jenis Bahan</span>
-          {options.bahans.length === 0
-            ? <p style={hint}>Default: {defaults.bahans.map(b => b.label).join(', ')}</p>
-            : <table style={{ width: '100%', fontSize: '0.78rem', borderCollapse: 'collapse', marginBottom: 4 }}>
-                <tbody>
-                  {options.bahans.map(b => (
-                    <tr key={b.id}>
-                      <td style={{ padding: '3px 0', fontWeight: 600 }}>{b.label}</td>
-                      <td style={{ padding: '3px 6px' }}><BahanPriceCell item={b} /></td>
-                      <td style={{ color: '#aaa', fontSize: '0.7rem', paddingRight: 6 }}>{formatRp(b.price)}</td>
-                      <td><DeleteBtn id={b.id} /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-          }
-          <AddBahanForm productType={id} />
-        </div>
-      )}
-
-      {hasSizes && (
-        <div>
-          <span style={secTitle}>Ukuran</span>
-          {options.sizes.length === 0
-            ? <p style={hint}>Default: {defaults.sizes.map(s => s.label).join(', ')}</p>
-            : <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 4 }}>
-                {options.sizes.map(s => (
-                  <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#f5f5f0', borderRadius: 6, padding: '3px 8px', fontSize: '0.78rem' }}>
-                    <span style={{ fontWeight: 600 }}>{s.label}</span>
-                    <DeleteBtn id={s.id} />
-                  </div>
-                ))}
-              </div>
-          }
-          <AddSizeForm productType={id} />
-        </div>
-      )}
-
-      {!hasColors && !hasBahan && !hasSizes && (
-        <p style={hint}>Tidak ada opsi yang bisa dikonfigurasi untuk produk ini.</p>
-      )}
-    </div>
-  )
-}
-
-export default function CustomProductCard({ id, name, sub, savedImage, hasColors, hasBahan, hasSizes, options, defaults }: Props) {
+export default function CustomProductCard({ id, name, sub, savedImage }: Props) {
   const [currentImage, setCurrentImage] = useState(savedImage)
   const [preview, setPreview]           = useState<string | null>(null)
   const [fileName, setFileName]         = useState<string | null>(null)
   const [isPending, startTransition]    = useTransition()
-  const [showDetail, setShowDetail]     = useState(false)
   const formRef  = useRef<HTMLFormElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const { toast } = useAdminToast()
@@ -230,7 +47,6 @@ export default function CustomProductCard({ id, name, sub, savedImage, hasColors
 
   return (
     <div className="admin-form-card">
-      {/* Preview area */}
       <div className="admin-showcase-preview">
         {displayed ? (
           <img src={displayed} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -268,27 +84,14 @@ export default function CustomProductCard({ id, name, sub, savedImage, hasColors
           <input ref={inputRef} type="file" name="image" accept="image/*" required={!currentImage} onChange={handleFileChange} style={{ display: 'none' }} />
         </div>
         <div className="admin-form-actions" style={{ justifyContent: 'space-between' }}>
-          <button type="button"
-            onClick={() => setShowDetail(v => !v)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', color: '#888', padding: 0, textDecoration: 'underline' }}>
-            {showDetail ? 'Tutup Detail' : 'Lihat Detail'}
-          </button>
+          <Link href={`/admin/custom-products/${id}`} className="btn-admin-secondary" style={{ fontSize: '0.82rem' }}>
+            Edit Produk
+          </Link>
           <button type="submit" className="btn-admin-primary" disabled={isPending || (!preview && !fileName)}>
             {isPending ? 'Menyimpan…' : currentImage && !preview ? 'Ganti Foto' : 'Simpan'}
           </button>
         </div>
       </form>
-
-      {showDetail && (
-        <DetailSection
-          id={id}
-          hasColors={hasColors}
-          hasBahan={hasBahan}
-          hasSizes={hasSizes}
-          options={options}
-          defaults={defaults}
-        />
-      )}
     </div>
   )
 }
