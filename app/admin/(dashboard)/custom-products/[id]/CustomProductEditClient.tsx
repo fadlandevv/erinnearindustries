@@ -15,7 +15,7 @@ import { useAdminToast } from '@/context/AdminToastContext'
 
 type ColorItem = { id: string; label: string; value: string }
 type BahanItem = { id: string; label: string; price: number }
-type SizeItem  = { id: string; label: string }
+type SizeItem  = { id: string; label: string; price: number }
 
 type Props = {
   productId: string
@@ -30,7 +30,7 @@ type Props = {
   sablonItems:   PricingItem[]
   productConfig: Record<string, number>
   configDefaults: Record<string, number>
-  defaults: { colors: { label: string; value: string }[]; bahans: { label: string }[]; sizes: { label: string }[] }
+  defaults: { colors: { label: string; value: string }[]; bahans: { label: string; price: number }[]; sizes: { label: string; price: number }[] }
 }
 
 function formatRp(n: number) { return 'Rp ' + n.toLocaleString('id-ID') }
@@ -105,10 +105,11 @@ function AddSizeForm({ productType }: { productType: string }) {
   const [state, action, pending] = useActionState(addCustomProductOptionAction, {})
   useEffect(() => { if (state.ok) { ref.current?.reset(); router.refresh() } }, [state.ok, router])
   return (
-    <form ref={ref} action={action} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.75rem' }}>
+    <form ref={ref} action={action} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.75rem', flexWrap: 'wrap' }}>
       <input type="hidden" name="product_type" value={productType} />
       <input type="hidden" name="category" value="size" />
-      <input type="text" name="label" placeholder="Ukuran baru (misal: XXXL)" className="admin-form-input" style={{ flex: 1 }} required />
+      <input type="text" name="label" placeholder="Ukuran baru (misal: XXXL)" className="admin-form-input" style={{ flex: 1, minWidth: 130 }} required />
+      <input type="number" name="price" placeholder="Surcharge (Rp)" className="admin-form-input" style={{ width: 150 }} min={0} step={1000} defaultValue={0} />
       <button type="submit" className="btn-admin-primary" disabled={pending} style={{ whiteSpace: 'nowrap' }}>
         {pending ? '…' : '+ Tambah'}
       </button>
@@ -420,13 +421,27 @@ export default function CustomProductEditClient({
         <CollapsibleCard title="Ukuran" open={!!openMap['ukuran']} onToggle={() => toggle('ukuran')}>
           {options.sizes.length === 0 && hint(defaults.sizes.map(s => s.label).join(', '))}
           {options.sizes.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
-              {options.sizes.map(s => (
-                <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#f5f5f0', borderRadius: 8, padding: '5px 12px', fontSize: '0.85rem' }}>
-                  <span style={{ fontWeight: 600 }}>{s.label}</span>
-                  <DeleteBtn id={s.id} label={s.label} />
-                </div>
-              ))}
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Ukuran</th>
+                    <th style={{ width: 200 }}>Surcharge/pcs</th>
+                    <th style={{ width: 120 }}>Nilai</th>
+                    <th style={{ width: 80 }}></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {options.sizes.map(s => (
+                    <tr key={s.id}>
+                      <td style={{ fontWeight: 600 }}>{s.label}</td>
+                      <td><PriceCell item={s} /></td>
+                      <td style={{ color: '#999', fontSize: '0.78rem' }}>{s.price > 0 ? `+${formatRp(s.price)}` : '—'}</td>
+                      <td><DeleteBtn id={s.id} label={s.label} /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
           <AddSizeForm productType={productId} />

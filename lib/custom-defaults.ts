@@ -10,11 +10,36 @@ export const DEFAULT_COLORS: ColorOption[] = [
   { label: 'Olive',  value: '#6b7c3d' },
 ]
 
-export const DEFAULT_SIZES: Record<string, string[]> = {
-  tshirt:         ['S', 'M', 'L', 'XL', 'XXL'],
-  'coach-jacket': ['S', 'M', 'L', 'XL', 'XXL'],
-  hoodie:         ['S', 'M', 'L', 'XL', 'XXL'],
-  jersey:         ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+export const DEFAULT_SIZES: Record<string, PriceOption[]> = {
+  tshirt:         [
+    { label: 'S',    price: 0 },
+    { label: 'M',    price: 0 },
+    { label: 'L',    price: 0 },
+    { label: 'XL',   price: 0 },
+    { label: 'XXL',  price: 0 },
+  ],
+  'coach-jacket': [
+    { label: 'S',   price: 0 },
+    { label: 'M',   price: 0 },
+    { label: 'L',   price: 0 },
+    { label: 'XL',  price: 0 },
+    { label: 'XXL', price: 0 },
+  ],
+  hoodie: [
+    { label: 'S',   price: 0 },
+    { label: 'M',   price: 0 },
+    { label: 'L',   price: 0 },
+    { label: 'XL',  price: 0 },
+    { label: 'XXL', price: 0 },
+  ],
+  jersey: [
+    { label: 'S',    price: 0 },
+    { label: 'M',    price: 0 },
+    { label: 'L',    price: 0 },
+    { label: 'XL',   price: 0 },
+    { label: 'XXL',  price: 0 },
+    { label: 'XXXL', price: 0 },
+  ],
 }
 
 export const DEFAULT_BAHANS: Record<string, PriceOption[]> = {

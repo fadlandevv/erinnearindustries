@@ -340,6 +340,21 @@ export async function seedDefaultBahansAction(
   await db.from('custom_product_options').insert(rows)
 }
 
+export async function seedDefaultSizesAction(
+  productType: string,
+  sizes: { label: string; price: number }[]
+): Promise<void> {
+  const rows = sizes.map((s, i) => ({
+    product_type: productType,
+    category: 'size',
+    label: s.label,
+    value: '',
+    price: s.price,
+    sort_order: Date.now() + i,
+  }))
+  await db.from('custom_product_options').insert(rows)
+}
+
 export async function updateCustomProductOptionPriceAction(
   id: string, price: number
 ): Promise<{ ok?: boolean; error?: string }> {

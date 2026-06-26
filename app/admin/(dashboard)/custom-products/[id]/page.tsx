@@ -3,7 +3,7 @@ import { getCustomProductOptions, getCustomProductImages } from '@/lib/data'
 import { DEFAULT_COLORS, DEFAULT_BAHANS, DEFAULT_SIZES } from '@/lib/custom-defaults'
 import { getPricingItems } from '@/lib/pricing'
 import { getProductConfig, PRODUCT_CONFIG_DEFAULTS } from '@/lib/product-config'
-import { seedDefaultBahansAction } from '@/lib/actions'
+import { seedDefaultBahansAction, seedDefaultSizesAction } from '@/lib/actions'
 import CustomProductEditClient from './CustomProductEditClient'
 
 const PRODUCTS: Record<string, {
@@ -38,10 +38,17 @@ export default async function CustomProductEditPage({ params }: { params: Params
     getProductConfig(id),
   ])
 
-  // Auto-seed bahan defaults into DB on first visit so admin can edit/delete them
-  if (product.hasBahan && opts.bahans.length === 0 && DEFAULT_BAHANS[id]?.length) {
-    await seedDefaultBahansAction(id, DEFAULT_BAHANS[id])
-    opts.bahans = await getCustomProductOptions(id).then(o => o.bahans)
+  // Auto-seed defaults into DB on first visit so admin can edit/delete them
+  const needsSeedBahan = product.hasBahan && opts.bahans.length === 0 && DEFAULT_BAHANS[id]?.length
+  const needsSeedSizes = product.hasSizes && opts.sizes.length === 0 && DEFAULT_SIZES[id]?.length
+  if (needsSeedBahan || needsSeedSizes) {
+    await Promise.all([
+      needsSeedBahan ? seedDefaultBahansAction(id, DEFAULT_BAHANS[id]) : Promise.resolve(),
+      needsSeedSizes ? seedDefaultSizesAction(id, DEFAULT_SIZES[id]) : Promise.resolve(),
+    ])
+    const fresh = await getCustomProductOptions(id)
+    if (needsSeedBahan) opts.bahans = fresh.bahans
+    if (needsSeedSizes) opts.sizes  = fresh.sizes
   }
 
   const allSablon = pricingItems.filter(i => i.type === 'sablon')
@@ -67,7 +74,7 @@ export default async function CustomProductEditPage({ params }: { params: Params
       defaults={{
         colors: DEFAULT_COLORS,
         bahans: DEFAULT_BAHANS[id] ?? [],
-        sizes:  (DEFAULT_SIZES[id] ?? []).map(s => ({ label: s })),
+        sizes:  DEFAULT_SIZES[id] ?? [],
       }}
     />
   )

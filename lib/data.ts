@@ -266,7 +266,7 @@ export type CustomProductOption = {
 export type ProductOptionMap = {
   colors:  { id: string; label: string; value: string }[]
   bahans:  { id: string; label: string; price: number }[]
-  sizes:   { id: string; label: string }[]
+  sizes:   { id: string; label: string; price: number }[]
 }
 
 export async function getCustomProductOptions(productType: string): Promise<ProductOptionMap> {
@@ -279,7 +279,7 @@ export async function getCustomProductOptions(productType: string): Promise<Prod
   return {
     colors: rows.filter(r => r.category === 'color').map(r => ({ id: r.id, label: r.label, value: r.value })),
     bahans: rows.filter(r => r.category === 'bahan').map(r => ({ id: r.id, label: r.label, price: r.price })),
-    sizes:  rows.filter(r => r.category === 'size').map(r => ({ id: r.id, label: r.label })),
+    sizes:  rows.filter(r => r.category === 'size').map(r => ({ id: r.id, label: r.label, price: r.price })),
   }
 }
 
@@ -295,7 +295,7 @@ export async function getAllCustomProductOptions(): Promise<Record<string, Produ
     const m = result[row.product_type]
     if (row.category === 'color') m.colors.push({ id: row.id, label: row.label, value: row.value })
     else if (row.category === 'bahan') m.bahans.push({ id: row.id, label: row.label, price: row.price })
-    else if (row.category === 'size')  m.sizes.push({ id: row.id, label: row.label })
+    else if (row.category === 'size')  m.sizes.push({ id: row.id, label: row.label, price: row.price })
   }
   return result
 }

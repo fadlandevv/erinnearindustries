@@ -302,7 +302,7 @@ export default function CustomDesignClient({
   sablonOptions:  PriceOption[]
   productType?:   string
   colorOptions?:  { label: string; value: string }[]
-  sizeOptions?:   string[]
+  sizeOptions?:   PriceOption[]
   productConfig?: Record<string, number>
 }) {
   const { addCustomItem, openCart } = useCart()
@@ -617,7 +617,7 @@ export default function CustomDesignClient({
                 <div className="custom-control-group">
                   <p className="custom-control-label">Ukuran <span className="custom-required">*</span></p>
                   <CustomDropdown
-                    options={(sizeOptions ?? SIZES).map(s => ({ label: s, price: 0 }))}
+                    options={sizeOptions ?? SIZES.map(s => ({ label: s, price: 0 }))}
                     value={form.selectedSize ?? ''}
                     placeholder="Pilih ukuran"
                     onChange={s => set('selectedSize', s)}
@@ -1013,7 +1013,7 @@ export default function CustomDesignClient({
                                 <div className="invoice-edit-field">
                                   <label className="invoice-edit-label">Ukuran</label>
                                   <CustomDropdown
-                                    options={(sizeOptions ?? SIZES).map(s => ({ label: s, price: 0 }))}
+                                    options={sizeOptions ?? SIZES.map(s => ({ label: s, price: 0 }))}
                                     value={editDraft.size ?? item.size}
                                     onChange={s => setEditDraft(d => ({ ...d, size: s }))}
                                   />

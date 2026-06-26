@@ -20,7 +20,7 @@ export default async function CustomTshirtPage() {
   const sablonOptions = pricingItems.filter(i => i.type === 'sablon').map(i => ({ label: i.label, price: i.price }))
   const colorOptions  = opts.colors.length > 0 ? opts.colors : DEFAULT_COLORS
   const bahanOptions  = opts.bahans.length > 0 ? opts.bahans : (DEFAULT_BAHANS['tshirt'] ?? [])
-  const sizeOptions   = opts.sizes.length  > 0 ? opts.sizes.map(s => s.label) : (DEFAULT_SIZES['tshirt'] ?? [])
+  const sizeOptions   = opts.sizes.length > 0 ? opts.sizes : (DEFAULT_SIZES['tshirt'] ?? [])
 
   return (
     <>

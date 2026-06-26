@@ -19,7 +19,7 @@ export default async function CustomJerseyPage() {
   const sablonOptions = pricingItems.filter(i => i.type === 'sablon').map(i => ({ label: i.label, price: i.price }))
   const colorOptions  = opts.colors.length > 0 ? opts.colors : DEFAULT_COLORS
   const bahanOptions  = opts.bahans.length > 0 ? opts.bahans : (DEFAULT_BAHANS['jersey'] ?? [])
-  const sizeOptions   = opts.sizes.length  > 0 ? opts.sizes.map(s => s.label) : (DEFAULT_SIZES['jersey'] ?? [])
+  const sizeOptions   = opts.sizes.length > 0 ? opts.sizes : (DEFAULT_SIZES['jersey'] ?? [])
 
   return (
     <>

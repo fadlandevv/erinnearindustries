@@ -19,7 +19,7 @@ export default async function CustomHoodiePage() {
   const sablonOptions = pricingItems.filter(i => i.type === 'sablon').map(i => ({ label: i.label, price: i.price }))
   const colorOptions  = opts.colors.length > 0 ? opts.colors : DEFAULT_COLORS
   const bahanOptions  = opts.bahans.length > 0 ? opts.bahans : (DEFAULT_BAHANS['hoodie'] ?? [])
-  const sizeOptions   = opts.sizes.length  > 0 ? opts.sizes.map(s => s.label) : (DEFAULT_SIZES['hoodie'] ?? [])
+  const sizeOptions   = opts.sizes.length > 0 ? opts.sizes : (DEFAULT_SIZES['hoodie'] ?? [])
 
   return (
     <>
