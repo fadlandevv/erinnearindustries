@@ -221,7 +221,7 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
   const photoCfg = PHOTO_MOCKUPS[productType] ?? PHOTO_MOCKUPS.tshirt
   const da = productType === 'amplop-packaging' && amplopDesignSize
     ? AMPLOP_DESIGN_SIZES[amplopDesignSize]
-    : productType === 'tshirt' && designSize
+    : designSize
       ? DESIGN_SIZES[designSize]
       : photoCfg.da
   const ox = designPos?.x ?? 0
