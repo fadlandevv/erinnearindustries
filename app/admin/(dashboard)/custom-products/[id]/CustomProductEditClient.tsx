@@ -8,6 +8,7 @@ import {
   updateCustomProductOptionPriceAction,
   updateCustomProductImageAction,
   updatePricingAction,
+  updateProductConfigAction,
 } from '@/lib/actions'
 import type { PricingItem } from '@/lib/pricing'
 import { useAdminToast } from '@/context/AdminToastContext'
@@ -25,8 +26,10 @@ type Props = {
   hasSizes:  boolean
   hasSablon: boolean
   savedImage?: string
-  options:    { colors: ColorItem[]; bahans: BahanItem[]; sizes: SizeItem[] }
-  sablonItems: PricingItem[]
+  options:       { colors: ColorItem[]; bahans: BahanItem[]; sizes: SizeItem[] }
+  sablonItems:   PricingItem[]
+  productConfig: Record<string, number>
+  configDefaults: Record<string, number>
   defaults: { colors: { label: string; value: string }[]; bahans: { label: string }[]; sizes: { label: string }[] }
 }
 
@@ -189,6 +192,64 @@ function FotoCard({ productId, savedImage }: { productId: string; savedImage?: s
 
 const hint = (text: string) => <p className="admin-form-hint" style={{ marginBottom: 8 }}>Default: {text}</p>
 
+// Labels shown to admin per config key
+const CONFIG_LABELS: Record<string, string> = {
+  logo_combo_price: 'Harga Logo combo (depan+belakang)/sisi',
+  price_front:      'Harga depan saja/pcs',
+  price_both:       'Harga depan+belakang/pcs',
+  surcharge_a3:     'Surcharge ukuran A3/pcs',
+  perekat_a4:       'Biaya perekat A4/pcs',
+  perekat_a3:       'Biaya perekat A3/pcs',
+  min_qty_a4:       'Min. order A4 (pcs)',
+  min_qty_a3:       'Min. order A3 (pcs)',
+  min_qty:          'Min. order (pcs)',
+}
+
+function ProductConfigSection({
+  productId, config, defaults,
+}: { productId: string; config: Record<string, number>; defaults: Record<string, number> }) {
+  const router = useRouter()
+  const [state, action, pending] = useActionState(updateProductConfigAction, {})
+  useEffect(() => { if (state.ok) router.refresh() }, [state.ok, router])
+
+  const keys = Object.keys(defaults)
+  if (keys.length === 0) return null
+
+  return (
+    <form action={action}>
+      <input type="hidden" name="product_type" value={productId} />
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead><tr><th>Ketentuan</th><th style={{ width: 170 }}>Nilai</th><th style={{ width: 130 }}>Saat ini</th></tr></thead>
+          <tbody>
+            {keys.map(key => (
+              <tr key={key}>
+                <td style={{ fontWeight: 500 }}>{CONFIG_LABELS[key] ?? key}</td>
+                <td>
+                  <input type="number" name={key} defaultValue={config[key] ?? defaults[key]}
+                    min={0} step={key.includes('qty') ? 1 : 100}
+                    className="admin-form-input" style={{ width: 130 }} />
+                </td>
+                <td style={{ color: '#999', fontSize: '0.78rem' }}>
+                  {key.includes('qty')
+                    ? `${config[key] ?? defaults[key]} pcs`
+                    : 'Rp ' + (config[key] ?? defaults[key]).toLocaleString('id-ID')}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {state.ok && <p style={{ fontSize: '0.78rem', color: '#16a34a', marginTop: 6 }}>Tersimpan.</p>}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
+        <button type="submit" className="btn-admin-primary" disabled={pending}>
+          {pending ? 'Menyimpan…' : 'Simpan Ketentuan'}
+        </button>
+      </div>
+    </form>
+  )
+}
+
 function SablonSection({ items }: { items: PricingItem[] }) {
   const [saveState, saveAction, savePending] = useActionState(updatePricingAction, {})
 
@@ -247,9 +308,18 @@ function CollapsibleCard({ title, open, onToggle, children }: { title: string; o
 }
 
 export default function CustomProductEditClient({
-  productId, productName, productSub, hasColors, hasBahan, hasSizes, hasSablon, savedImage, options, sablonItems, defaults,
+  productId, productName, productSub, hasColors, hasBahan, hasSizes, hasSablon,
+  savedImage, options, sablonItems, productConfig, configDefaults, defaults,
 }: Props) {
-  const sections = ['foto', ...(hasColors ? ['warna'] : []), ...(hasBahan ? ['bahan'] : []), ...(hasSizes ? ['ukuran'] : []), ...(hasSablon ? ['sablon'] : [])]
+  const hasConfig = Object.keys(configDefaults).length > 0
+  const sections = [
+    'foto',
+    ...(hasColors  ? ['warna']  : []),
+    ...(hasBahan   ? ['bahan']  : []),
+    ...(hasSizes   ? ['ukuran'] : []),
+    ...(hasSablon  ? ['sablon'] : []),
+    ...(hasConfig  ? ['config'] : []),
+  ]
   const [openMap, setOpenMap] = useState<Record<string, boolean>>({})
 
   const toggle = (key: string) => setOpenMap(p => ({ ...p, [key]: !p[key] }))
@@ -352,7 +422,13 @@ export default function CustomProductEditClient({
         </CollapsibleCard>
       )}
 
-      {!hasColors && !hasBahan && !hasSizes && !hasSablon && (
+      {hasConfig && (
+        <CollapsibleCard title="Harga & Ketentuan" open={!!openMap['config']} onToggle={() => toggle('config')}>
+          <ProductConfigSection productId={productId} config={productConfig} defaults={configDefaults} />
+        </CollapsibleCard>
+      )}
+
+      {!hasColors && !hasBahan && !hasSizes && !hasSablon && !hasConfig && (
         <div className="admin-form-card" style={{ color: '#aaa', fontSize: '0.82rem', padding: '1rem 1.1rem' }}>
           Tidak ada opsi yang bisa dikonfigurasi untuk produk ini.
         </div>

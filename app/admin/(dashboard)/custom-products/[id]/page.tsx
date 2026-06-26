@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { getCustomProductOptions, getCustomProductImages } from '@/lib/data'
 import { DEFAULT_COLORS, DEFAULT_BAHANS, DEFAULT_SIZES } from '@/lib/custom-defaults'
 import { getPricingItems } from '@/lib/pricing'
+import { getProductConfig, PRODUCT_CONFIG_DEFAULTS } from '@/lib/product-config'
 import CustomProductEditClient from './CustomProductEditClient'
 
 const PRODUCTS: Record<string, {
@@ -29,10 +30,11 @@ export default async function CustomProductEditPage({ params }: { params: Params
   const product = PRODUCTS[id]
   if (!product) notFound()
 
-  const [opts, images, pricingItems] = await Promise.all([
+  const [opts, images, pricingItems, productConfig] = await Promise.all([
     getCustomProductOptions(id),
     getCustomProductImages(),
     getPricingItems(),
+    getProductConfig(id),
   ])
 
   const allSablon = pricingItems.filter(i => i.type === 'sablon')
@@ -53,6 +55,8 @@ export default async function CustomProductEditPage({ params }: { params: Params
       savedImage={images[id]}
       options={opts}
       sablonItems={sablonItems}
+      productConfig={productConfig}
+      configDefaults={PRODUCT_CONFIG_DEFAULTS[id] ?? {}}
       defaults={{
         colors: DEFAULT_COLORS,
         bahans: DEFAULT_BAHANS[id] ?? [],

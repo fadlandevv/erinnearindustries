@@ -1230,3 +1230,22 @@ export async function updateCustomProductImageAction(
   return { url: publicUrl }
 }
 
+
+export async function updateProductConfigAction(
+  _prev: Record<string, unknown>,
+  formData: FormData
+): Promise<{ ok?: boolean; error?: string }> {
+  try {
+    const { upsertProductConfig } = await import('./product-config')
+    const productType = formData.get('product_type') as string
+    const entries = Array.from(formData.entries()).filter(([k]) => k !== 'product_type')
+    await Promise.all(
+      entries.map(([key, val]) => upsertProductConfig(productType, key, parseInt(val as string) || 0))
+    )
+    revalidatePath(`/custom/${productType}`)
+    revalidatePath(`/admin/custom-products/${productType}`)
+    return { ok: true }
+  } catch (e) {
+    return { error: String(e) }
+  }
+}

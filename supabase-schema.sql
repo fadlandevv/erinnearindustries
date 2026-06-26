@@ -259,3 +259,12 @@ insert into custom_products (id, name, sub, desc_short, href, bg, icon_svg, sort
   ('hoodie',          'Hoodie', 'Fleece',      'Custom depan belakang lengan',  '/custom/hoodie',          '#f5e6e9', '<path d="M20.38 3.46L16 2c0 2.21-1.79 4-4 4S8 4.21 8 2L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/><path d="M9 22v-3a3 3 0 016 0v3" stroke-dasharray="2 1.5"/>', 4),
   ('jersey',          'Jersey', 'Sublimasi',   'Full-print sesuai desainmu',    '/custom/jersey',          '#e8f0e4', '<path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/><line x1="6" y1="10" x2="6" y2="20"/><line x1="18" y1="10" x2="18" y2="20"/>', 5)
 on conflict (id) do nothing;
+
+-- Custom product price config (per-product hardcoded pricing editable via CMS)
+create table if not exists custom_product_config (
+  product_type text not null,
+  key          text not null,
+  value        integer not null default 0,
+  updated_at   timestamptz default now(),
+  primary key (product_type, key)
+);

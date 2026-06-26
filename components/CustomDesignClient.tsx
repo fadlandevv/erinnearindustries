@@ -130,19 +130,10 @@ const SHIRT_COLORS = [
 ]
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL']
-const LOGO_COMBO_PRICE = 10000
+const LOGO_COMBO_PRICE = 10000 // fallback; overridden by productConfig.logo_combo_price
 
 type PriceOption = { label: string; price: number }
 type SablonOpt = PriceOption | null
-
-
-function resolveEffectiveSablon(depan: SablonOpt, belakang: SablonOpt): { depan: SablonOpt; belakang: SablonOpt } {
-  const both = !!depan && !!belakang
-  return {
-    depan:    both && depan?.label === 'Logo'    ? { ...depan,    price: LOGO_COMBO_PRICE } : depan,
-    belakang: both && belakang?.label === 'Logo' ? { ...belakang, price: LOGO_COMBO_PRICE } : belakang,
-  }
-}
 
 type DesignPos = { x: number; y: number }
 type DesignSize = 'logo' | 'a4' | 'a3'
@@ -305,12 +296,14 @@ export default function CustomDesignClient({
   productType = 'tshirt',
   colorOptions,
   sizeOptions,
+  productConfig = {},
 }: {
   bahanOptions:   PriceOption[]
   sablonOptions:  PriceOption[]
   productType?:   string
   colorOptions?:  { label: string; value: string }[]
   sizeOptions?:   string[]
+  productConfig?: Record<string, number>
 }) {
   const { addCustomItem, openCart } = useCart()
 
@@ -391,12 +384,13 @@ export default function CustomDesignClient({
   const isTotebag    = productType === 'totebag'
   const noWarnaNoBaju = isAmplop || isTotebag
 
-  const amplopMinQty = amplopSize === 'A3' ? 500 : 100
-  const totebagMinQty = 24
-  const totebagHarga  = form.backDesign ? 45000 : 30000
-  const amplopSizeSurcharge = amplopSize === 'A3' ? 1100 : 0
-  const amplopPerekatPrice = amplopPerekat === 'Pakai Perekat' ? (amplopSize === 'A3' ? 500 : 300) : 0
-  const amplopHarga   = (form.backDesign ? 2200 : 1500) + amplopSizeSurcharge + amplopPerekatPrice
+  const cfg = productConfig
+  const amplopMinQty        = amplopSize === 'A3' ? (cfg.min_qty_a3 ?? 500) : (cfg.min_qty_a4 ?? 100)
+  const totebagMinQty       = cfg.min_qty ?? 24
+  const totebagHarga        = form.backDesign ? (cfg.price_both ?? 45000) : (cfg.price_front ?? 30000)
+  const amplopSizeSurcharge = amplopSize === 'A3' ? (cfg.surcharge_a3 ?? 1100) : 0
+  const amplopPerekatPrice  = amplopPerekat === 'Pakai Perekat' ? (amplopSize === 'A3' ? (cfg.perekat_a3 ?? 500) : (cfg.perekat_a4 ?? 300)) : 0
+  const amplopHarga         = (form.backDesign ? (cfg.price_both ?? 2200) : (cfg.price_front ?? 1500)) + amplopSizeSurcharge + amplopPerekatPrice
   const minQty = isAmplop ? amplopMinQty : isTotebag ? totebagMinQty : 1
 
   useEffect(() => {
@@ -409,7 +403,15 @@ export default function CustomDesignClient({
   const activePos    = activeSide === 'front' ? frontPos : backPos
 
   const bahanPriceVal = noWarnaNoBaju ? 0 : (form.bahan === 'Lainnya' ? form.bahanCustomPrice : form.bahanPrice)
-  const { depan: effDepan, belakang: effBelakang } = resolveEffectiveSablon(form.sablonDepan, form.sablonBelakang)
+  const logoComboPrice = cfg.logo_combo_price ?? LOGO_COMBO_PRICE
+  const resolveEffective = (d: SablonOpt, b: SablonOpt) => {
+    const both = !!d && !!b
+    return {
+      depan:    both && d?.label === 'Logo' ? { ...d, price: logoComboPrice } : d,
+      belakang: both && b?.label === 'Logo' ? { ...b, price: logoComboPrice } : b,
+    }
+  }
+  const { depan: effDepan, belakang: effBelakang } = resolveEffective(form.sablonDepan, form.sablonBelakang)
   const autoHarga = isTotebag
     ? totebagHarga
     : isAmplop
@@ -479,7 +481,7 @@ export default function CustomDesignClient({
   }
 
   const saveEdit = (item: InvoiceItem) => {
-    const { depan: effD, belakang: effB } = resolveEffectiveSablon(editDraft.sablonDepan ?? null, editDraft.sablonBelakang ?? null)
+    const { depan: effD, belakang: effB } = resolveEffective(editDraft.sablonDepan ?? null, editDraft.sablonBelakang ?? null)
     const basePcs = item.hargaPerPcs - (item.sablonDepan?.price ?? 0) - (item.sablonBelakang?.price ?? 0)
     const newHarga = basePcs + (effD?.price ?? 0) + (effB?.price ?? 0)
     setInvoiceItems(prev => prev.map(i => i.rowId === item.rowId
