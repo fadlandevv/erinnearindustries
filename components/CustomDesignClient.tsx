@@ -325,6 +325,7 @@ export default function CustomDesignClient({
   const [amplopPerekat, setAmplopPerekat] = useState<'Pakai Perekat' | 'Tanpa Perekat'>('Pakai Perekat')
   const [totebagSize, setTotebagSize] = useState<'Sedang (30x40cm)' | 'Besar (40x60cm)'>('Sedang (30x40cm)')
   const [totebagBahan, setTotebagBahan] = useState('Canvas')
+  const [totebagPenutup, setTotebagPenutup] = useState<'Tanpa Penutup' | 'Sleting' | 'Velcro'>('Tanpa Penutup')
 
   const [invoiceId]    = useState(() => generateId(6))
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([])
@@ -436,7 +437,7 @@ export default function CustomDesignClient({
       hargaPerPcs: autoHarga,
       catatan:  [
         isAmplop  ? `${amplopSize} · ${amplopPerekat}` : '',
-        isTotebag ? `${totebagBahan} · ${totebagSize}` : '',
+        isTotebag ? `${totebagBahan} · ${totebagSize} · ${totebagPenutup}` : '',
         form.note,
       ].filter(Boolean).join(' — ') || undefined,
     }
@@ -629,18 +630,32 @@ export default function CustomDesignClient({
               </div>
             </div>
 
-            {/* Ukuran — totebag only */}
+            {/* Ukuran + Penutup — totebag only */}
             {isTotebag && (
-              <div className="custom-control-group">
-                <p className="custom-control-label">Ukuran Totebag</p>
-                <CustomDropdown
-                  options={[
-                    { label: 'Sedang (30x40cm)', price: 0 },
-                    { label: 'Besar (40x60cm)',  price: 0 },
-                  ]}
-                  value={totebagSize}
-                  onChange={v => setTotebagSize(v as typeof totebagSize)}
-                />
+              <div className="custom-row-2col">
+                <div className="custom-control-group">
+                  <p className="custom-control-label">Penutup</p>
+                  <CustomDropdown
+                    options={[
+                      { label: 'Tanpa Penutup', price: 0 },
+                      { label: 'Sleting',        price: 0 },
+                      { label: 'Velcro',         price: 0 },
+                    ]}
+                    value={totebagPenutup}
+                    onChange={v => setTotebagPenutup(v as typeof totebagPenutup)}
+                  />
+                </div>
+                <div className="custom-control-group">
+                  <p className="custom-control-label">Ukuran Totebag</p>
+                  <CustomDropdown
+                    options={[
+                      { label: 'Sedang (30x40cm)', price: 0 },
+                      { label: 'Besar (40x60cm)',  price: 0 },
+                    ]}
+                    value={totebagSize}
+                    onChange={v => setTotebagSize(v as typeof totebagSize)}
+                  />
+                </div>
               </div>
             )}
 
