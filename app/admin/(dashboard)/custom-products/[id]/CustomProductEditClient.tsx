@@ -206,7 +206,7 @@ export default function CustomProductEditClient({
   productId, hasColors, hasBahan, hasSizes, savedImage, options, defaults,
 }: Props) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: 900 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
       {/* Row 1: Foto | Warna */}
       <div style={col2}>
