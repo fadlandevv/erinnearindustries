@@ -24,12 +24,11 @@ export default function CustomProductCard({ id, name, sub, savedImage }: Props) 
         )}
       </div>
 
-      <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: 12 }}>
-        {name} <span style={{ fontWeight: 400, color: '#888' }}>· {sub}</span>
-      </div>
-
-      <div className="admin-form-actions">
-        <Link href={`/admin/custom-products/${id}`} className="btn-admin-primary" style={{ width: '100%', textAlign: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+        <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+          {name} <span style={{ fontWeight: 400, color: '#888' }}>· {sub}</span>
+        </div>
+        <Link href={`/admin/custom-products/${id}`} className="btn-admin-primary" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
           Edit Produk
         </Link>
       </div>
