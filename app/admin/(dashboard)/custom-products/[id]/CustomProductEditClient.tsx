@@ -183,13 +183,12 @@ function FotoCard({ productId, savedImage }: { productId: string; savedImage?: s
 
 const hint = (text: string) => <p className="admin-form-hint" style={{ marginBottom: 8 }}>Default: {text}</p>
 
-function CollapsibleCard({ title, children }: { title: string; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false)
+function CollapsibleCard({ title, open, onToggle, children }: { title: string; open: boolean; onToggle: () => void; children: React.ReactNode }) {
   return (
     <div className="admin-form-card" style={{ padding: 0, overflow: 'hidden' }}>
       <button
         type="button"
-        onClick={() => setOpen(o => !o)}
+        onClick={onToggle}
         style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.85rem 1.1rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
       >
         <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{title}</span>
@@ -212,15 +211,34 @@ function CollapsibleCard({ title, children }: { title: string; children: React.R
 export default function CustomProductEditClient({
   productId, hasColors, hasBahan, hasSizes, savedImage, options, defaults,
 }: Props) {
+  const sections = ['foto', ...(hasColors ? ['warna'] : []), ...(hasBahan ? ['bahan'] : []), ...(hasSizes ? ['ukuran'] : [])]
+  const [openMap, setOpenMap] = useState<Record<string, boolean>>({})
+
+  const toggle = (key: string) => setOpenMap(p => ({ ...p, [key]: !p[key] }))
+  const allOpen = sections.every(s => openMap[s])
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-      <CollapsibleCard title="Foto Background">
+      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+        <button type="button" className="btn-admin-secondary"
+          style={{ fontSize: '0.8rem', padding: '0.35rem 0.8rem' }}
+          onClick={() => setOpenMap(Object.fromEntries(sections.map(s => [s, true])))}>
+          Show All
+        </button>
+        <button type="button" className="btn-admin-secondary"
+          style={{ fontSize: '0.8rem', padding: '0.35rem 0.8rem' }}
+          onClick={() => setOpenMap({})}>
+          Hide All
+        </button>
+      </div>
+
+      <CollapsibleCard title="Foto Background" open={!!openMap['foto']} onToggle={() => toggle('foto')}>
         <FotoCard productId={productId} savedImage={savedImage} />
       </CollapsibleCard>
 
       {hasColors && (
-        <CollapsibleCard title="Warna">
+        <CollapsibleCard title="Warna" open={!!openMap['warna']} onToggle={() => toggle('warna')}>
           {options.colors.length === 0 && hint(defaults.colors.map(c => c.label).join(', '))}
           {options.colors.length > 0 && (
             <div className="admin-table-wrap">
@@ -248,7 +266,7 @@ export default function CustomProductEditClient({
       )}
 
       {hasBahan && (
-        <CollapsibleCard title="Jenis Bahan">
+        <CollapsibleCard title="Jenis Bahan" open={!!openMap['bahan']} onToggle={() => toggle('bahan')}>
           {options.bahans.length === 0 && hint(defaults.bahans.map(b => b.label).join(', '))}
           {options.bahans.length > 0 && (
             <div className="admin-table-wrap">
@@ -272,7 +290,7 @@ export default function CustomProductEditClient({
       )}
 
       {hasSizes && (
-        <CollapsibleCard title="Ukuran">
+        <CollapsibleCard title="Ukuran" open={!!openMap['ukuran']} onToggle={() => toggle('ukuran')}>
           {options.sizes.length === 0 && hint(defaults.sizes.map(s => s.label).join(', '))}
           {options.sizes.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
