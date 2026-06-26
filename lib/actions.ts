@@ -363,6 +363,24 @@ export async function updateCustomProductOptionPriceAction(
   return { ok: true }
 }
 
+// Upsert by (product_type, category, label) — inserts if not yet in DB, updates if exists
+export async function upsertCustomProductOptionPriceAction(
+  productType: string, category: string, label: string, price: number
+): Promise<{ ok?: boolean; error?: string }> {
+  const { data } = await db.from('custom_product_options')
+    .select('id').eq('product_type', productType).eq('category', category).eq('label', label).maybeSingle()
+  if (data) {
+    const { error } = await db.from('custom_product_options').update({ price }).eq('id', data.id)
+    if (error) return { error: error.message }
+  } else {
+    const { error } = await db.from('custom_product_options').insert({
+      product_type: productType, category, label, value: '', price, sort_order: Date.now(),
+    })
+    if (error) return { error: error.message }
+  }
+  return { ok: true }
+}
+
 export async function uploadDesignFileAction(
   formData: FormData
 ): Promise<{ url?: string; error?: string }> {

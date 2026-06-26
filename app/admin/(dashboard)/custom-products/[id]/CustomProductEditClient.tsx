@@ -6,6 +6,7 @@ import {
   addCustomProductOptionAction,
   deleteCustomProductOptionAction,
   updateCustomProductOptionPriceAction,
+  upsertCustomProductOptionPriceAction,
   updateCustomProductImageAction,
   updatePricingAction,
   updateProductConfigAction,
@@ -30,7 +31,7 @@ type Props = {
   sablonItems:   PricingItem[]
   productConfig: Record<string, number>
   configDefaults: Record<string, number>
-  defaults: { colors: { label: string; value: string }[]; bahans: { label: string; price: number }[]; sizes: { label: string; price: number }[] }
+  defaults: { colors: { label: string; value: string }[] }
 }
 
 function formatRp(n: number) { return 'Rp ' + n.toLocaleString('id-ID') }
@@ -118,11 +119,12 @@ function AddSizeForm({ productType }: { productType: string }) {
   )
 }
 
-function PriceCell({ item }: { item: BahanItem }) {
+function PriceCell({ item, productType, category }: { item: BahanItem; productType: string; category: 'bahan' | 'size' }) {
   const router = useRouter()
   const { toast } = useAdminToast()
   const [price, setPrice] = useState(item.price)
   const [saving, setSaving] = useState(false)
+  const isVirtual = item.id.startsWith('__new__:')
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <input type="number" value={price} min={0} step={1000}
@@ -134,7 +136,9 @@ function PriceCell({ item }: { item: BahanItem }) {
           disabled={saving}
           onClick={async () => {
             setSaving(true)
-            const res = await updateCustomProductOptionPriceAction(item.id, price)
+            const res = isVirtual
+              ? await upsertCustomProductOptionPriceAction(productType, category, item.label, price)
+              : await updateCustomProductOptionPriceAction(item.id, price)
             setSaving(false)
             if (res?.ok) {
               toast(`Harga ${item.label} disimpan`)
@@ -395,55 +399,55 @@ export default function CustomProductEditClient({
 
       {hasBahan && (
         <CollapsibleCard title="Jenis Bahan" open={!!openMap['bahan']} onToggle={() => toggle('bahan')}>
-          {options.bahans.length === 0 && hint(defaults.bahans.map(b => b.label).join(', '))}
-          {options.bahans.length > 0 && (
-            <div className="admin-table-wrap">
-              <table className="admin-table">
-                <thead><tr><th>Label</th><th style={{ width: 200 }}>Harga/pcs</th><th style={{ width: 120 }}>Nilai</th><th style={{ width: 80 }}></th></tr></thead>
-                <tbody>
-                  {options.bahans.map(b => (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead><tr><th>Label</th><th style={{ width: 200 }}>Harga/pcs</th><th style={{ width: 120 }}>Nilai</th><th style={{ width: 80 }}></th></tr></thead>
+              <tbody>
+                {options.bahans.map(b => {
+                  const isVirtual = b.id.startsWith('__new__:')
+                  return (
                     <tr key={b.id}>
                       <td style={{ fontWeight: 600 }}>{b.label}</td>
-                      <td><PriceCell item={b} /></td>
+                      <td><PriceCell item={b} productType={productId} category="bahan" /></td>
                       <td style={{ color: '#999', fontSize: '0.78rem' }}>{formatRp(b.price)}</td>
-                      <td><DeleteBtn id={b.id} label={b.label} /></td>
+                      <td>{!isVirtual && <DeleteBtn id={b.id} label={b.label} />}</td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
           <AddBahanForm productType={productId} />
         </CollapsibleCard>
       )}
 
       {hasSizes && (
         <CollapsibleCard title="Ukuran" open={!!openMap['ukuran']} onToggle={() => toggle('ukuran')}>
-          {options.sizes.length === 0 && hint(defaults.sizes.map(s => s.label).join(', '))}
-          {options.sizes.length > 0 && (
-            <div className="admin-table-wrap">
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>Ukuran</th>
-                    <th style={{ width: 200 }}>Surcharge/pcs</th>
-                    <th style={{ width: 120 }}>Nilai</th>
-                    <th style={{ width: 80 }}></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {options.sizes.map(s => (
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Ukuran</th>
+                  <th style={{ width: 200 }}>Surcharge/pcs</th>
+                  <th style={{ width: 120 }}>Nilai</th>
+                  <th style={{ width: 80 }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {options.sizes.map(s => {
+                  const isVirtual = s.id.startsWith('__new__:')
+                  return (
                     <tr key={s.id}>
                       <td style={{ fontWeight: 600 }}>{s.label}</td>
-                      <td><PriceCell item={s} /></td>
+                      <td><PriceCell item={s} productType={productId} category="size" /></td>
                       <td style={{ color: '#999', fontSize: '0.78rem' }}>{s.price > 0 ? `+${formatRp(s.price)}` : '—'}</td>
-                      <td><DeleteBtn id={s.id} label={s.label} /></td>
+                      <td>{!isVirtual && <DeleteBtn id={s.id} label={s.label} />}</td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
           <AddSizeForm productType={productId} />
         </CollapsibleCard>
       )}

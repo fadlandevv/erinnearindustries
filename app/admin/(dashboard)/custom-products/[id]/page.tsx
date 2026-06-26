@@ -3,8 +3,19 @@ import { getCustomProductOptions, getCustomProductImages } from '@/lib/data'
 import { DEFAULT_COLORS, DEFAULT_BAHANS, DEFAULT_SIZES } from '@/lib/custom-defaults'
 import { getPricingItems } from '@/lib/pricing'
 import { getProductConfig, PRODUCT_CONFIG_DEFAULTS } from '@/lib/product-config'
-import { seedDefaultBahansAction, seedDefaultSizesAction } from '@/lib/actions'
 import CustomProductEditClient from './CustomProductEditClient'
+
+// Merge DB items with defaults — missing defaults show as virtual rows (id = '__new__:label')
+function mergeWithDefaults(
+  dbItems: { id: string; label: string; price: number }[],
+  defaults: { label: string; price: number }[]
+) {
+  const dbLabels = new Set(dbItems.map(i => i.label))
+  const missing = defaults
+    .filter(d => !dbLabels.has(d.label))
+    .map(d => ({ id: `__new__:${d.label}`, label: d.label, price: d.price }))
+  return [...dbItems, ...missing]
+}
 
 const PRODUCTS: Record<string, {
   name: string; sub: string
@@ -38,21 +49,11 @@ export default async function CustomProductEditPage({ params }: { params: Params
     getProductConfig(id),
   ])
 
-  // Auto-seed defaults into DB on first visit so admin can edit/delete them
-  const needsSeedBahan = product.hasBahan && opts.bahans.length === 0 && DEFAULT_BAHANS[id]?.length
-  const needsSeedSizes = product.hasSizes && opts.sizes.length === 0 && DEFAULT_SIZES[id]?.length
-  if (needsSeedBahan || needsSeedSizes) {
-    await Promise.all([
-      needsSeedBahan ? seedDefaultBahansAction(id, DEFAULT_BAHANS[id]) : Promise.resolve(),
-      needsSeedSizes ? seedDefaultSizesAction(id, DEFAULT_SIZES[id]) : Promise.resolve(),
-    ])
-    const fresh = await getCustomProductOptions(id)
-    if (needsSeedBahan) opts.bahans = fresh.bahans
-    if (needsSeedSizes) opts.sizes  = fresh.sizes
-  }
+  // Merge DB data with code defaults — defaults always visible even if DB is empty
+  const mergedBahans = product.hasBahan ? mergeWithDefaults(opts.bahans, DEFAULT_BAHANS[id] ?? []) : []
+  const mergedSizes  = product.hasSizes  ? mergeWithDefaults(opts.sizes,  DEFAULT_SIZES[id]  ?? []) : []
 
   const allSablon = pricingItems.filter(i => i.type === 'sablon')
-  // Filter sablon sesuai yang dipakai di halaman website per produk
   const sablonItems = id === 'coach-jacket'
     ? allSablon.filter(i => i.label === 'Logo')
     : allSablon
@@ -67,15 +68,11 @@ export default async function CustomProductEditPage({ params }: { params: Params
       hasSizes={product.hasSizes}
       hasSablon={product.hasSablon}
       savedImage={images[id]}
-      options={opts}
+      options={{ colors: opts.colors, bahans: mergedBahans, sizes: mergedSizes }}
       sablonItems={sablonItems}
       productConfig={productConfig}
       configDefaults={PRODUCT_CONFIG_DEFAULTS[id] ?? {}}
-      defaults={{
-        colors: DEFAULT_COLORS,
-        bahans: DEFAULT_BAHANS[id] ?? [],
-        sizes:  DEFAULT_SIZES[id] ?? [],
-      }}
+      defaults={{ colors: DEFAULT_COLORS }}
     />
   )
 }
