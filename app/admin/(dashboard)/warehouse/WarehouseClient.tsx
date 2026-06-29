@@ -118,10 +118,10 @@ function InlineStockCell({ qty, onSave, pending }: {
     )
   }
 
-  const badgeClass = qty === 0 ? 'wh-badge-empty' : qty <= 10 ? 'wh-badge-low' : 'wh-badge-ok'
+  const color = qty === 0 ? '#dc2626' : qty <= 10 ? '#d97706' : 'inherit'
   return (
-    <span className={`wh-badge ${badgeClass}`} onClick={startEdit} title="Klik untuk edit"
-      style={{ cursor: 'pointer', opacity: pending ? 0.5 : 1 }}>
+    <span onClick={startEdit} title="Klik untuk edit"
+      style={{ cursor: 'pointer', color, fontWeight: 600, opacity: pending ? 0.5 : 1 }}>
       {qty === 0 ? 'Habis' : `${qty} pcs`}
     </span>
   )
