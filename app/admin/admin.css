@@ -1164,7 +1164,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
-.admin-showcase-grid .admin-form-card { padding: 24px; height: 350px; overflow-y: auto; }
+.admin-showcase-grid .admin-form-card { padding: 24px; height: 550px; overflow-y: auto; }
 .admin-showcase-preview {
   position: relative;
   width: 100%;
