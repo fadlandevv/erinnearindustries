@@ -182,7 +182,7 @@ export async function duplicateProduct(id: string) {
 export async function deleteProduct(id: string) {
   await _deleteProductFromDB(id)
   revalidatePath('/product')
-  redirect('/admin/products?toast=Produk+berhasil+dihapus&toastType=error')
+  redirect('/admin/products?toast=Produk+berhasil+dihapus&toastType=success')
 }
 
 export async function createService(formData: FormData) {
@@ -294,7 +294,7 @@ export async function deleteService(id: string) {
   const services = await getServices()
   await saveServices(services.filter((s) => s.id !== id))
   revalidatePath('/service')
-  redirect('/admin/services?toast=Layanan+berhasil+dihapus&toastType=error')
+  redirect('/admin/services?toast=Layanan+berhasil+dihapus&toastType=success')
 }
 
 function parsePrice(str: string): number {
