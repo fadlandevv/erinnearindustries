@@ -223,18 +223,20 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
               ? <span className="wh-size-chip">{size}</span>
               : <span style={{ color: '#aaa', fontSize: '0.8rem' }}>—</span>}
           </td>
-          <td>
+          <td style={{ whiteSpace: 'nowrap' }}>
             <InlinePriceCell value={harga} pending={savingKey === key}
               onSave={v => handlePriceSave(product.id, product.title, size, 'harga', v)} />
           </td>
-          <td>
+          <td style={{ whiteSpace: 'nowrap' }}>
             <InlinePriceCell value={hpp} pending={savingKey === key}
               onSave={v => handlePriceSave(product.id, product.title, size, 'hpp', v)} />
           </td>
-          <td style={{ color: reseller ? '#16a34a' : '#ccc', fontWeight: reseller ? 600 : 400 }}>
-            {formatRp(reseller)}
+          <td style={{ whiteSpace: 'nowrap' }}>
+            <span className="wh-inline-val" style={{ color: reseller ? '#16a34a' : '#aaa', fontWeight: reseller ? 600 : 400 }}>
+              {formatRp(reseller)}
+            </span>
           </td>
-          <td>
+          <td style={{ whiteSpace: 'nowrap' }}>
             <InlineStockCell qty={qty} pending={stockSavingKey === key}
               onSave={(type, amount) => handleStockSave(product.id, product.title, size, type, amount)} />
           </td>
