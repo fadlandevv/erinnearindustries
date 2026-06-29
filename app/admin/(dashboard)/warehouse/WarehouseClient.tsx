@@ -77,12 +77,10 @@ function InlineStockCell({ qty, onSave, pending }: {
   pending: boolean
 }) {
   const [editing, setEditing] = useState(false)
-  const [type, setType] = useState<'restock' | 'keluar' | 'koreksi'>('koreksi')
   const [amount, setAmount] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   function startEdit() {
-    setType('koreksi')
     setAmount(String(qty))
     setEditing(true)
     setTimeout(() => { inputRef.current?.select() }, 0)
@@ -90,7 +88,7 @@ function InlineStockCell({ qty, onSave, pending }: {
 
   function commit() {
     const n = parseInt(amount, 10)
-    if (!isNaN(n) && n >= 0) onSave(type, n)
+    if (!isNaN(n) && n >= 0) onSave('koreksi', n)
     setEditing(false)
   }
 
@@ -101,19 +99,10 @@ function InlineStockCell({ qty, onSave, pending }: {
 
   if (editing) {
     return (
-      <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexWrap: 'wrap' }}>
-        <select className="admin-form-input" value={type}
-          style={{ padding: '0.3rem 0.4rem', fontSize: '0.75rem', width: 'auto' }}
-          onChange={e => setType(e.target.value as typeof type)}>
-          <option value="koreksi">Set</option>
-          <option value="restock">+ Masuk</option>
-          <option value="keluar">− Keluar</option>
-        </select>
-        <input ref={inputRef} type="number" min={0} className="admin-form-input"
-          style={{ width: 64, padding: '0.3rem 0.5rem', fontSize: '0.82rem' }}
-          value={amount} onChange={e => setAmount(e.target.value)}
-          onBlur={commit} onKeyDown={onKeyDown} autoFocus />
-      </div>
+      <input ref={inputRef} type="number" min={0} className="admin-form-input"
+        style={{ width: 90, padding: '0.3rem 0.5rem', fontSize: '0.82rem' }}
+        value={amount} onChange={e => setAmount(e.target.value)}
+        onBlur={commit} onKeyDown={onKeyDown} autoFocus />
     )
   }
 
@@ -253,7 +242,7 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
             {sizeIdx === 0 ? (
               <form action={duplicateProduct.bind(null, product.id)}>
                 <button type="submit" className="btn-admin-secondary"
-                  style={{ padding: '0.3rem 0.5rem', lineHeight: 1 }}
+                  style={{ padding: '0.25rem', lineHeight: 1, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   title="Duplikat produk">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
@@ -317,7 +306,7 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
                     <th style={{ width: 120 }}>HPP</th>
                     <th style={{ width: 130 }}>H. Reseller</th>
                     <th style={{ width: 130 }}>Stok</th>
-                    <th style={{ width: 44 }}></th>
+                    <th style={{ width: 32 }}></th>
                   </tr>
                 </thead>
                 <tbody>{rows}</tbody>
