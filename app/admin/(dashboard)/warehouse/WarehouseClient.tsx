@@ -1,7 +1,7 @@
 'use client'
 import { useState, useTransition, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { adjustStockAction, updateProductPriceAction, upsertSizeEntryAction, duplicateProduct } from '@/lib/actions'
+import { adjustStockAction, updateProductPriceAction, upsertSizeEntryAction, copyPricingToAllSizes } from '@/lib/actions'
 import type { Product } from '@/lib/data'
 import type { StockLogEntry } from '@/lib/warehouse'
 
@@ -167,6 +167,15 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
   const [search, setSearch] = useState('')
   const [savingKey, setSavingKey] = useState<string | null>(null)
   const [stockSavingKey, setStockSavingKey] = useState<string | null>(null)
+  const [copyingKey, setCopyingKey] = useState<string | null>(null)
+
+  async function handleCopyPricing(productId: string, size: string) {
+    const key = `${productId}:${size}`
+    setCopyingKey(key)
+    await copyPricingToAllSizes(productId, size)
+    setCopyingKey(null)
+    router.refresh()
+  }
 
   const totalItems = Object.values(stockMap).reduce((a, b) => a + b, 0)
   const outOfStock = products.reduce((acc, p) => {
@@ -241,16 +250,16 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
               onSave={(type, amount) => handleStockSave(product.id, product.title, size, type, amount)} />
           </td>
           <td>
-            {sizeIdx === 0 ? (
-              <form action={duplicateProduct.bind(null, product.id)}>
-                <button type="submit" className="btn-admin-secondary"
-                  style={{ padding: '0.25rem', lineHeight: 1, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  title="Duplikat produk">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
-                  </svg>
-                </button>
-              </form>
+            {product.sizes.length > 1 ? (
+              <button className="btn-admin-secondary"
+                onClick={() => handleCopyPricing(product.id, size)}
+                disabled={copyingKey === `${product.id}:${size}`}
+                style={{ padding: '0.25rem', lineHeight: 1, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: copyingKey === `${product.id}:${size}` ? 0.5 : 1 }}
+                title="Copy harga & stok ke semua ukuran lain">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                </svg>
+              </button>
             ) : null}
           </td>
         </tr>

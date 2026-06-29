@@ -199,6 +199,44 @@ export async function duplicateProduct(id: string) {
   redirect(`/admin/products/${newId}/edit?toast=Produk+berhasil+diduplikat`)
 }
 
+export async function copyPricingToAllSizes(productId: string, fromSize: string): Promise<{ ok: boolean; error?: string }> {
+  const { data: source } = await db
+    .from('warehouse_stock')
+    .select('harga,hpp,quantity')
+    .eq('product_id', productId)
+    .eq('size', fromSize)
+    .maybeSingle()
+
+  if (!source) return { ok: false, error: 'Data ukuran tidak ditemukan' }
+
+  const products = await getProducts()
+  const product = products.find(p => p.id === productId)
+  if (!product) return { ok: false, error: 'Produk tidak ditemukan' }
+
+  const sizes = product.sizes.length > 0 ? product.sizes : ['-']
+  const otherSizes = sizes.filter(s => s !== fromSize)
+
+  for (const size of otherSizes) {
+    const { data: existing } = await db
+      .from('warehouse_stock')
+      .select('id')
+      .eq('product_id', productId)
+      .eq('size', size)
+      .maybeSingle()
+
+    if (existing) {
+      await db.from('warehouse_stock')
+        .update({ harga: source.harga, hpp: source.hpp, quantity: source.quantity })
+        .eq('id', existing.id)
+    } else {
+      await db.from('warehouse_stock')
+        .insert({ product_id: productId, size, harga: source.harga, hpp: source.hpp, quantity: source.quantity })
+    }
+  }
+
+  return { ok: true }
+}
+
 export async function deleteProduct(id: string) {
   await _deleteProductFromDB(id)
   revalidateTag('products', {})
