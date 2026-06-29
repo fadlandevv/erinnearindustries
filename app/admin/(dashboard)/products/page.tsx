@@ -1,15 +1,10 @@
 import Link from 'next/link'
 import { getProducts } from '@/lib/data'
 import { deleteProduct, duplicateProduct } from '@/lib/actions'
-import { getPriceMap } from '@/lib/warehouse'
 import RelativeTime from '@/components/RelativeTime'
 
-function formatRp(n: number) {
-  return 'Rp ' + n.toLocaleString('id-ID')
-}
-
 export default async function AdminProductsPage() {
-  const [products, priceMap] = await Promise.all([getProducts(), getPriceMap()])
+  const products = await getProducts()
 
   return (
     <>
@@ -30,7 +25,6 @@ export default async function AdminProductsPage() {
               <th>Warna</th>
               <th>Nama Produk</th>
               <th>Tag</th>
-              <th>Harga</th>
               <th>Diperbarui</th>
               <th>Aksi</th>
             </tr>
@@ -38,17 +32,12 @@ export default async function AdminProductsPage() {
           <tbody>
             {products.length === 0 && (
               <tr>
-                <td colSpan={6} className="admin-empty">Belum ada produk. Tambahkan produk pertama.</td>
+                <td colSpan={5} className="admin-empty">Belum ada produk. Tambahkan produk pertama.</td>
               </tr>
             )}
             {products.map((p) => {
               const deleteAction = deleteProduct.bind(null, p.id)
               const duplicateAction = duplicateProduct.bind(null, p.id)
-              const sizes = p.sizes?.length ? p.sizes : ['-']
-              const prices = sizes.map(s => priceMap[`${p.id}:${s}`]?.harga).filter((h): h is number => h != null)
-              const minP = prices.length ? Math.min(...prices) : null
-              const maxP = prices.length ? Math.max(...prices) : null
-              const priceLabel = minP == null ? '—' : minP === maxP ? formatRp(minP) : `${formatRp(minP)} – ${formatRp(maxP!)}`
               return (
                 <tr key={p.id}>
                   <td>
@@ -60,7 +49,6 @@ export default async function AdminProductsPage() {
                   </td>
                   <td style={{ fontWeight: 500 }}>{p.title}</td>
                   <td><span className="admin-badge">{p.tag}</span></td>
-                  <td style={{ fontSize: '0.85rem', color: '#555' }}>{priceLabel}</td>
                   <td>
                     {p.updatedAt
                       ? <RelativeTime iso={p.updatedAt} />
