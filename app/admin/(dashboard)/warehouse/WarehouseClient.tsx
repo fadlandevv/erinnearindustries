@@ -1,13 +1,14 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { adjustStockAction, updateProductPriceAction } from '@/lib/actions'
+import { adjustStockAction, updateProductPriceAction, upsertSizeEntryAction } from '@/lib/actions'
 import type { Product } from '@/lib/data'
 import type { StockLogEntry } from '@/lib/warehouse'
 
 type Props = {
   products: Product[]
   stockMap: Record<string, number>
+  priceMap: Record<string, { harga: number | null; hpp: number | null }>
   logs: StockLogEntry[]
 }
 
@@ -20,7 +21,12 @@ function fmt(date: string) {
   })
 }
 
-export default function WarehouseClient({ products, stockMap, logs }: Props) {
+function formatRp(n: number | null) {
+  if (!n) return <span style={{ color: '#bbb' }}>—</span>
+  return <span>{'Rp ' + n.toLocaleString('id-ID')}</span>
+}
+
+export default function WarehouseClient({ products, stockMap, priceMap, logs }: Props) {
   const router = useRouter()
   const [tab, setTab] = useState<'stock' | 'log'>('stock')
   const [search, setSearch] = useState('')
@@ -33,11 +39,18 @@ export default function WarehouseClient({ products, stockMap, logs }: Props) {
   const [stockError, setStockError] = useState('')
   const [stockPending, startStockTransition] = useTransition()
 
-  // price edit state
-  const [activePriceId, setActivePriceId] = useState<string | null>(null)
-  const [priceInput, setPriceInput] = useState('')
+  // price edit state (per size)
+  const [activePriceKey, setActivePriceKey] = useState<string | null>(null)
+  const [hargaInput, setHargaInput] = useState('')
+  const [hppInput, setHppInput] = useState('')
   const [priceError, setPriceError] = useState('')
   const [pricePending, startPriceTransition] = useTransition()
+
+  // product display price edit
+  const [activeDisplayPriceId, setActiveDisplayPriceId] = useState<string | null>(null)
+  const [displayPriceInput, setDisplayPriceInput] = useState('')
+  const [displayPriceError, setDisplayPriceError] = useState('')
+  const [displayPricePending, startDisplayPriceTransition] = useTransition()
 
   const totalItems = Object.values(stockMap).reduce((a, b) => a + b, 0)
   const outOfStock = products.reduce((acc, p) => {
@@ -53,19 +66,32 @@ export default function WarehouseClient({ products, stockMap, logs }: Props) {
   function openStockEdit(key: string) {
     if (activeStockKey === key) { setActiveStockKey(null); return }
     setActiveStockKey(key)
-    setActivePriceId(null)
+    setActivePriceKey(null)
+    setActiveDisplayPriceId(null)
     setFormType('restock')
     setFormAmount('')
     setFormNote('')
     setStockError('')
   }
 
-  function openPriceEdit(productId: string, currentPrice: string) {
-    if (activePriceId === productId) { setActivePriceId(null); return }
-    setActivePriceId(productId)
+  function openPriceEdit(key: string, productId: string, size: string) {
+    if (activePriceKey === key) { setActivePriceKey(null); return }
+    setActivePriceKey(key)
     setActiveStockKey(null)
-    setPriceInput(currentPrice === '—' ? '' : currentPrice)
+    setActiveDisplayPriceId(null)
+    const entry = priceMap[key]
+    setHargaInput(entry?.harga ? String(entry.harga) : '')
+    setHppInput(entry?.hpp ? String(entry.hpp) : '')
     setPriceError('')
+  }
+
+  function openDisplayPriceEdit(productId: string, currentPrice: string) {
+    if (activeDisplayPriceId === productId) { setActiveDisplayPriceId(null); return }
+    setActiveDisplayPriceId(productId)
+    setActivePriceKey(null)
+    setActiveStockKey(null)
+    setDisplayPriceInput(currentPrice === '—' ? '' : currentPrice)
+    setDisplayPriceError('')
   }
 
   function handleStockSave(productId: string, productTitle: string, size: string) {
@@ -80,14 +106,28 @@ export default function WarehouseClient({ products, stockMap, logs }: Props) {
     })
   }
 
-  function handlePriceSave(productId: string) {
-    const val = priceInput.trim()
-    if (!val) { setPriceError('Harga tidak boleh kosong.'); return }
+  function handlePriceSave(productId: string, productTitle: string, size: string) {
+    const harga = parseInt(hargaInput.replace(/[^0-9]/g, '')) || null
+    const hpp = parseInt(hppInput.replace(/[^0-9]/g, '')) || null
     setPriceError('')
     startPriceTransition(async () => {
-      const res = await updateProductPriceAction(productId, val)
+      const key = `${productId}:${size}`
+      const currentQty = stockMap[key] ?? 0
+      const res = await upsertSizeEntryAction({ productId, productTitle, size, quantity: currentQty, harga, hpp })
       if (res?.error) { setPriceError(res.error); return }
-      setActivePriceId(null)
+      setActivePriceKey(null)
+      router.refresh()
+    })
+  }
+
+  function handleDisplayPriceSave(productId: string) {
+    const val = displayPriceInput.trim()
+    if (!val) { setDisplayPriceError('Harga tidak boleh kosong.'); return }
+    setDisplayPriceError('')
+    startDisplayPriceTransition(async () => {
+      const res = await updateProductPriceAction(productId, val)
+      if (res?.error) { setDisplayPriceError(res.error); return }
+      setActiveDisplayPriceId(null)
       router.refresh()
     })
   }
@@ -103,18 +143,24 @@ export default function WarehouseClient({ products, stockMap, logs }: Props) {
     return sizes.flatMap((size, sizeIdx) => {
       const key = `${product.id}:${size}`
       const qty = stockMap[key] ?? 0
+      const entry = priceMap[key]
+      const harga = entry?.harga ?? null
+      const hpp = entry?.hpp ?? null
+      const reseller = harga ? Math.round(harga * 0.85) : null
+
       const result = [
         <tr key={key} className={`wh-row${sizeIdx === 0 ? ' wh-row-group-start' : ''}`}>
-          {/* Produk — only first row shows name + price-edit button */}
+          {/* Produk */}
           <td className="wh-product-cell">
             {sizeIdx === 0 ? (
               <div className="wh-product-name-wrap">
                 <span>{product.title}</span>
                 <button
-                  className={`wh-price-edit-btn${activePriceId === product.id ? ' active' : ''}`}
-                  onClick={() => openPriceEdit(product.id, product.price)}
+                  className={`wh-price-edit-btn${activeDisplayPriceId === product.id ? ' active' : ''}`}
+                  onClick={() => openDisplayPriceEdit(product.id, product.price)}
+                  title="Edit harga tampilan website"
                 >
-                  {activePriceId === product.id ? '↑ Tutup' : '✎'}
+                  {activeDisplayPriceId === product.id ? '↑' : '✎'}
                 </button>
               </div>
             ) : null}
@@ -125,53 +171,104 @@ export default function WarehouseClient({ products, stockMap, logs }: Props) {
               ? <span className="wh-size-chip">{size}</span>
               : <span style={{ color: '#aaa', fontSize: '0.8rem' }}>—</span>}
           </td>
-          {/* Harga — only first row */}
-          <td className="wh-price-cell">
-            {sizeIdx === 0 ? (
-              <span className={product.price === '—' ? 'wh-price-unset' : 'wh-price-val'}>
-                {product.price}
-              </span>
-            ) : null}
-          </td>
+          {/* Harga Jual */}
+          <td style={{ fontWeight: harga ? 600 : 400 }}>{formatRp(harga)}</td>
+          {/* HPP */}
+          <td>{formatRp(hpp)}</td>
+          {/* Harga Reseller */}
+          <td style={{ color: reseller ? '#16a34a' : undefined }}>{formatRp(reseller)}</td>
           {/* Stok */}
           <td><StockBadge qty={qty} /></td>
           {/* Aksi */}
           <td>
-            <button
-              className={`wh-edit-btn${activeStockKey === key ? ' active' : ''}`}
-              onClick={() => openStockEdit(key)}
-            >
-              {activeStockKey === key ? '↑ Tutup' : 'Edit Stok'}
-            </button>
+            <div style={{ display: 'flex', gap: 4 }}>
+              <button
+                className={`wh-edit-btn${activePriceKey === key ? ' active' : ''}`}
+                onClick={() => openPriceEdit(key, product.id, size)}
+              >
+                {activePriceKey === key ? '↑' : 'Harga'}
+              </button>
+              <button
+                className={`wh-edit-btn${activeStockKey === key ? ' active' : ''}`}
+                onClick={() => openStockEdit(key)}
+              >
+                {activeStockKey === key ? '↑' : 'Stok'}
+              </button>
+            </div>
           </td>
         </tr>,
       ]
 
-      // Price edit row — appears after first size row
-      if (sizeIdx === 0 && activePriceId === product.id) {
+      // Display price edit row (per product, after first size)
+      if (sizeIdx === 0 && activeDisplayPriceId === product.id) {
         result.push(
-          <tr key={`${product.id}-price-form`} className="wh-form-row">
-            <td colSpan={5}>
+          <tr key={`${product.id}-display-price-form`} className="wh-form-row">
+            <td colSpan={7}>
               <div className="wh-inline-form">
+                <p style={{ fontSize: '0.78rem', color: '#888', margin: '0 0 8px' }}>
+                  Harga tampilan di website (misal: Rp 150.000 atau Mulai Rp 150.000)
+                </p>
                 <div className="wh-form-row-inner">
                   <div className="wh-form-group wh-form-group-grow">
-                    <label>Harga Baru</label>
+                    <label>Harga Display</label>
                     <input
                       type="text"
                       className="admin-form-input"
                       placeholder="cth. Rp 150.000"
-                      value={priceInput}
-                      onChange={e => setPriceInput(e.target.value)}
+                      value={displayPriceInput}
+                      onChange={e => setDisplayPriceInput(e.target.value)}
                     />
                   </div>
                   <div className="wh-form-group wh-form-group-btn">
                     <label>&nbsp;</label>
-                    <button
-                      className="btn-admin-primary"
-                      style={{ whiteSpace: 'nowrap' }}
+                    <button className="btn-admin-primary" style={{ whiteSpace: 'nowrap' }}
+                      disabled={displayPricePending}
+                      onClick={() => handleDisplayPriceSave(product.id)}>
+                      {displayPricePending ? 'Menyimpan…' : 'Simpan'}
+                    </button>
+                  </div>
+                </div>
+                {displayPriceError && <div className="admin-error" style={{ marginTop: '0.5rem' }}>{displayPriceError}</div>}
+              </div>
+            </td>
+          </tr>
+        )
+      }
+
+      // Price edit row
+      if (activePriceKey === key) {
+        result.push(
+          <tr key={`${key}-price-form`} className="wh-form-row">
+            <td colSpan={7}>
+              <div className="wh-inline-form">
+                <div className="wh-form-row-inner">
+                  <div className="wh-form-group">
+                    <label>Harga Jual (Rp)</label>
+                    <input type="text" className="admin-form-input wh-price-input"
+                      placeholder="cth. 150000"
+                      value={hargaInput}
+                      onChange={e => setHargaInput(e.target.value)} />
+                  </div>
+                  <div className="wh-form-group">
+                    <label>HPP (Rp)</label>
+                    <input type="text" className="admin-form-input wh-price-input"
+                      placeholder="cth. 80000"
+                      value={hppInput}
+                      onChange={e => setHppInput(e.target.value)} />
+                  </div>
+                  <div className="wh-form-group" style={{ justifyContent: 'flex-end' }}>
+                    <label style={{ fontSize: '0.75rem', color: '#888' }}>H. Reseller (auto)</label>
+                    <div className="admin-form-input" style={{ background: '#f5f4f1', color: '#16a34a', fontWeight: 600, cursor: 'default' }}>
+                      {hargaInput
+                        ? 'Rp ' + Math.round((parseInt(hargaInput.replace(/[^0-9]/g, '')) || 0) * 0.85).toLocaleString('id-ID')
+                        : '—'}
+                    </div>
+                  </div>
+                  <div className="wh-form-group wh-form-group-btn">
+                    <label>&nbsp;</label>
+                    <button className="btn-admin-primary" style={{ whiteSpace: 'nowrap' }}
                       disabled={pricePending}
-                      onClick={() => handlePriceSave(product.id)}
-                    >
+                      onClick={() => handlePriceSave(product.id, product.title, size)}>
                       {pricePending ? 'Menyimpan…' : 'Simpan Harga'}
                     </button>
                   </div>
@@ -179,24 +276,21 @@ export default function WarehouseClient({ products, stockMap, logs }: Props) {
                 {priceError && <div className="admin-error" style={{ marginTop: '0.5rem' }}>{priceError}</div>}
               </div>
             </td>
-          </tr>,
+          </tr>
         )
       }
 
-      // Stock edit row — appears after its own size row
+      // Stock edit row
       if (activeStockKey === key) {
         result.push(
           <tr key={`${key}-stock-form`} className="wh-form-row">
-            <td colSpan={5}>
+            <td colSpan={7}>
               <div className="wh-inline-form">
                 <div className="wh-form-row-inner">
                   <div className="wh-form-group">
                     <label>Tipe</label>
-                    <select
-                      className="admin-form-input wh-select"
-                      value={formType}
-                      onChange={e => setFormType(e.target.value as typeof formType)}
-                    >
+                    <select className="admin-form-input wh-select" value={formType}
+                      onChange={e => setFormType(e.target.value as typeof formType)}>
                       <option value="restock">Masuk (tambah stok)</option>
                       <option value="keluar">Keluar (kurangi stok)</option>
                       <option value="koreksi">Koreksi (set ke angka ini)</option>
@@ -204,32 +298,21 @@ export default function WarehouseClient({ products, stockMap, logs }: Props) {
                   </div>
                   <div className="wh-form-group">
                     <label>Jumlah (pcs)</label>
-                    <input
-                      type="number" min={1}
-                      className="admin-form-input wh-num-input"
-                      placeholder="0"
-                      value={formAmount}
-                      onChange={e => setFormAmount(e.target.value)}
-                    />
+                    <input type="number" min={1} className="admin-form-input wh-num-input"
+                      placeholder="0" value={formAmount}
+                      onChange={e => setFormAmount(e.target.value)} />
                   </div>
                   <div className="wh-form-group wh-form-group-grow">
                     <label>Keterangan (opsional)</label>
-                    <input
-                      type="text"
-                      className="admin-form-input"
-                      placeholder="cth. restock batch Maret"
-                      value={formNote}
-                      onChange={e => setFormNote(e.target.value)}
-                    />
+                    <input type="text" className="admin-form-input"
+                      placeholder="cth. restock batch Maret" value={formNote}
+                      onChange={e => setFormNote(e.target.value)} />
                   </div>
                   <div className="wh-form-group wh-form-group-btn">
                     <label>&nbsp;</label>
-                    <button
-                      className="btn-admin-primary"
-                      style={{ whiteSpace: 'nowrap' }}
+                    <button className="btn-admin-primary" style={{ whiteSpace: 'nowrap' }}
                       disabled={stockPending}
-                      onClick={() => handleStockSave(product.id, product.title, size)}
-                    >
+                      onClick={() => handleStockSave(product.id, product.title, size)}>
                       {stockPending ? 'Menyimpan…' : 'Simpan'}
                     </button>
                   </div>
@@ -237,7 +320,7 @@ export default function WarehouseClient({ products, stockMap, logs }: Props) {
                 {stockError && <div className="admin-error" style={{ marginTop: '0.5rem' }}>{stockError}</div>}
               </div>
             </td>
-          </tr>,
+          </tr>
         )
       }
 
@@ -280,13 +363,9 @@ export default function WarehouseClient({ products, stockMap, logs }: Props) {
       {tab === 'stock' && (
         <>
           <div style={{ marginBottom: '1rem' }}>
-            <input
-              type="text"
-              className="admin-form-input wh-search-bar"
+            <input type="text" className="admin-form-input wh-search-bar"
               placeholder="Cari nama produk atau tag..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
+              value={search} onChange={e => setSearch(e.target.value)} />
           </div>
 
           {filtered.length === 0 ? (
@@ -297,10 +376,12 @@ export default function WarehouseClient({ products, stockMap, logs }: Props) {
                 <thead>
                   <tr>
                     <th>Produk</th>
-                    <th style={{ width: 80 }}>Ukuran</th>
-                    <th style={{ width: 140 }}>Harga</th>
-                    <th style={{ width: 110 }}>Stok</th>
-                    <th style={{ width: 110 }}>Aksi</th>
+                    <th style={{ width: 70 }}>Ukuran</th>
+                    <th style={{ width: 130 }}>Harga Jual</th>
+                    <th style={{ width: 120 }}>HPP</th>
+                    <th style={{ width: 130 }}>H. Reseller</th>
+                    <th style={{ width: 100 }}>Stok</th>
+                    <th style={{ width: 120 }}>Aksi</th>
                   </tr>
                 </thead>
                 <tbody>{rows}</tbody>
@@ -334,11 +415,7 @@ export default function WarehouseClient({ products, stockMap, logs }: Props) {
                     <td style={{ fontSize: '0.8rem', color: '#888', whiteSpace: 'nowrap' }}>{fmt(log.createdAt)}</td>
                     <td>{log.productTitle}</td>
                     <td>{log.size !== '-' ? <span className="wh-size-chip">{log.size}</span> : '—'}</td>
-                    <td>
-                      <span className={`wh-badge ${TYPE_COLORS[log.type]}`}>
-                        {TYPE_LABELS[log.type]}
-                      </span>
-                    </td>
+                    <td><span className={`wh-badge ${TYPE_COLORS[log.type]}`}>{TYPE_LABELS[log.type]}</span></td>
                     <td style={{ fontWeight: 600, color: log.quantityChange >= 0 ? '#16a34a' : '#dc2626' }}>
                       {log.quantityChange >= 0 ? '+' : ''}{log.quantityChange}
                     </td>

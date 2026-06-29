@@ -1,8 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getProductById } from '@/lib/data'
-import { getProductSizeEntries } from '@/lib/warehouse'
-import StockPricingTable from './StockPricingTable'
 import InfoForm from './InfoForm'
 import PhotosForm from './PhotosForm'
 
@@ -14,8 +12,6 @@ export default async function EditProductPage({
   const { id } = await params
   const product = await getProductById(id)
   if (!product) notFound()
-
-  const entries = await getProductSizeEntries(id, product.sizes)
 
   let sizechartData: Record<string, { panjang?: number; lebar?: number }> = {}
   try {
@@ -33,12 +29,6 @@ export default async function EditProductPage({
       </div>
 
       <InfoForm product={product} sizechartData={sizechartData} />
-
-      <StockPricingTable
-        productId={product.id}
-        productTitle={product.title}
-        entries={entries}
-      />
 
       <PhotosForm
         productId={product.id}

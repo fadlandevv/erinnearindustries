@@ -89,6 +89,17 @@ export async function upsertSizeEntry(
   return {}
 }
 
+export async function getPriceMap(): Promise<Record<string, { harga: number | null; hpp: number | null }>> {
+  try {
+    const { data } = await db.from('warehouse_stock').select('product_id,size,harga,hpp')
+    const map: Record<string, { harga: number | null; hpp: number | null }> = {}
+    for (const row of data ?? []) {
+      map[`${row.product_id}:${row.size}`] = { harga: row.harga ?? null, hpp: row.hpp ?? null }
+    }
+    return map
+  } catch { return {} }
+}
+
 export async function getStockMap(): Promise<Record<string, number>> {
   try {
     const { data } = await db.from('warehouse_stock').select('product_id,size,quantity')
