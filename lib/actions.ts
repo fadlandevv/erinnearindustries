@@ -177,6 +177,23 @@ export async function duplicateProduct(id: string) {
   const newId = Date.now().toString()
   products.push({ ...source, id: newId, title: `${source.title} (Copy)`, image: undefined, images: undefined })
   await saveProducts(products)
+
+  const { data: stockRows } = await db
+    .from('warehouse_stock')
+    .select('size,quantity,harga,hpp')
+    .eq('product_id', id)
+  if (stockRows && stockRows.length > 0) {
+    await db.from('warehouse_stock').insert(
+      stockRows.map(r => ({
+        product_id: newId,
+        size: r.size,
+        quantity: r.quantity,
+        harga: r.harga,
+        hpp: r.hpp,
+      }))
+    )
+  }
+
   revalidateTag('products', {})
   revalidatePath('/product')
   redirect(`/admin/products/${newId}/edit?toast=Produk+berhasil+diduplikat`)
