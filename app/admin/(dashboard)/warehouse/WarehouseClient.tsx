@@ -1,7 +1,7 @@
 'use client'
 import { useState, useTransition, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { adjustStockAction, updateProductPriceAction, upsertSizeEntryAction } from '@/lib/actions'
+import { adjustStockAction, updateProductPriceAction, upsertSizeEntryAction, duplicateProduct } from '@/lib/actions'
 import type { Product } from '@/lib/data'
 import type { StockLogEntry } from '@/lib/warehouse'
 
@@ -249,6 +249,19 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
             <InlineStockCell qty={qty} pending={stockSavingKey === key}
               onSave={(type, amount) => handleStockSave(product.id, product.title, size, type, amount)} />
           </td>
+          <td>
+            {sizeIdx === 0 ? (
+              <form action={duplicateProduct.bind(null, product.id)}>
+                <button type="submit" className="btn-admin-secondary"
+                  style={{ padding: '0.3rem 0.5rem', lineHeight: 1 }}
+                  title="Duplikat produk">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                  </svg>
+                </button>
+              </form>
+            ) : null}
+          </td>
         </tr>
       )
     })
@@ -304,6 +317,7 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
                     <th style={{ width: 120 }}>HPP</th>
                     <th style={{ width: 130 }}>H. Reseller</th>
                     <th style={{ width: 130 }}>Stok</th>
+                    <th style={{ width: 44 }}></th>
                   </tr>
                 </thead>
                 <tbody>{rows}</tbody>
