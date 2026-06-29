@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache'
 import { db } from './db'
 
 export type Product = {
@@ -85,10 +86,14 @@ function toProduct(row: Record<string, unknown>): Product {
   }
 }
 
-export async function getProducts(): Promise<Product[]> {
-  const { data } = await db.from('products').select('*').order('created_at', { ascending: true })
-  return (data ?? []).map(toProduct)
-}
+export const getProducts = unstable_cache(
+  async (): Promise<Product[]> => {
+    const { data } = await db.from('products').select('*').order('created_at', { ascending: true })
+    return (data ?? []).map(toProduct)
+  },
+  ['products'],
+  { tags: ['products'], revalidate: 300 }
+)
 
 export async function getProductById(id: string): Promise<Product | undefined> {
   const { data } = await db.from('products').select('*').eq('id', id).maybeSingle()
@@ -127,10 +132,14 @@ function toService(row: Record<string, unknown>): ServiceItem {
   }
 }
 
-export async function getServices(): Promise<ServiceItem[]> {
-  const { data } = await db.from('services').select('*').order('created_at', { ascending: true })
-  return (data ?? []).map(toService)
-}
+export const getServices = unstable_cache(
+  async (): Promise<ServiceItem[]> => {
+    const { data } = await db.from('services').select('*').order('created_at', { ascending: true })
+    return (data ?? []).map(toService)
+  },
+  ['services'],
+  { tags: ['services'], revalidate: 300 }
+)
 
 export async function getServiceById(id: string): Promise<ServiceItem | undefined> {
   const { data } = await db.from('services').select('*').eq('id', id).maybeSingle()
@@ -246,10 +255,14 @@ export async function deleteCustomProduct(id: string): Promise<void> {
   await db.from('custom_products').delete().eq('id', id)
 }
 
-export async function getCustomProductImages(): Promise<Record<string, string>> {
-  const { data } = await db.from('content').select('value').eq('key', 'custom_product_images').maybeSingle()
-  return (data?.value ?? {}) as Record<string, string>
-}
+export const getCustomProductImages = unstable_cache(
+  async (): Promise<Record<string, string>> => {
+    const { data } = await db.from('content').select('value').eq('key', 'custom_product_images').maybeSingle()
+    return (data?.value ?? {}) as Record<string, string>
+  },
+  ['custom-product-images'],
+  { tags: ['custom-product-images'], revalidate: 300 }
+)
 
 // ── Custom Product Options ────────────────────────────────────
 
@@ -302,12 +315,16 @@ export async function getAllCustomProductOptions(): Promise<Record<string, Produ
 
 // ── Content ──────────────────────────────────────────────────
 
-export async function getContent(): Promise<ContentData> {
-  const { data } = await db.from('content').select('*')
-  const map: Record<string, unknown> = {}
-  for (const row of data ?? []) map[row.key] = row.value
-  return { id: (map.id ?? {}) as ContentLang, en: (map.en ?? {}) as ContentLang }
-}
+export const getContent = unstable_cache(
+  async (): Promise<ContentData> => {
+    const { data } = await db.from('content').select('*')
+    const map: Record<string, unknown> = {}
+    for (const row of data ?? []) map[row.key] = row.value
+    return { id: (map.id ?? {}) as ContentLang, en: (map.en ?? {}) as ContentLang }
+  },
+  ['content'],
+  { tags: ['content'], revalidate: 3600 }
+)
 
 export async function saveContent(data: ContentData): Promise<void> {
   await db.from('content').upsert({ key: 'id', value: data.id })

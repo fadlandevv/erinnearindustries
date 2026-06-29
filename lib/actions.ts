@@ -1,7 +1,7 @@
 'use server'
 import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { getProducts, saveProducts, deleteProduct as _deleteProductFromDB, getServices, saveServices, getGallery, saveGallery, getShowcase, saveShowcase, saveContent, type ContentData } from './data'
 import { saveOrder, getOrderById, getOrdersByEmail, deleteOrder, updateOrderStatus, type OrderItem, type Order } from './orders'
 import { createSnapToken } from './midtrans'
@@ -125,6 +125,7 @@ export async function createProduct(formData: FormData) {
     updatedAt: new Date().toISOString(),
   })
   await saveProducts(products)
+  revalidateTag('products', {})
   revalidatePath('/product')
   redirect('/admin/products?toast=Produk+berhasil+ditambah')
 }
@@ -163,6 +164,7 @@ export async function updateProduct(id: string, formData: FormData) {
     } : p
   )
   await saveProducts(updated)
+  revalidateTag('products', {})
   revalidatePath('/product')
   revalidatePath(`/product/${id}`)
   redirect('/admin/products?toast=Produk+berhasil+diperbarui')
@@ -175,12 +177,14 @@ export async function duplicateProduct(id: string) {
   const newId = Date.now().toString()
   products.push({ ...source, id: newId, title: `${source.title} (Copy)`, image: undefined, images: undefined })
   await saveProducts(products)
+  revalidateTag('products', {})
   revalidatePath('/product')
   redirect(`/admin/products/${newId}/edit?toast=Produk+berhasil+diduplikat`)
 }
 
 export async function deleteProduct(id: string) {
   await _deleteProductFromDB(id)
+  revalidateTag('products', {})
   revalidatePath('/product')
   redirect('/admin/products?toast=Produk+berhasil+dihapus&toastType=success')
 }
@@ -200,6 +204,7 @@ export async function createService(formData: FormData) {
     ...(features?.length ? { features } : {}),
   })
   await saveServices(services)
+  revalidateTag('services', {})
   revalidatePath('/service')
   redirect('/admin/services?toast=Layanan+berhasil+ditambah')
 }
@@ -221,6 +226,7 @@ export async function updateService(id: string, formData: FormData) {
     } : s
   )
   await saveServices(updated)
+  revalidateTag('services', {})
   revalidatePath('/service')
   revalidatePath(`/service/${id}`)
   redirect('/admin/services?toast=Layanan+berhasil+diperbarui')
@@ -293,6 +299,7 @@ export async function updateGallerySlot(slotId: string, formData: FormData): Pro
 export async function deleteService(id: string) {
   const services = await getServices()
   await saveServices(services.filter((s) => s.id !== id))
+  revalidateTag('services', {})
   revalidatePath('/service')
   redirect('/admin/services?toast=Layanan+berhasil+dihapus&toastType=success')
 }
@@ -606,6 +613,7 @@ export async function saveContentAction(_prev: unknown, formData: FormData): Pro
   const raw = formData.get('content') as string
   const data = JSON.parse(raw) as ContentData
   await saveContent(data)
+  revalidateTag('content', {})
   revalidatePath('/', 'layout')
   return { ok: true }
 }
@@ -1282,6 +1290,7 @@ export async function updateCustomProductImageAction(
   images[id] = publicUrl
   await db.from('content').upsert({ key: 'custom_product_images', value: images })
 
+  revalidateTag('custom-product-images', {})
   revalidatePath('/custom')
   return { url: publicUrl }
 }
