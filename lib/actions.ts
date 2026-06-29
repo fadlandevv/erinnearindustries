@@ -109,6 +109,7 @@ export async function createProduct(formData: FormData) {
   const colors = colorsRaw.split(',').map((c) => c.trim()).filter(Boolean)
 
   const products = await getProducts()
+  const maxOrder = products.reduce((m, p) => Math.max(m, p.sortOrder ?? 0), -1)
   products.push({
     id,
     tag: formData.get('tag') as string,
@@ -123,6 +124,7 @@ export async function createProduct(formData: FormData) {
     ...(image ? { image } : {}),
     ...(images.some(Boolean) ? { images } : {}),
     updatedAt: new Date().toISOString(),
+    sortOrder: maxOrder + 1,
   })
   await saveProducts(products)
   revalidateTag('products', {})
@@ -183,7 +185,8 @@ export async function duplicateProduct(id: string) {
   const source = products.find((p) => p.id === id)
   if (!source) return
   const newId = Date.now().toString()
-  products.push({ ...source, id: newId, title: `${source.title} (Copy)`, image: undefined, images: undefined })
+  const maxOrder = products.reduce((m, p) => Math.max(m, p.sortOrder ?? 0), -1)
+  products.push({ ...source, id: newId, title: `${source.title} (Copy)`, image: undefined, images: undefined, sortOrder: maxOrder + 1 })
   await saveProducts(products)
 
   const { data: stockRows } = await db
