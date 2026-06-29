@@ -64,9 +64,8 @@ function InlinePriceCell({ value, onSave, pending }: {
   }
 
   return (
-    <span onClick={startEdit} title="Klik untuk edit"
-      style={{ cursor: 'pointer', color: value ? 'inherit' : '#ccc', fontWeight: value ? 600 : 400,
-        opacity: pending ? 0.5 : 1 }}>
+    <span onClick={startEdit} title="Klik untuk edit" className="wh-inline-val"
+      style={{ opacity: pending ? 0.5 : 1, color: value ? 'inherit' : '#aaa', fontWeight: value ? 600 : 400 }}>
       {formatRp(value)}
     </span>
   )
@@ -120,8 +119,8 @@ function InlineStockCell({ qty, onSave, pending }: {
 
   const color = qty === 0 ? '#dc2626' : qty <= 10 ? '#d97706' : 'inherit'
   return (
-    <span onClick={startEdit} title="Klik untuk edit"
-      style={{ cursor: 'pointer', color, fontWeight: 600, opacity: pending ? 0.5 : 1 }}>
+    <span onClick={startEdit} title="Klik untuk edit" className="wh-inline-val"
+      style={{ color, fontWeight: 600, opacity: pending ? 0.5 : 1 }}>
       {qty === 0 ? 'Habis' : `${qty} pcs`}
     </span>
   )

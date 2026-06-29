@@ -1421,6 +1421,20 @@
 .wh-select { min-width: 200px; }
 .wh-num-input { width: 90px; }
 .wh-price-input { width: 130px; }
+.wh-inline-val {
+  display: inline-block;
+  cursor: pointer;
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #e5e5e5;
+  background: #fafafa;
+  font-size: 0.85rem;
+  min-width: 90px;
+  transition: background 0.12s;
+}
+.wh-inline-val:hover { background: #f0ede8; }
+[data-theme="dark"] .wh-inline-val { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="dark"] .wh-inline-val:hover { background: #222; }
 
 /* dark mode */
 [data-theme="dark"] .wh-stat-card { background: #141414; border-color: #1e1e1e; }
