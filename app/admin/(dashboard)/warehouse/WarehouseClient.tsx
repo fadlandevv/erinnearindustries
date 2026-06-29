@@ -308,7 +308,7 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
                     <th style={{ whiteSpace: 'nowrap' }}>HPP</th>
                     <th style={{ whiteSpace: 'nowrap' }}>H. Reseller</th>
                     <th style={{ whiteSpace: 'nowrap' }}>Stok</th>
-                    <th style={{ width: 32 }}></th>
+                    <th style={{ width: 50 }}></th>
                   </tr>
                 </thead>
                 <tbody>{rows}</tbody>
