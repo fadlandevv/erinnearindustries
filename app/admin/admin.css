@@ -1398,8 +1398,8 @@
 
 .wh-table th, .wh-table td { padding-left: 16px; padding-right: 16px; }
 .wh-table th:not(:first-child), .wh-table td:not(:first-child) { padding-left: 32px; padding-right: 32px; }
-.wh-table th:last-child, .wh-table td:last-child { padding-left: 8px; padding-right: 150px; }
-.wh-table .wh-product-cell { font-weight: 600; vertical-align: top; width: 900px; max-width: 900px; }
+.wh-table th:last-child, .wh-table td:last-child { padding-left: 8px; padding-right: 50px; }
+.wh-table .wh-product-cell { font-weight: 600; vertical-align: top; }
 .wh-row-group-start td { border-top: 1.5px solid #e8e8e8 !important; }
 
 .wh-edit-btn {
