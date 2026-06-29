@@ -26,8 +26,8 @@ export default async function PembukuanPage({
     <>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title">Pembukuan</h1>
-          <p className="admin-page-subtitle">Pencatatan pemasukan & pengeluaran per bulan</p>
+          <h1 className="admin-page-title">Bookkeeping</h1>
+          <p className="admin-page-subtitle">Record income &amp; expenses per month</p>
         </div>
       </div>
 

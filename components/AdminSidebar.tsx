@@ -18,7 +18,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    group: 'Konten',
+    group: 'Content',
     icon: '✎',
     items: [
       { label: 'Services', href: '/admin/services', icon: '✦', permission: 'services' },
@@ -35,7 +35,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    group: 'Inventori',
+    group: 'Inventory',
     icon: '▦',
     items: [
       { label: 'Products', href: '/admin/products', icon: '◈', permission: 'products' },
@@ -43,7 +43,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    group: 'Transaksi',
+    group: 'Transactions',
     icon: '◷',
     items: [
       { label: 'Orders',     href: '/admin/orders',     icon: '◷', permission: 'orders'     },
@@ -52,7 +52,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    group: 'Pengguna',
+    group: 'Users',
     icon: '◎',
     items: [
       { label: 'Account', href: '/admin/members', icon: '◎', permission: 'members' },
@@ -66,7 +66,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    group: 'Sistem',
+    group: 'System',
     icon: '⊞',
     items: [
       { label: 'Role Access', href: '/admin/roles',      icon: '⊞', permission: 'roles'      },

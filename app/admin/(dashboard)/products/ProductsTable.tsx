@@ -64,22 +64,22 @@ export default function ProductsTable({ products }: { products: Product[] }) {
 
   return (
     <div className="admin-table-wrap">
-      {saving && <p style={{ fontSize: '0.8rem', color: '#999', marginBottom: 8 }}>Menyimpan urutan...</p>}
+      {saving && <p style={{ fontSize: '0.8rem', color: '#999', marginBottom: 8 }}>Saving order...</p>}
       <table className="admin-table">
         <thead>
           <tr>
             <th style={{ width: 28 }}></th>
-            <th>Warna</th>
-            <SortTh label="Nama Produk" k="title" />
+            <th>Color</th>
+            <SortTh label="Product Name" k="title" />
             <SortTh label="Tag" k="tag" />
-            <SortTh label="Diperbarui" k="updatedAt" />
-            <th>Aksi</th>
+            <SortTh label="Updated" k="updatedAt" />
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {displayed.length === 0 && (
             <tr>
-              <td colSpan={6} className="admin-empty">Belum ada produk. Tambahkan produk pertama.</td>
+              <td colSpan={6} className="admin-empty">No products yet. Add your first product.</td>
             </tr>
           )}
           {displayed.map((p, i) => {
@@ -111,10 +111,10 @@ export default function ProductsTable({ products }: { products: Product[] }) {
                   <div className="admin-table-actions">
                     <Link href={`/admin/products/${p.id}/edit`} className="btn-admin-edit">Edit</Link>
                     <form action={duplicateAction}>
-                      <button type="submit" className="btn-admin-secondary">Duplikat</button>
+                      <button type="submit" className="btn-admin-secondary">Duplicate</button>
                     </form>
                     <form action={deleteAction}>
-                      <button type="submit" className="btn-admin-danger">Hapus</button>
+                      <button type="submit" className="btn-admin-danger">Delete</button>
                     </form>
                   </div>
                 </td>

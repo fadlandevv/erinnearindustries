@@ -7,8 +7,8 @@ export default async function ContentPage() {
     <>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title">Konten Halaman</h1>
-          <p className="admin-page-subtitle">Edit teks banner, judul, dan deskripsi setiap halaman</p>
+          <h1 className="admin-page-title">Page Content</h1>
+          <p className="admin-page-subtitle">Edit banner text, titles, and descriptions for each page</p>
         </div>
       </div>
       <ContentEditor initialContent={content} />

@@ -25,7 +25,7 @@ export default async function EditProductPage({
           <h1 className="admin-page-title">Edit Product</h1>
           <p className="admin-page-subtitle">{product.title}</p>
         </div>
-        <Link href="/admin/products" className="btn-admin-secondary">← Kembali</Link>
+        <Link href="/admin/products" className="btn-admin-secondary">← Back</Link>
       </div>
 
       <InfoForm product={product} sizechartData={sizechartData} />

@@ -9,7 +9,7 @@ export default async function RekapPage({
   searchParams: Promise<{ tab?: string }>
 }) {
   const { tab } = await searchParams
-  const initialTab = (tab === 'mingguan' || tab === 'tahunan') ? tab : 'bulanan'
+  const initialTab: 'weekly' | 'monthly' | 'yearly' = tab === 'weekly' || tab === 'mingguan' ? 'weekly' : tab === 'yearly' || tab === 'tahunan' ? 'yearly' : 'monthly'
 
   const jar = await cookies()
   const adminId = jar.get('admin-token')?.value
@@ -22,8 +22,8 @@ export default async function RekapPage({
     <>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title">Rekap Pemasukan</h1>
-          <p className="admin-page-subtitle">Ringkasan dari web, marketplace, dan offline</p>
+          <h1 className="admin-page-title">Revenue Recap</h1>
+          <p className="admin-page-subtitle">Summary from web, marketplace, and offline</p>
         </div>
       </div>
 

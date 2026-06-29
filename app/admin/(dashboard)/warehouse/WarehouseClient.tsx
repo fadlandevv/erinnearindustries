@@ -12,7 +12,7 @@ type Props = {
   logs: StockLogEntry[]
 }
 
-const TYPE_LABELS = { restock: 'Masuk', keluar: 'Keluar', koreksi: 'Koreksi' }
+const TYPE_LABELS = { restock: 'In', keluar: 'Out', koreksi: 'Correction' }
 const TYPE_COLORS: Record<string, string> = { restock: 'wh-badge-ok', keluar: 'wh-badge-empty', koreksi: 'wh-badge-low' }
 
 function fmt(date: string) {
@@ -64,7 +64,7 @@ function InlinePriceCell({ value, onSave, pending }: {
   }
 
   return (
-    <span onClick={startEdit} title="Klik untuk edit" className="wh-inline-val"
+    <span onClick={startEdit} title="Click to edit" className="wh-inline-val"
       style={{ opacity: pending ? 0.5 : 1, color: value ? 'inherit' : '#aaa', fontWeight: value ? 600 : 400 }}>
       {formatRp(value)}
     </span>
@@ -108,9 +108,9 @@ function InlineStockCell({ qty, onSave, pending }: {
 
   const color = qty === 0 ? '#dc2626' : qty <= 10 ? '#d97706' : 'inherit'
   return (
-    <span onClick={startEdit} title="Klik untuk edit" className="wh-inline-val"
+    <span onClick={startEdit} title="Click to edit" className="wh-inline-val"
       style={{ color, fontWeight: 600, opacity: pending ? 0.5 : 1 }}>
-      {qty === 0 ? 'Habis' : `${qty} pcs`}
+      {qty === 0 ? 'Out of stock' : `${qty} pcs`}
     </span>
   )
 }
@@ -149,13 +149,13 @@ function InlineDisplayPriceCell({ productId, currentPrice }: { productId: string
       <input ref={inputRef} type="text" className="admin-form-input"
         style={{ width: '100%', padding: '0.25rem 0.4rem', fontSize: '0.82rem', marginTop: 4 }}
         value={input} onChange={e => setInput(e.target.value)}
-        onBlur={commit} onKeyDown={onKeyDown} autoFocus placeholder="cth. Rp 150.000" />
+        onBlur={commit} onKeyDown={onKeyDown} autoFocus placeholder="e.g. Rp 150.000" />
     )
   }
 
   return (
     <button className={`wh-price-edit-btn${pending ? ' active' : ''}`}
-      onClick={startEdit} title="Edit harga tampilan website" style={{ opacity: pending ? 0.5 : 1 }}>
+      onClick={startEdit} title="Edit website display price" style={{ opacity: pending ? 0.5 : 1 }}>
       {pending ? '…' : '✎'}
     </button>
   )
@@ -167,6 +167,7 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
   const [search, setSearch] = useState('')
   const [savingKey, setSavingKey] = useState<string | null>(null)
   const [stockSavingKey, setStockSavingKey] = useState<string | null>(null)
+  const [hiddenProducts, setHiddenProducts] = useState<Set<string>>(new Set())
   const [copyPopover, setCopyPopover] = useState<{ productId: string; fromSize: string; allSizes: string[] } | null>(null)
   const [copyTargets, setCopyTargets] = useState<string[]>([])
   const [copyPending, setCopyPending] = useState(false)
@@ -218,7 +219,16 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
 
   const rows = filtered.flatMap(product => {
     const sizes = product.sizes?.length ? product.sizes : ['-']
-    return sizes.map((size, sizeIdx) => {
+    const isHidden = hiddenProducts.has(product.id)
+    function toggleHide() {
+      setHiddenProducts(prev => {
+        const next = new Set(prev)
+        next.has(product.id) ? next.delete(product.id) : next.add(product.id)
+        return next
+      })
+    }
+    return sizes.flatMap((size, sizeIdx) => {
+      if (isHidden && sizeIdx > 0) return []
       const key = `${product.id}:${size}`
       const qty = stockMap[key] ?? 0
       const entry = priceMap[key]
@@ -226,12 +236,23 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
       const hpp = entry?.hpp ?? null
       const reseller = harga ? Math.round(harga * 0.85) : null
 
-      return (
-        <tr key={key} className={`wh-row${sizeIdx === 0 ? ' wh-row-group-start' : ''}`}>
+      return [(
+        <tr key={key} className={`wh-row${sizeIdx === 0 ? ' wh-row-group-start' : ''}${isHidden ? ' wh-row-hidden' : ''}`}>
           <td className="wh-product-cell">
             {sizeIdx === 0 ? (
               <div className="wh-product-name-wrap">
-                <span>{product.title}</span>
+                <button type="button" onClick={toggleHide} className="wh-visibility-btn" title={isHidden ? 'Tampilkan' : 'Sembunyikan'}>
+                  {isHidden ? (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                  ) : (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  )}
+                </button>
+                <span style={{ opacity: isHidden ? 0.45 : 1 }}>{product.title}</span>
                 <InlineDisplayPriceCell productId={product.id} currentPrice={product.price} />
               </div>
             ) : null}
@@ -263,7 +284,7 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
               <button className="btn-admin-secondary"
                 onClick={() => handleCopyClick(product.id, size, product.sizes)}
                 style={{ padding: '0.25rem', lineHeight: 1, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                title="Copy harga & stok ke ukuran lain">
+                title="Copy price & stock to other sizes">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
                 </svg>
@@ -271,7 +292,7 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
             ) : null}
           </td>
         </tr>
-      )
+      )]
     })
   })
 
@@ -281,28 +302,28 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
       <div className="wh-stats">
         <div className="wh-stat-card">
           <div className="wh-stat-val">{products.length}</div>
-          <div className="wh-stat-lbl">Produk</div>
+          <div className="wh-stat-lbl">Products</div>
         </div>
         <div className="wh-stat-card">
           <div className="wh-stat-val">{totalItems.toLocaleString('id-ID')}</div>
-          <div className="wh-stat-lbl">Total Stok (pcs)</div>
+          <div className="wh-stat-lbl">Total Stock (pcs)</div>
         </div>
         <div className="wh-stat-card">
           <div className={`wh-stat-val${outOfStock > 0 ? ' wh-stat-danger' : ''}`}>{outOfStock}</div>
-          <div className="wh-stat-lbl">Varian Habis</div>
+          <div className="wh-stat-lbl">Out of Stock Variants</div>
         </div>
         <div className="wh-stat-card">
           <div className="wh-stat-val">{logs.length}</div>
-          <div className="wh-stat-lbl">Total Transaksi</div>
+          <div className="wh-stat-lbl">Total Transactions</div>
         </div>
       </div>
 
       <div className="wh-tabs">
         <button className={`wh-tab${tab === 'stock' ? ' active' : ''}`} onClick={() => setTab('stock')}>
-          Stok &amp; Harga
+          Stock &amp; Price
         </button>
         <button className={`wh-tab${tab === 'log' ? ' active' : ''}`} onClick={() => setTab('log')}>
-          Riwayat{logs.length > 0 ? ` (${logs.length})` : ''}
+          History{logs.length > 0 ? ` (${logs.length})` : ''}
         </button>
       </div>
 
@@ -310,22 +331,22 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
         <>
           <div style={{ marginBottom: '1rem' }}>
             <input type="text" className="admin-form-input wh-search-bar"
-              placeholder="Cari nama produk atau tag..."
+              placeholder="Search product name or tag..."
               value={search} onChange={e => setSearch(e.target.value)} />
           </div>
           {filtered.length === 0 ? (
-            <div className="admin-empty">Tidak ada produk ditemukan.</div>
+            <div className="admin-empty">No products found.</div>
           ) : (
             <div className="admin-table-wrap">
               <table className="admin-table wh-table">
                 <thead>
                   <tr>
-                    <th>Produk</th>
-                    <th style={{ width: 70 }}>Ukuran</th>
-                    <th style={{ whiteSpace: 'nowrap' }}>Harga Jual</th>
-                    <th style={{ whiteSpace: 'nowrap' }}>HPP</th>
-                    <th style={{ whiteSpace: 'nowrap' }}>H. Reseller</th>
-                    <th style={{ whiteSpace: 'nowrap' }}>Stok</th>
+                    <th>Product</th>
+                    <th style={{ width: 70 }}>Size</th>
+                    <th style={{ whiteSpace: 'nowrap' }}>Selling Price</th>
+                    <th style={{ whiteSpace: 'nowrap' }}>COGS</th>
+                    <th style={{ whiteSpace: 'nowrap' }}>Reseller Price</th>
+                    <th style={{ whiteSpace: 'nowrap' }}>Stock</th>
                     <th style={{ width: 50 }}></th>
                   </tr>
                 </thead>
@@ -334,7 +355,7 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
             </div>
           )}
           <p style={{ fontSize: '0.75rem', color: '#aaa', marginTop: '0.75rem' }}>
-            Klik nilai untuk mengedit langsung.
+            Click a value to edit inline.
           </p>
         </>
       )}
@@ -342,17 +363,17 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
       {tab === 'log' && (
         <div className="admin-table-wrap">
           {logs.length === 0 ? (
-            <div className="admin-empty">Belum ada riwayat perubahan stok.</div>
+            <div className="admin-empty">No stock change history yet.</div>
           ) : (
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th>Waktu</th><th>Produk</th>
-                  <th style={{ width: 70 }}>Ukuran</th>
-                  <th style={{ width: 90 }}>Tipe</th>
-                  <th style={{ width: 100 }}>Perubahan</th>
-                  <th style={{ width: 100 }}>Stok Akhir</th>
-                  <th>Keterangan</th>
+                  <th>Time</th><th>Product</th>
+                  <th style={{ width: 70 }}>Size</th>
+                  <th style={{ width: 90 }}>Type</th>
+                  <th style={{ width: 100 }}>Change</th>
+                  <th style={{ width: 100 }}>Stock After</th>
+                  <th>Note</th>
                   <th style={{ width: 110 }}>Admin</th>
                 </tr>
               </thead>
@@ -383,8 +404,8 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
       <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         onClick={e => { if (e.target === e.currentTarget) setCopyPopover(null) }}>
         <div className="admin-form-card" style={{ width: 280, padding: '1.25rem', margin: 0 }}>
-          <p style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: 4 }}>Copy harga &amp; stok dari <strong>{copyPopover.fromSize}</strong></p>
-          <p style={{ fontSize: '0.78rem', color: '#999', marginBottom: 12 }}>Pilih ukuran tujuan:</p>
+          <p style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: 4 }}>Copy price &amp; stock from <strong>{copyPopover.fromSize}</strong></p>
+          <p style={{ fontSize: '0.78rem', color: '#999', marginBottom: 12 }}>Select target sizes:</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
             {copyPopover.allSizes.map(s => (
               <label key={s} style={{ display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer', fontSize: '0.85rem' }}>
@@ -397,9 +418,9 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="btn-admin-primary" style={{ flex: 1 }}
               onClick={handleCopyConfirm} disabled={copyPending || copyTargets.length === 0}>
-              {copyPending ? 'Menyalin...' : 'Apply'}
+              {copyPending ? 'Copying...' : 'Apply'}
             </button>
-            <button className="btn-admin-secondary" onClick={() => setCopyPopover(null)} disabled={copyPending}>Batal</button>
+            <button className="btn-admin-secondary" onClick={() => setCopyPopover(null)} disabled={copyPending}>Cancel</button>
           </div>
         </div>
       </div>

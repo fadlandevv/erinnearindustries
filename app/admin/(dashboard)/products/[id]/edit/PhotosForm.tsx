@@ -22,7 +22,7 @@ export default function PhotosForm({ productId, image, images }: Props) {
   useEffect(() => {
     if (!state) return
     if (state.ok) {
-      toast('Foto produk berhasil disimpan')
+      toast('Product photos saved successfully')
       router.refresh()
     } else if (state.error) {
       toast(state.error, 'error')
@@ -32,10 +32,10 @@ export default function PhotosForm({ productId, image, images }: Props) {
   return (
     <div className="admin-form-card" style={{ marginTop: '1.25rem' }}>
       <form action={action} encType="multipart/form-data">
-        <p className="admin-form-section-title">Foto Produk</p>
-        <p className="admin-form-hint" style={{ marginBottom: '0.75rem' }}>Foto pertama jadi foto utama produk</p>
+        <p className="admin-form-section-title">Product Photos</p>
+        <p className="admin-form-hint" style={{ marginBottom: '0.75rem' }}>The first photo becomes the main product photo</p>
         <div className="admin-photos-5col">
-          <ImageUploadField name="image" label="1 — Utama" current={image} />
+          <ImageUploadField name="image" label="1 — Main" current={image} />
           {[0, 1, 2, 3].map(i => (
             <ImageUploadField
               key={i}
@@ -48,7 +48,7 @@ export default function PhotosForm({ productId, image, images }: Props) {
         <div className="admin-form-divider" />
         <div className="admin-form-actions">
           <button type="submit" className="btn-admin-primary" disabled={isPending}>
-            {isPending ? 'Menyimpan...' : 'Simpan Foto'}
+            {isPending ? 'Saving...' : 'Save Photos'}
           </button>
         </div>
       </form>

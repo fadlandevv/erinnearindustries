@@ -25,7 +25,7 @@ export default function InfoForm({ product, sizechartData }: Props) {
   useEffect(() => {
     if (!state) return
     if (state.ok) {
-      toast('Informasi produk berhasil disimpan')
+      toast('Product information saved successfully')
       router.push('/admin/products')
     } else if (state.error) {
       toast(state.error, 'error')
@@ -35,10 +35,10 @@ export default function InfoForm({ product, sizechartData }: Props) {
   return (
     <div className="admin-form-card">
       <form action={action}>
-        <p className="admin-form-section-title">Informasi Produk</p>
+        <p className="admin-form-section-title">Product Information</p>
 
         <div className="admin-form-group">
-          <label htmlFor="title">Nama Produk *</label>
+          <label htmlFor="title">Product Name *</label>
           <input id="title" name="title" type="text" className="admin-form-input"
             defaultValue={product.title} required />
         </div>
@@ -51,7 +51,7 @@ export default function InfoForm({ product, sizechartData }: Props) {
         </div>
 
         <div className="admin-form-group">
-          <label>Ukuran Tersedia *</label>
+          <label>Available Sizes *</label>
           <div className="admin-size-checkboxes">
             {sizeOptions.map(size => (
               <label key={size} className="admin-size-check">
@@ -64,31 +64,31 @@ export default function InfoForm({ product, sizechartData }: Props) {
         </div>
 
         <div className="admin-form-group">
-          <label htmlFor="colors">Pilihan Warna</label>
+          <label htmlFor="colors">Color Options</label>
           <input id="colors" name="colors" type="text" className="admin-form-input"
             defaultValue={product.colors?.join(', ') ?? product.bg}
-            placeholder="cth. #0d0d0d, #f5f2ec, #1a3a5c" />
-          <p className="admin-form-hint">Hex warna dipisah koma</p>
+            placeholder="e.g. #0d0d0d, #f5f2ec, #1a3a5c" />
+          <p className="admin-form-hint">Hex colors separated by commas</p>
         </div>
 
         <div className="admin-form-group">
-          <label htmlFor="description">Deskripsi Produk *</label>
+          <label htmlFor="description">Product Description *</label>
           <textarea id="description" name="description" className="admin-form-textarea"
             defaultValue={product.description} required />
         </div>
 
         <div className="admin-form-divider" />
-        <p className="admin-form-section-title">Detail Produk</p>
+        <p className="admin-form-section-title">Product Details</p>
 
         <div className="admin-form-group">
           <label htmlFor="material">Material *</label>
           <textarea
             id="material" name="material" className="admin-form-textarea" rows={3}
             defaultValue={Array.isArray(product.material) ? product.material.join('\n') : product.material}
-            placeholder={'cth.\n100% Cotton Oxford\nBreathable & Lightweight'}
+            placeholder={'e.g.\n100% Cotton Oxford\nBreathable & Lightweight'}
             required
           />
-          <p className="admin-form-hint">Satu baris = satu poin material</p>
+          <p className="admin-form-hint">One line = one material point</p>
         </div>
 
 
@@ -98,9 +98,9 @@ export default function InfoForm({ product, sizechartData }: Props) {
             <table className="admin-sizechart-table">
               <thead>
                 <tr>
-                  <th>Ukuran</th>
-                  <th>Panjang (cm)</th>
-                  <th>Lebar (cm)</th>
+                  <th>Size</th>
+                  <th>Length (cm)</th>
+                  <th>Width (cm)</th>
                 </tr>
               </thead>
               <tbody>
@@ -119,9 +119,9 @@ export default function InfoForm({ product, sizechartData }: Props) {
         <div className="admin-form-divider" />
         <div className="admin-form-actions">
           <button type="submit" className="btn-admin-primary" disabled={isPending}>
-            {isPending ? 'Menyimpan...' : 'Simpan'}
+            {isPending ? 'Saving...' : 'Save'}
           </button>
-          <Link href="/admin/products" className="btn-admin-secondary">Batal</Link>
+          <Link href="/admin/products" className="btn-admin-secondary">Cancel</Link>
         </div>
       </form>
     </div>

@@ -23,14 +23,14 @@ export default async function EditServicePage({
           <h1 className="admin-page-title">Edit Service</h1>
           <p className="admin-page-subtitle">{service.title}</p>
         </div>
-        <Link href="/admin/services" className="btn-admin-secondary">← Kembali</Link>
+        <Link href="/admin/services" className="btn-admin-secondary">← Back</Link>
       </div>
 
       <div className="admin-form-card">
         <form action={updateAction}>
           <div className="admin-form-grid">
             <div className="admin-form-group">
-              <label htmlFor="title">Nama Layanan *</label>
+              <label htmlFor="title">Service Name *</label>
               <input id="title" name="title" type="text" className="admin-form-input"
                 defaultValue={service.title} required />
             </div>
@@ -45,35 +45,35 @@ export default async function EditServicePage({
           </div>
 
           <div className="admin-form-group">
-            <label htmlFor="desc">Deskripsi Singkat *</label>
+            <label htmlFor="desc">Short Description *</label>
             <textarea id="desc" name="desc" className="admin-form-textarea"
               defaultValue={service.desc} required />
-            <p className="admin-form-hint">Ditampilkan di kartu layanan</p>
+            <p className="admin-form-hint">Displayed on the service card</p>
           </div>
 
           <div className="admin-form-group">
-            <label htmlFor="longDesc">Deskripsi Lengkap <span style={{ color: '#aaa', fontWeight: 400 }}>(opsional)</span></label>
+            <label htmlFor="longDesc">Full Description <span style={{ color: '#aaa', fontWeight: 400 }}>(optional)</span></label>
             <textarea id="longDesc" name="longDesc" className="admin-form-textarea" rows={5}
               defaultValue={service.longDesc ?? ''} />
           </div>
 
           <div className="admin-form-group">
-            <label htmlFor="features">Yang Termasuk <span style={{ color: '#aaa', fontWeight: 400 }}>(opsional)</span></label>
+            <label htmlFor="features">What&apos;s Included <span style={{ color: '#aaa', fontWeight: 400 }}>(optional)</span></label>
             <textarea id="features" name="features" className="admin-form-textarea" rows={5}
               defaultValue={service.features?.join('\n') ?? ''} />
-            <p className="admin-form-hint">Satu item per baris</p>
+            <p className="admin-form-hint">One item per line</p>
           </div>
 
           <div className="admin-form-group">
-            <label htmlFor="tag">Badge <span style={{ color: '#aaa', fontWeight: 400 }}>(opsional)</span></label>
+            <label htmlFor="tag">Badge <span style={{ color: '#aaa', fontWeight: 400 }}>(optional)</span></label>
             <input id="tag" name="tag" type="text" className="admin-form-input"
-              defaultValue={service.tag ?? ''} placeholder="cth. Most Popular atau B2B" />
-            <p className="admin-form-hint">Kosongkan jika tidak ingin menampilkan badge</p>
+              defaultValue={service.tag ?? ''} placeholder="e.g. Most Popular or B2B" />
+            <p className="admin-form-hint">Leave blank to hide the badge</p>
           </div>
 
           <div className="admin-form-actions">
-            <button type="submit" className="btn-admin-primary">Simpan Perubahan</button>
-            <Link href="/admin/services" className="btn-admin-secondary">Batal</Link>
+            <button type="submit" className="btn-admin-primary">Save Changes</button>
+            <Link href="/admin/services" className="btn-admin-secondary">Cancel</Link>
           </div>
         </form>
       </div>

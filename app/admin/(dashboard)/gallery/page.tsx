@@ -10,7 +10,7 @@ export default async function GalleryAdminPage() {
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Gallery</h1>
-          <p className="admin-page-subtitle">Kelola 5 foto bento di homepage</p>
+          <p className="admin-page-subtitle">Manage the 5 bento photos on the homepage</p>
         </div>
       </div>
 
@@ -24,7 +24,7 @@ export default async function GalleryAdminPage() {
                   <img src={slot.image} alt={slot.label} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 ) : (
                   <div className="admin-gallery-empty">
-                    <span>Belum ada foto</span>
+                    <span>No photo yet</span>
                   </div>
                 )}
               </div>
@@ -35,7 +35,7 @@ export default async function GalleryAdminPage() {
 
               <form action={action} encType="multipart/form-data" className="admin-gallery-form">
                 <div className="admin-form-group" style={{ marginBottom: '0.75rem' }}>
-                  <label>Foto</label>
+                  <label>Photo</label>
                   <input
                     type="file"
                     name="image"
@@ -44,7 +44,7 @@ export default async function GalleryAdminPage() {
                   />
                 </div>
                 <button type="submit" className="btn-admin-primary" style={{ width: '100%', justifyContent: 'center' }}>
-                  Simpan
+                  Save
                 </button>
               </form>
             </div>

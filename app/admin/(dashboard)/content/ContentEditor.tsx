@@ -9,9 +9,9 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'home-hero', label: 'Home Hero' },
   { id: 'home-stats', label: 'Home Stats' },
   { id: 'home-sections', label: 'Home Sections' },
-  { id: 'products', label: 'Produk' },
-  { id: 'services', label: 'Layanan' },
-  { id: 'contact', label: 'Kontak' },
+  { id: 'products', label: 'Products' },
+  { id: 'services', label: 'Services' },
+  { id: 'contact', label: 'Contact' },
 ]
 
 export default function ContentEditor({ initialContent }: { initialContent: ContentData }) {
@@ -117,10 +117,10 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
           <div>
             <p className="admin-form-section-title">Home — Hero Banner</p>
             <p className="admin-form-hint" style={{ marginBottom: '1rem' }}>
-              Gunakan <code>*kata*</code> untuk miring. Gunakan baris baru untuk jeda baris di judul.
+              Use <code>*word*</code> for italic. Use a new line for line breaks in the title.
             </p>
             <BiField section="hero" field="badge" label="Badge / Pill" />
-            <BiField section="hero" field="title" label="Judul (gunakan *kata* untuk italik, Enter = baris baru)" multiline />
+            <BiField section="hero" field="title" label="Title (use *word* for italic, Enter = new line)" multiline />
             <BiField section="hero" field="sub" label="Subtitle" multiline />
           </div>
         )}
@@ -129,8 +129,8 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
         {tab === 'home-stats' && (
           <div>
             <p className="admin-form-section-title">Home — Stats Section</p>
-            <BiField section="stats" field="heading" label="Heading (Enter = baris baru)" multiline />
-            <BiField section="stats" field="desc" label="Deskripsi" multiline />
+            <BiField section="stats" field="heading" label="Heading (Enter = new line)" multiline />
+            <BiField section="stats" field="desc" label="Description" multiline />
             <div className="admin-form-section-title" style={{ marginTop: '1.5rem', fontSize: '0.8rem' }}>Stat Items</div>
             {(content.id.stats?.items ?? []).map((_, idx) => (
               <div key={idx} className="admin-card" style={{ padding: '1rem', marginBottom: '0.75rem' }}>
@@ -155,11 +155,11 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
                 </div>
                 <div className="admin-2col-grid">
                   <div className={grp}>
-                    <label>Deskripsi 🇮🇩</label>
+                    <label>Description 🇮🇩</label>
                     <textarea className={ta} rows={2} value={content.id.stats?.items?.[idx]?.desc ?? ''} onChange={e => setStatItem('id', idx, 'desc', e.target.value)} />
                   </div>
                   <div className={grp}>
-                    <label>Deskripsi 🇬🇧</label>
+                    <label>Description 🇬🇧</label>
                     <textarea className={ta} rows={2} value={content.en.stats?.items?.[idx]?.desc ?? ''} onChange={e => setStatItem('en', idx, 'desc', e.target.value)} />
                   </div>
                 </div>
@@ -173,13 +173,13 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
           <div>
             <p className="admin-form-section-title">Home — Featured Products Section</p>
             <BiField section="featuredProducts" field="badge" label="Badge" />
-            <BiField section="featuredProducts" field="title" label="Judul (Enter = baris baru)" multiline />
+            <BiField section="featuredProducts" field="title" label="Title (Enter = new line)" multiline />
 
             <div style={{ borderTop: '1px solid var(--border,#e8e4de)', margin: '1.5rem 0' }} />
 
             <p className="admin-form-section-title">Home — Services Section</p>
             <BiField section="servicesSection" field="badge" label="Badge" />
-            <BiField section="servicesSection" field="title" label="Judul (Enter = baris baru)" multiline />
+            <BiField section="servicesSection" field="title" label="Title (Enter = new line)" multiline />
             <BiField section="servicesSection" field="sub" label="Subtitle" multiline />
           </div>
         )}
@@ -187,9 +187,9 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
         {/* ── Products Page ── */}
         {tab === 'products' && (
           <div>
-            <p className="admin-form-section-title">Halaman Produk — Banner</p>
+            <p className="admin-form-section-title">Products Page — Banner</p>
             <BiField section="productPage" field="badge" label="Badge" />
-            <BiField section="productPage" field="title" label="Judul (Enter = baris baru)" multiline />
+            <BiField section="productPage" field="title" label="Title (Enter = new line)" multiline />
             <BiField section="productPage" field="sub" label="Subtitle" multiline />
           </div>
         )}
@@ -197,15 +197,15 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
         {/* ── Services Page ── */}
         {tab === 'services' && (
           <div>
-            <p className="admin-form-section-title">Halaman Layanan — Banner</p>
+            <p className="admin-form-section-title">Services Page — Banner</p>
             <BiField section="servicePage" field="badge" label="Badge" />
-            <BiField section="servicePage" field="title" label="Judul (Enter = baris baru)" multiline />
+            <BiField section="servicePage" field="title" label="Title (Enter = new line)" multiline />
             <BiField section="servicePage" field="sub" label="Subtitle" multiline />
 
             <div style={{ borderTop: '1px solid var(--border,#e8e4de)', margin: '1.5rem 0' }} />
 
             <p className="admin-form-section-title">How We Work / Process Steps</p>
-            <BiField section="servicePage" field="processTitle" label="Judul Section" />
+            <BiField section="servicePage" field="processTitle" label="Section Title" />
 
             {(content.id.servicePage?.steps ?? []).map((_, idx) => (
               <div key={idx} className="admin-card" style={{ padding: '1rem', marginBottom: '0.75rem' }}>
@@ -214,21 +214,21 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
                 </p>
                 <div className="admin-2col-grid" style={{ marginBottom: '0.75rem' }}>
                   <div className={grp}>
-                    <label>Judul 🇮🇩</label>
+                    <label>Title 🇮🇩</label>
                     <input className={inp} value={content.id.servicePage?.steps?.[idx]?.title ?? ''} onChange={e => setStepField('id', idx, 'title', e.target.value)} />
                   </div>
                   <div className={grp}>
-                    <label>Judul 🇬🇧</label>
+                    <label>Title 🇬🇧</label>
                     <input className={inp} value={content.en.servicePage?.steps?.[idx]?.title ?? ''} onChange={e => setStepField('en', idx, 'title', e.target.value)} />
                   </div>
                 </div>
                 <div className="admin-2col-grid">
                   <div className={grp}>
-                    <label>Deskripsi 🇮🇩</label>
+                    <label>Description 🇮🇩</label>
                     <textarea className={ta} rows={2} value={content.id.servicePage?.steps?.[idx]?.desc ?? ''} onChange={e => setStepField('id', idx, 'desc', e.target.value)} />
                   </div>
                   <div className={grp}>
-                    <label>Deskripsi 🇬🇧</label>
+                    <label>Description 🇬🇧</label>
                     <textarea className={ta} rows={2} value={content.en.servicePage?.steps?.[idx]?.desc ?? ''} onChange={e => setStepField('en', idx, 'desc', e.target.value)} />
                   </div>
                 </div>
@@ -240,9 +240,9 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
         {/* ── Contact Page ── */}
         {tab === 'contact' && (
           <div>
-            <p className="admin-form-section-title">Halaman Kontak — Banner</p>
+            <p className="admin-form-section-title">Contact Page — Banner</p>
             <BiField section="contact" field="badge" label="Badge" />
-            <BiField section="contact" field="title" label="Judul (Enter = baris baru)" multiline />
+            <BiField section="contact" field="title" label="Title (Enter = new line)" multiline />
             <BiField section="contact" field="sub" label="Subtitle" multiline />
           </div>
         )}
@@ -251,11 +251,11 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
       {/* Save bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
         <button type="submit" className="btn-admin-primary" disabled={pending}>
-          {pending ? 'Menyimpan...' : 'Simpan Perubahan'}
+          {pending ? 'Saving...' : 'Save Changes'}
         </button>
         {state?.ok && (
           <span style={{ color: '#22c55e', fontWeight: 600, fontSize: '0.875rem' }}>
-            ✓ Tersimpan
+            ✓ Saved
           </span>
         )}
       </div>

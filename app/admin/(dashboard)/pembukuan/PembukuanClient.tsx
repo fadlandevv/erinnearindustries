@@ -7,7 +7,7 @@ import { PEMASUKAN_CATEGORIES, PENGELUARAN_CATEGORIES } from '@/lib/pembukuan-co
 import AdminSelect from '@/components/AdminSelect'
 import AdminDatePicker from '@/components/AdminDatePicker'
 
-type Filter = 'semua' | 'pemasukan' | 'pengeluaran'
+type Filter = 'all' | 'pemasukan' | 'pengeluaran'
 type Mode = 'monthly' | 'yearly'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']
@@ -39,7 +39,7 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
   const now = new Date()
   const currentYear = now.getFullYear()
 
-  const [filter, setFilter] = useState<Filter>('semua')
+  const [filter, setFilter] = useState<Filter>('all')
   const [formType, setFormType] = useState<'pemasukan' | 'pengeluaran'>('pemasukan')
   const [dateValue, setDateValue] = useState(
     `${year}-${String(month).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
@@ -93,7 +93,7 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
 
   // ── Monthly filtered list ──
   const displayed = useMemo(
-    () => filter === 'semua' ? entries : entries.filter(e => e.type === filter),
+    () => filter === 'all' ? entries : entries.filter(e => e.type === filter),
     [entries, filter],
   )
 
@@ -197,7 +197,7 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
 
         {mode === 'yearly' && (
           <span style={{ fontSize: '0.82rem', color: '#aaa', fontWeight: 500 }}>
-            Ringkasan per bulan — {year}
+            Monthly summary — {year}
           </span>
         )}
       </div>
@@ -205,30 +205,30 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
       {/* ── Summary cards ── */}
       <div className="admin-stats-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', marginBottom: 0 }}>
         <div className="admin-stat-card" style={{ borderTop: '3px solid #10b981' }}>
-          <div className="admin-stat-label">Total Pemasukan</div>
+          <div className="admin-stat-label">Total Income</div>
           <div style={{ color: '#10b981', fontSize: '1.4rem', fontWeight: 700, marginTop: '0.35rem' }}>
             {rpCompact(totalPemasukan)}
           </div>
           <div style={{ fontSize: '0.72rem', color: '#aaa', marginTop: '0.15rem' }}>
-            {entries.filter(e => e.type === 'pemasukan').length} transaksi
+            {entries.filter(e => e.type === 'pemasukan').length} transactions
           </div>
         </div>
         <div className="admin-stat-card" style={{ borderTop: '3px solid #ef4444' }}>
-          <div className="admin-stat-label">Total Pengeluaran</div>
+          <div className="admin-stat-label">Total Expenses</div>
           <div style={{ color: '#ef4444', fontSize: '1.4rem', fontWeight: 700, marginTop: '0.35rem' }}>
             {rpCompact(totalPengeluaran)}
           </div>
           <div style={{ fontSize: '0.72rem', color: '#aaa', marginTop: '0.15rem' }}>
-            {entries.filter(e => e.type === 'pengeluaran').length} transaksi
+            {entries.filter(e => e.type === 'pengeluaran').length} transactions
           </div>
         </div>
         <div className="admin-stat-card" style={{ borderTop: `3px solid ${saldo >= 0 ? '#f47c2f' : '#ef4444'}` }}>
-          <div className="admin-stat-label">Saldo Bersih</div>
+          <div className="admin-stat-label">Net Balance</div>
           <div style={{ color: saldo >= 0 ? '#f47c2f' : '#ef4444', fontSize: '1.4rem', fontWeight: 700, marginTop: '0.35rem' }}>
             {saldo < 0 ? '−' : ''}{rpCompact(Math.abs(saldo))}
           </div>
           <div style={{ fontSize: '0.72rem', color: '#aaa', marginTop: '0.15rem' }}>
-            {entries.length} total transaksi
+            {entries.length} total transactions
           </div>
         </div>
       </div>
@@ -237,9 +237,9 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
       {mode === 'monthly' && (
         <div>
           <div style={{ marginBottom: '0.75rem' }}>
-            <h2 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>Tambah Transaksi</h2>
+            <h2 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>Add Transaction</h2>
             <span style={{ fontSize: '0.78rem', color: '#aaa', display: 'block', marginTop: '2px' }}>
-              Catat pemasukan atau pengeluaran baru
+              Record a new income or expense
             </span>
           </div>
           <div className="admin-form-card" style={{ borderColor: '#f0ede7' }}>
@@ -250,7 +250,7 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
               <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
 
                 <div className="admin-form-group" style={{ flex: '0 0 auto', margin: 0 }}>
-                  <label>Tipe</label>
+                  <label>Type</label>
                   <div style={{ display: 'flex', gap: '0.4rem' }}>
                     {(['pemasukan', 'pengeluaran'] as const).map(t => (
                       <button
@@ -267,7 +267,7 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
                           fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', transition: 'all 0.12s',
                         }}
                       >
-                        {t === 'pemasukan' ? '↑ Pemasukan' : '↓ Pengeluaran'}
+                        {t === 'pemasukan' ? '↑ Income' : '↓ Expense'}
                       </button>
                     ))}
                   </div>
@@ -275,7 +275,7 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
                 </div>
 
                 <div className="admin-form-group" style={{ flex: '1 1 180px', margin: 0 }}>
-                  <label>Tanggal</label>
+                  <label>Date</label>
                   <AdminDatePicker
                     name="date"
                     value={dateValue}
@@ -284,7 +284,7 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
                 </div>
 
                 <div className="admin-form-group" style={{ flex: '1 1 180px', margin: 0 }}>
-                  <label>Kategori</label>
+                  <label>Category</label>
                   <AdminSelect
                     name="category"
                     value={categoryValue}
@@ -294,22 +294,22 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
                 </div>
 
                 <div className="admin-form-group" style={{ flex: '2 1 200px', margin: 0 }}>
-                  <label>Keterangan</label>
-                  <input className="admin-form-input" name="description" placeholder="cth. Pembelian kain batik 10 meter" />
+                  <label>Description</label>
+                  <input className="admin-form-input" name="description" placeholder="e.g. Purchase of 10m batik fabric" />
                 </div>
 
                 <div className="admin-form-group" style={{ flex: '1 1 150px', margin: 0 }}>
-                  <label>Jumlah (Rp)</label>
-                  <input className="admin-form-input" name="amount" type="number" min="1" placeholder="cth. 500000" required />
+                  <label>Amount (Rp)</label>
+                  <input className="admin-form-input" name="amount" type="number" min="1" placeholder="e.g. 500000" required />
                 </div>
 
                 <div className="admin-form-group" style={{ flex: '1 1 150px', margin: 0 }}>
-                  <label>Catatan <span style={{ color: '#bbb' }}>(opsional)</span></label>
-                  <input className="admin-form-input" name="note" placeholder="tambahan info" />
+                  <label>Note <span style={{ color: '#bbb' }}>(optional)</span></label>
+                  <input className="admin-form-input" name="note" placeholder="additional info" />
                 </div>
 
                 <div className="admin-form-group" style={{ flex: '0 0 auto', margin: 0 }}>
-                  <label>Diisi oleh</label>
+                  <label>Filled by</label>
                   <div className="admin-form-input" style={{
                     display: 'flex', alignItems: 'center', gap: '0.5rem',
                     background: '#f8f6f2', cursor: 'default', borderColor: '#ece9e3', width: 'auto',
@@ -327,7 +327,7 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
 
                 <div style={{ flexShrink: 0, paddingBottom: '0.05rem' }}>
                   <button type="submit" className="btn-admin-primary" disabled={pending} style={{ fontSize: '0.82rem', whiteSpace: 'nowrap' }}>
-                    {pending ? 'Menyimpan...' : '+ Simpan'}
+                    {pending ? 'Saving...' : '+ Save'}
                   </button>
                 </div>
               </div>
@@ -340,20 +340,20 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
       {mode === 'yearly' && (
         <div>
           <div style={{ marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>Ringkasan Bulanan — {year}</h2>
+            <h2 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>Monthly Summary — {year}</h2>
             <span style={{ fontSize: '0.78rem', color: '#aaa', display: 'block', marginTop: '2px' }}>
-              Klik bulan untuk lihat detail transaksi
+              Click a month to view transaction details
             </span>
           </div>
           <div className="admin-table-wrap">
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th>Bulan</th>
-                  <th style={{ color: '#059669' }}>Pemasukan</th>
-                  <th style={{ color: '#dc2626' }}>Pengeluaran</th>
-                  <th>Saldo</th>
-                  <th>Transaksi</th>
+                  <th>Month</th>
+                  <th style={{ color: '#059669' }}>Income</th>
+                  <th style={{ color: '#dc2626' }}>Expenses</th>
+                  <th>Balance</th>
+                  <th>Transactions</th>
                 </tr>
               </thead>
               <tbody>
@@ -377,7 +377,7 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
                       {row.count === 0 ? '—' : `${row.saldo >= 0 ? '+' : '−'} ${rp(Math.abs(row.saldo))}`}
                     </td>
                     <td style={{ color: '#888', fontSize: '0.82rem' }}>
-                      {row.count === 0 ? '—' : `${row.count} entri`}
+                      {row.count === 0 ? '—' : `${row.count} entries`}
                     </td>
                   </tr>
                 ))}
@@ -394,7 +394,7 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
                   <td style={{ fontWeight: 700, color: saldo >= 0 ? '#f47c2f' : '#dc2626' }}>
                     {`${saldo >= 0 ? '+' : '−'} ${rp(Math.abs(saldo))}`}
                   </td>
-                  <td style={{ color: '#888', fontSize: '0.82rem' }}>{entries.length} entri</td>
+                  <td style={{ color: '#888', fontSize: '0.82rem' }}>{entries.length} entries</td>
                 </tr>
               </tfoot>
             </table>
@@ -408,14 +408,14 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
             <div>
               <h2 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>
-                Daftar Transaksi — {MONTHS[month - 1]} {year}
+                Transactions — {MONTHS[month - 1]} {year}
               </h2>
               <span style={{ fontSize: '0.78rem', color: '#aaa', display: 'block', marginTop: '2px' }}>
-                {entries.length} entri
+                {entries.length} entries
               </span>
             </div>
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.3rem', background: '#f5f3ef', padding: '0.3rem', borderRadius: 10 }}>
-              {(['semua', 'pemasukan', 'pengeluaran'] as Filter[]).map(f => (
+              {(['all', 'pemasukan', 'pengeluaran'] as Filter[]).map(f => (
                 <button
                   key={f}
                   type="button"
@@ -428,7 +428,7 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
                     boxShadow: filter === f ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
                   }}
                 >
-                  {f === 'semua' ? 'Semua' : f === 'pemasukan' ? '↑ Pemasukan' : '↓ Pengeluaran'}
+                  {f === 'all' ? 'All' : f === 'pemasukan' ? '↑ Income' : '↓ Expense'}
                 </button>
               ))}
             </div>
@@ -438,21 +438,21 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th>Tanggal</th>
-                  <th>Tipe</th>
-                  <th>Kategori</th>
-                  <th>Keterangan</th>
-                  <th>Jumlah</th>
-                  <th>Catatan</th>
-                  <th>Diisi oleh</th>
-                  <th style={{ width: 80 }}>Aksi</th>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Note</th>
+                  <th>Filled by</th>
+                  <th style={{ width: 80 }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {displayed.length === 0 ? (
                   <tr>
                     <td colSpan={8} style={{ textAlign: 'center', color: '#bbb', padding: '2.5rem', fontSize: '0.875rem' }}>
-                      Belum ada transaksi untuk bulan ini.
+                      No transactions for this month yet.
                     </td>
                   </tr>
                 ) : displayed.map(e => (
@@ -466,7 +466,7 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
                         color: e.type === 'pemasukan' ? '#059669' : '#dc2626',
                         fontWeight: 600,
                       }}>
-                        {e.type === 'pemasukan' ? '↑ Pemasukan' : '↓ Pengeluaran'}
+                        {e.type === 'pemasukan' ? '↑ Income' : '↓ Expense'}
                       </span>
                     </td>
                     <td style={{ fontWeight: 500, fontSize: '0.85rem' }}>{e.category}</td>
@@ -496,12 +496,12 @@ export default function PembukuanClient({ entries, year, month, mode, adminName 
                         style={{ fontSize: '0.72rem', padding: '0.25rem 0.6rem' }}
                         disabled={deletingId}
                         onClick={() => {
-                          if (!confirm('Hapus transaksi ini?')) return
+                          if (!confirm('Delete this transaction?')) return
                           setDeleteTarget(e.id)
                           startDelete(() => { deletePembukuanAction(e.id).then(() => setDeleteTarget(null)) })
                         }}
                       >
-                        {deleteTarget === e.id && deletingId ? '...' : 'Hapus'}
+                        {deleteTarget === e.id && deletingId ? '...' : 'Delete'}
                       </button>
                     </td>
                   </tr>

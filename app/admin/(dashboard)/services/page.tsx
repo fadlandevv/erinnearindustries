@@ -9,10 +9,10 @@ export default async function AdminServicesPage() {
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Services</h1>
-          <p className="admin-page-subtitle">{services.length} layanan terdaftar</p>
+          <p className="admin-page-subtitle">{services.length} services registered</p>
         </div>
         <Link href="/admin/services/new" className="btn-admin-primary">
-          + Tambah Service
+          + Add Service
         </Link>
       </div>
 
@@ -21,16 +21,16 @@ export default async function AdminServicesPage() {
           <thead>
             <tr>
               <th>Icon</th>
-              <th>Nama Layanan</th>
-              <th>Deskripsi</th>
+              <th>Service Name</th>
+              <th>Description</th>
               <th>Badge</th>
-              <th>Aksi</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {services.length === 0 && (
               <tr>
-                <td colSpan={5} className="admin-empty">Belum ada layanan. Tambahkan layanan pertama.</td>
+                <td colSpan={5} className="admin-empty">No services yet. Add your first service.</td>
               </tr>
             )}
             {services.map((s) => {
@@ -53,7 +53,7 @@ export default async function AdminServicesPage() {
                         Edit
                       </Link>
                       <form action={deleteAction}>
-                        <button type="submit" className="btn-admin-danger">Hapus</button>
+                        <button type="submit" className="btn-admin-danger">Delete</button>
                       </form>
                     </div>
                   </td>

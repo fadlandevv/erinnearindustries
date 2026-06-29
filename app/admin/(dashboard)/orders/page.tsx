@@ -22,22 +22,22 @@ export default async function OrdersPage() {
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Orders</h1>
-          <p className="admin-page-subtitle">Daftar semua pesanan masuk</p>
+          <p className="admin-page-subtitle">List of all incoming orders</p>
         </div>
       </div>
 
       <div className="admin-stats-grid admin-stats-4col">
         <div className="admin-stat-card">
           <div className="admin-stat-num">{stats.total}</div>
-          <div className="admin-stat-label">Total Pesanan</div>
+          <div className="admin-stat-label">Total Orders</div>
         </div>
         <div className="admin-stat-card">
           <div className="admin-stat-num">{stats.paid}</div>
-          <div className="admin-stat-label">Dibayar</div>
+          <div className="admin-stat-label">Paid</div>
         </div>
         <div className="admin-stat-card">
           <div className="admin-stat-num">{stats.pending}</div>
-          <div className="admin-stat-label">Menunggu</div>
+          <div className="admin-stat-label">Pending</div>
         </div>
         <div className="admin-stat-card">
           <div className="admin-stat-num" style={{ fontSize: '1.25rem' }}>

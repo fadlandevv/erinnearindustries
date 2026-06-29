@@ -5,13 +5,13 @@ import type { OrderMessage } from '@/lib/order-messages'
 import { updateOrderStatusFormAction, adminSendOrderMessageAction, getOrderMessagesAction, adminMarkOrderMessagesReadAction } from '@/lib/actions'
 
 const statusLabel: Record<string, string> = {
-  pending:    'Menunggu',
-  paid:       'Dibayar',
-  processing: 'Diproses',
-  shipped:    'Dikirim',
-  delivered:  'Selesai',
-  failed:     'Gagal',
-  expired:    'Kedaluwarsa',
+  pending:    'Pending',
+  paid:       'Paid',
+  processing: 'Processing',
+  shipped:    'Shipped',
+  delivered:  'Delivered',
+  failed:     'Failed',
+  expired:    'Expired',
 }
 const statusCls: Record<string, string> = {
   pending:    'oh-badge-pending',
@@ -86,9 +86,9 @@ function AdminChatPanel({ orderId, onClose }: { orderId: string; onClose: () => 
       <div className="od-chat-bare">
         <div className="od-chat-body">
           {loading ? (
-            <p className="od-chat-empty">Memuat...</p>
+            <p className="od-chat-empty">Loading...</p>
           ) : messages.length === 0 ? (
-            <p className="od-chat-empty">Belum ada pesan untuk pesanan ini.</p>
+            <p className="od-chat-empty">No messages for this order yet.</p>
           ) : (
             messages.map(msg => (
               <div key={msg.id} className={`od-chat-msg od-chat-msg--${msg.sender}`}>
@@ -106,9 +106,9 @@ function AdminChatPanel({ orderId, onClose }: { orderId: string; onClose: () => 
 
         <form ref={formRef} action={action} className="od-chat-form">
           <input type="hidden" name="orderId" value={orderId} />
-          <input name="message" type="text" className="od-chat-input" placeholder="Balas pesan..." maxLength={500} required />
+          <input name="message" type="text" className="od-chat-input" placeholder="Reply message..." maxLength={500} required />
           <button type="submit" className="od-chat-send" disabled={isPending}>
-            {isPending ? '...' : 'Kirim'}
+            {isPending ? '...' : 'Send'}
           </button>
         </form>
       </div>
@@ -196,37 +196,37 @@ export default function OrdersClient({ orders, userMap, allMessages }: Props) {
       <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '1rem', alignItems: 'center' }}>
         <input
           type="text" value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Cari ID pesanan atau nama..."
+          placeholder="Search order ID or name..."
           className="admin-search-input" style={{ flex: '1 1 200px', minWidth: 0 }}
         />
         <select value={source} onChange={e => setSource(e.target.value as typeof source)} className="admin-select-inline">
-          <option value="all">Semua Tipe</option>
+          <option value="all">All Types</option>
           <option value="customer">Customer</option>
           <option value="reseller">Reseller</option>
         </select>
         <select value={year} onChange={e => { setYear(e.target.value); setMonth('all') }} className="admin-select-inline">
-          <option value="all">Semua Tahun</option>
+          <option value="all">All Years</option>
           {years.map(y => <option key={y} value={y}>{y}</option>)}
         </select>
         <select value={month} onChange={e => setMonth(e.target.value)} className="admin-select-inline">
-          <option value="all">Semua Bulan</option>
+          <option value="all">All Months</option>
           {months.map(m => <option key={m} value={m}>{IDX[m]}</option>)}
         </select>
         <select value={sort} onChange={e => setSort(e.target.value as 'newest' | 'oldest')} className="admin-select-inline">
-          <option value="newest">Terbaru</option>
-          <option value="oldest">Terlama</option>
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
         </select>
       </div>
 
       {isFiltering && (
         <p style={{ fontSize: '0.8rem', color: '#aaa', marginBottom: '0.75rem' }}>
-          {filtered.length} dari {orders.length} pesanan
+          {filtered.length} of {orders.length} orders
         </p>
       )}
 
       {filtered.length === 0 ? (
         <p className="admin-empty">
-          {orders.length === 0 ? 'Belum ada pesanan' : 'Tidak ada pesanan yang cocok'}
+          {orders.length === 0 ? 'No orders yet' : 'No matching orders'}
         </p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -246,7 +246,7 @@ export default function OrdersClient({ orders, userMap, allMessages }: Props) {
                     className={`oh-chat-btn${chatOpen ? ' oh-chat-btn--active' : ''}${!isOpen ? ' oh-chat-btn--muted' : ''}${unread > 0 && !chatOpen ? ' oh-chat-btn--unread' : ''}`}
                     onClick={() => toggleChat(order.id)}
                     disabled={!isOpen}
-                    aria-label="Diskusi"
+                    aria-label="Discussion"
                   >
                     {unread > 0 && !chatOpen && <span className="oh-chat-btn-badge">{unread}</span>}
                     {chatOpen ? (
@@ -315,23 +315,23 @@ export default function OrdersClient({ orders, userMap, allMessages }: Props) {
                             <div className="oh-item-visual" style={{ background: item.bg }} />
                             <div className="oh-item-info">
                               <span className="oh-item-name">{item.title}</span>
-                              <span className="oh-item-meta">Ukuran <strong>{item.size}</strong> · {item.quantity} pcs</span>
+                              <span className="oh-item-meta">Size <strong>{item.size}</strong> · {item.quantity} pcs</span>
                               {(item.customDesignDepan || item.customDesignBelakang) && (
                                 <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
                                   {item.customDesignDepan && (
                                     <a href={item.customDesignDepan} target="_blank" rel="noopener noreferrer"
                                       style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', color: '#555', border: '1px solid #e5e5e5', borderRadius: 6, padding: '2px 7px', background: '#fafafa', textDecoration: 'none' }}>
                                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                                      <img src={item.customDesignDepan} alt="desain depan" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 4 }} />
-                                      Depan ↗
+                                      <img src={item.customDesignDepan} alt="front design" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 4 }} />
+                                      Front ↗
                                     </a>
                                   )}
                                   {item.customDesignBelakang && (
                                     <a href={item.customDesignBelakang} target="_blank" rel="noopener noreferrer"
                                       style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', color: '#555', border: '1px solid #e5e5e5', borderRadius: 6, padding: '2px 7px', background: '#fafafa', textDecoration: 'none' }}>
                                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                                      <img src={item.customDesignBelakang} alt="desain belakang" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 4 }} />
-                                      Belakang ↗
+                                      <img src={item.customDesignBelakang} alt="back design" style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 4 }} />
+                                      Back ↗
                                     </a>
                                   )}
                                 </div>
@@ -346,7 +346,7 @@ export default function OrdersClient({ orders, userMap, allMessages }: Props) {
 
                       <div className="oh-card-foot">
                         <div className="oh-ship-info">
-                          <span className="oh-ship-label">Alamat Pengiriman</span>
+                          <span className="oh-ship-label">Shipping Address</span>
                           <span className="oh-ship-addr">
                             {order.customer.address}, {order.customer.city} {order.customer.postalCode}
                           </span>

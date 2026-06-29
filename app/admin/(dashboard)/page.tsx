@@ -10,10 +10,10 @@ export default async function AdminDashboard() {
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Dashboard</h1>
-          <p className="admin-page-subtitle">Selamat datang di Erinnear CMS</p>
+          <p className="admin-page-subtitle">Welcome to Erinnear CMS</p>
         </div>
         <Link href="/" target="_blank" className="btn-admin-secondary">
-          ↗ Lihat Website
+          ↗ View Website
         </Link>
       </div>
 
@@ -39,22 +39,22 @@ export default async function AdminDashboard() {
         <Link href="/admin/products" className="admin-quick-link">
           <div className="admin-quick-link-icon">◈</div>
           <h4>Manage Products</h4>
-          <p>{products.length} produk terdaftar</p>
+          <p>{products.length} products registered</p>
         </Link>
         <Link href="/admin/services" className="admin-quick-link">
           <div className="admin-quick-link-icon">✦</div>
           <h4>Manage Services</h4>
-          <p>{services.length} layanan terdaftar</p>
+          <p>{services.length} services registered</p>
         </Link>
         <Link href="/admin/products/new" className="admin-quick-link">
           <div className="admin-quick-link-icon">＋</div>
-          <h4>Tambah Product Baru</h4>
-          <p>Tambahkan produk ke katalog</p>
+          <h4>Add New Product</h4>
+          <p>Add a product to the catalog</p>
         </Link>
         <Link href="/admin/services/new" className="admin-quick-link">
           <div className="admin-quick-link-icon">＋</div>
-          <h4>Tambah Service Baru</h4>
-          <p>Tambahkan layanan baru</p>
+          <h4>Add New Service</h4>
+          <p>Add a new service</p>
         </Link>
       </div>
     </>

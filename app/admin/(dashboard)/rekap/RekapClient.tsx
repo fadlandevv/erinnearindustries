@@ -4,7 +4,7 @@ import { addManualEntryAction, deleteManualEntryAction } from '@/lib/actions'
 import type { PeriodRow, ManualEntry } from '@/lib/rekap'
 import AdminModal from '@/components/AdminModal'
 
-type Tab = 'mingguan' | 'bulanan' | 'tahunan'
+type Tab = 'weekly' | 'monthly' | 'yearly'
 
 type Props = {
   mingguan: PeriodRow[]
@@ -151,7 +151,7 @@ function EntriesModal({ entries, onClose }: { entries: ManualEntry[]; onClose: (
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function RekapClient({ mingguan, bulanan, tahunan, entries, initialTab, adminName }: Props) {
-  const [tab, setTab] = useState<Tab>(initialTab)
+  const [tab, setTab] = useState<Tab>(initialTab as Tab)
   const [state, formAction, pending] = useActionState(addManualEntryAction, {})
   const [showModal, setShowModal] = useState(false)
 
@@ -207,7 +207,7 @@ export default function RekapClient({ mingguan, bulanan, tahunan, entries, initi
 
       {/* ── Tab switcher ── */}
       <div style={{ display: 'flex', gap: '0.4rem', background: '#f5f3ef', padding: '0.3rem', borderRadius: 12, width: 'fit-content' }}>
-        {(['mingguan', 'bulanan', 'tahunan'] as Tab[]).map(t => (
+        {(['weekly', 'monthly', 'yearly'] as Tab[]).map(t => (
           <button
             key={t}
             type="button"
@@ -233,18 +233,18 @@ export default function RekapClient({ mingguan, bulanan, tahunan, entries, initi
 
       {/* ── Summary cards ── */}
       <div className="admin-stats-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
-        <SummaryCard label="Total Pemasukan" value={rpCompact(grandTotal)} accent="#f47c2f" />
+        <SummaryCard label="Total Revenue" value={rpCompact(grandTotal)} accent="#f47c2f" />
         <SummaryCard label="Web" value={rpCompact(totalWeb)} sub={`${rows.reduce((s,r)=>s+r.webOrders,0)} order`} accent="#3b82f6" />
         <SummaryCard label="Marketplace" value={rpCompact(totalMarket)} accent="#8b5cf6" />
         <SummaryCard label="Offline" value={rpCompact(totalOffline)} accent="#10b981" />
       </div>
 
       {/* ── Input Manual — only on Mingguan tab ── */}
-      {tab === 'mingguan' && <div>
+      {tab === 'weekly' && <div>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
           <div>
-            <h2 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, lineHeight: 1.2 }}>Input Manual</h2>
-            <span style={{ fontSize: '0.78rem', color: '#aaa', marginTop: '2px', display: 'block' }}>Pemasukan dari marketplace & offline</span>
+            <h2 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, lineHeight: 1.2 }}>Manual Entry</h2>
+            <span style={{ fontSize: '0.78rem', color: '#aaa', marginTop: '2px', display: 'block' }}>Income from marketplace &amp; offline</span>
           </div>
           {entries.length > 0 && (
             <button
@@ -263,12 +263,12 @@ export default function RekapClient({ mingguan, bulanan, tahunan, entries, initi
             {state.error && <div className="admin-error" style={{ marginBottom: '0.75rem' }}>{state.error}</div>}
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
               <div className="admin-form-group" style={{ flex: '1 1 130px', margin: 0 }}>
-                <label>Tanggal</label>
+                <label>Date</label>
                 <input className="admin-form-input" name="date" type="date" required
                   defaultValue={new Date().toISOString().slice(0, 10)} />
               </div>
               <div className="admin-form-group" style={{ flex: '1 1 130px', margin: 0 }}>
-                <label>Sumber</label>
+                <label>Source</label>
                 <select className="admin-form-select" name="source" required>
                   <option value="marketplace">Marketplace</option>
                   <option value="offline">Offline</option>

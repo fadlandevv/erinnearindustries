@@ -10,10 +10,10 @@ export default async function AdminProductsPage() {
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Products</h1>
-          <p className="admin-page-subtitle">{products.length} produk terdaftar</p>
+          <p className="admin-page-subtitle">{products.length} products registered</p>
         </div>
         <Link href="/admin/products/new" className="btn-admin-primary">
-          + Tambah Product
+          + Add Product
         </Link>
       </div>
       <ProductsTable products={products} />

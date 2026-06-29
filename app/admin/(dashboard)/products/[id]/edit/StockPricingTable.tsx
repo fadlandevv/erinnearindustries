@@ -42,7 +42,7 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
 
   function handleSave(size: string) {
     const quantity = parseInt(qty, 10)
-    if (isNaN(quantity) || quantity < 0) { setError('Stok tidak valid.'); return }
+    if (isNaN(quantity) || quantity < 0) { setError('Invalid stock value.'); return }
     setError('')
     startTransition(async () => {
       try {
@@ -53,10 +53,10 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
         })
         if (res?.error) { setError(res.error); toast(res.error, 'error'); return }
         setActiveSize(null)
-        toast('Stok & harga berhasil disimpan')
+        toast('Stock & price saved successfully')
         router.refresh()
       } catch {
-        const msg = 'Terjadi kesalahan. Pastikan tabel sudah dibuat di Supabase.'
+        const msg = 'An error occurred. Make sure the table exists in Supabase.'
         setError(msg)
         toast(msg, 'error')
       }
@@ -68,9 +68,9 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
   return (
     <div className="admin-form-card" style={{ marginTop: '1.25rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-        <p className="admin-form-section-title" style={{ margin: 0 }}>Stok &amp; Harga</p>
+        <p className="admin-form-section-title" style={{ margin: 0 }}>Stock &amp; Price</p>
         <span style={{ fontSize: '0.8rem', color: '#888' }}>
-          Total stok: <strong>{totalStock} pcs</strong>
+          Total stock: <strong>{totalStock} pcs</strong>
         </span>
       </div>
 
@@ -78,11 +78,11 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
         <table className="admin-table">
           <thead>
             <tr>
-              <th style={{ width: 90 }}>Ukuran</th>
-              <th style={{ width: 110 }}>Stok</th>
-              <th style={{ width: 140 }}>Harga Jual</th>
-              <th style={{ width: 140 }}>HPP</th>
-              <th style={{ width: 90 }}>Aksi</th>
+              <th style={{ width: 90 }}>Size</th>
+              <th style={{ width: 110 }}>Stock</th>
+              <th style={{ width: 140 }}>Selling Price</th>
+              <th style={{ width: 140 }}>COGS</th>
+              <th style={{ width: 90 }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -96,7 +96,7 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
                   </td>
                   <td>
                     {entry.quantity === 0
-                      ? <span className="wh-badge wh-badge-empty">Habis</span>
+                      ? <span className="wh-badge wh-badge-empty">Out of stock</span>
                       : entry.quantity <= 10
                         ? <span className="wh-badge wh-badge-low">{entry.quantity} pcs</span>
                         : <span className="wh-badge wh-badge-ok">{entry.quantity} pcs</span>}
@@ -113,7 +113,7 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
                       className={`wh-edit-btn${activeSize === entry.size ? ' active' : ''}`}
                       onClick={() => openEdit(entry)}
                     >
-                      {activeSize === entry.size ? '↑ Tutup' : 'Edit'}
+                      {activeSize === entry.size ? '↑ Close' : 'Edit'}
                     </button>
                   </td>
                 </tr>
@@ -124,7 +124,7 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
                       <div className="wh-inline-form">
                         <div className="wh-form-row-inner">
                           <div className="wh-form-group">
-                            <label>Stok (pcs)</label>
+                            <label>Stock (pcs)</label>
                             <input
                               type="number" min={0}
                               className="admin-form-input wh-num-input"
@@ -133,7 +133,7 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
                             />
                           </div>
                           <div className="wh-form-group">
-                            <label>Harga Jual (Rp)</label>
+                            <label>Selling Price (Rp)</label>
                             <input
                               type="text"
                               className="admin-form-input wh-price-input"
@@ -161,7 +161,7 @@ export default function StockPricingTable({ productId, productTitle, entries }: 
                               disabled={isPending}
                               onClick={() => handleSave(entry.size)}
                             >
-                              {isPending ? 'Menyimpan…' : 'Simpan'}
+                              {isPending ? 'Saving…' : 'Save'}
                             </button>
                           </div>
                         </div>

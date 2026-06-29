@@ -10,24 +10,24 @@ export default function NewProductPage() {
     <>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title">Tambah Product</h1>
-          <p className="admin-page-subtitle">Tambahkan produk baru ke katalog</p>
+          <h1 className="admin-page-title">Add Product</h1>
+          <p className="admin-page-subtitle">Add a new product to the catalog</p>
         </div>
-        <Link href="/admin/products" className="btn-admin-secondary">← Kembali</Link>
+        <Link href="/admin/products" className="btn-admin-secondary">← Back</Link>
       </div>
 
       <div className="admin-form-card">
         <form action={createProduct} encType="multipart/form-data">
           <div className="admin-product-layout">
 
-            {/* ── Kiri ── */}
+            {/* ── Left ── */}
             <div className="admin-product-info">
 
-              {/* Section: Informasi Produk */}
-              <p className="admin-form-section-title">Informasi Produk</p>
+              {/* Section: Product Information */}
+              <p className="admin-form-section-title">Product Information</p>
 
               <div className="admin-form-group">
-                <label htmlFor="title">Nama Produk *</label>
+                <label htmlFor="title">Product Name *</label>
                 <input id="title" name="title" type="text" className="admin-form-input"
                   placeholder="cth. Classic Oxford Shirt" required />
               </div>
@@ -40,7 +40,7 @@ export default function NewProductPage() {
               </div>
 
               <div className="admin-form-group">
-                <label>Ukuran Tersedia *</label>
+                <label>Available Sizes *</label>
                 <div className="admin-size-checkboxes">
                   {sizeOptions.map((size) => (
                     <label key={size} className="admin-size-check">
@@ -52,30 +52,30 @@ export default function NewProductPage() {
               </div>
 
               <div className="admin-form-group">
-                <label htmlFor="colors">Pilihan Warna</label>
+                <label htmlFor="colors">Color Options</label>
                 <input id="colors" name="colors" type="text" className="admin-form-input"
-                  placeholder="cth. #0d0d0d, #f5f2ec, #1a3a5c" />
-                <p className="admin-form-hint">Hex warna dipisah koma</p>
+                  placeholder="e.g. #0d0d0d, #f5f2ec, #1a3a5c" />
+                <p className="admin-form-hint">Hex colors separated by commas</p>
               </div>
 
               <div className="admin-form-group">
-                <label htmlFor="description">Deskripsi Produk *</label>
+                <label htmlFor="description">Product Description *</label>
                 <textarea id="description" name="description" className="admin-form-textarea"
-                  placeholder="Deskripsikan produk ini secara singkat..." required />
+                  placeholder="Briefly describe this product..." required />
               </div>
 
-              {/* Section: Detail Produk */}
+              {/* Section: Product Details */}
               <div className="admin-form-divider" />
-              <p className="admin-form-section-title">Detail Produk</p>
+              <p className="admin-form-section-title">Product Details</p>
 
               <div className="admin-form-group">
                 <label htmlFor="material">Material *</label>
                 <textarea
                   id="material" name="material" className="admin-form-textarea" rows={3}
-                  placeholder={"cth.\n100% Cotton Oxford\nBreathable & Lightweight"}
+                  placeholder={"e.g.\n100% Cotton Oxford\nBreathable & Lightweight"}
                   required
                 />
-                <p className="admin-form-hint">Satu baris = satu poin material</p>
+                <p className="admin-form-hint">One line = one material point</p>
               </div>
 
               <div className="admin-form-group">
@@ -83,9 +83,9 @@ export default function NewProductPage() {
                 <table className="admin-sizechart-table">
                   <thead>
                     <tr>
-                      <th>Ukuran</th>
-                      <th>Panjang (cm)</th>
-                      <th>Lebar (cm)</th>
+                      <th>Size</th>
+                      <th>Length (cm)</th>
+                      <th>Width (cm)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -101,12 +101,12 @@ export default function NewProductPage() {
               </div>
             </div>
 
-            {/* ── Kanan: Foto Produk ── */}
+            {/* ── Right: Product Photos ── */}
             <div className="admin-product-photos">
-              <p className="admin-form-section-title">Foto Produk</p>
-              <p className="admin-form-hint" style={{ marginBottom: '0.75rem' }}>Foto pertama jadi foto utama produk</p>
+              <p className="admin-form-section-title">Product Photos</p>
+              <p className="admin-form-hint" style={{ marginBottom: '0.75rem' }}>The first photo becomes the main product photo</p>
               <div className="admin-photos-5col">
-                <ImageUploadField name="image" label="1 — Utama" />
+                <ImageUploadField name="image" label="1 — Main" />
                 {[0, 1, 2, 3].map((i) => (
                   <ImageUploadField key={i} name={`detail-${i}`} label={`${i + 2}`} />
                 ))}
@@ -117,8 +117,8 @@ export default function NewProductPage() {
           {/* ── Actions ── */}
           <div className="admin-form-divider" />
           <div className="admin-form-actions">
-            <button type="submit" className="btn-admin-primary">Simpan Product</button>
-            <Link href="/admin/products" className="btn-admin-secondary">Batal</Link>
+            <button type="submit" className="btn-admin-primary">Save Product</button>
+            <Link href="/admin/products" className="btn-admin-secondary">Cancel</Link>
           </div>
         </form>
       </div>

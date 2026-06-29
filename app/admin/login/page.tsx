@@ -13,8 +13,8 @@ export default function LoginPage() {
           <span className="admin-login-logo-mark">EI</span>
           Erinnear CMS
         </div>
-        <h1>Selamat datang</h1>
-        <p>Masuk ke panel admin untuk mengelola konten website.</p>
+        <h1>Welcome</h1>
+        <p>Sign in to the admin panel to manage website content.</p>
 
         {state.error && <div className="admin-error">{state.error}</div>}
 
@@ -26,7 +26,7 @@ export default function LoginPage() {
               name="username"
               type="text"
               className="admin-form-input"
-              placeholder="Username admin"
+              placeholder="Admin username"
               autoComplete="username"
               required
             />
@@ -48,7 +48,7 @@ export default function LoginPage() {
             style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem', padding: '0.75rem' }}
             disabled={isPending}
           >
-            {isPending ? 'Memproses...' : 'Masuk →'}
+            {isPending ? 'Processing...' : 'Sign In →'}
           </button>
         </form>
       </div>
