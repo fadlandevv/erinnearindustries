@@ -1396,6 +1396,7 @@
   font-size: 12.48px; font-weight: 600; color: #555;
 }
 
+.wh-table th, .wh-table td { padding-left: 16px; padding-right: 16px; }
 .wh-table .wh-product-cell { font-weight: 600; vertical-align: top; width: 200px; max-width: 200px; }
 .wh-row-group-start td { border-top: 1.5px solid #e8e8e8 !important; }
 
