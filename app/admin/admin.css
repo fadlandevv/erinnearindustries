@@ -1164,15 +1164,16 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
-.admin-showcase-grid .admin-form-card { padding: 24px; height: 550px; overflow-y: auto; }
+.admin-showcase-grid .admin-form-card { padding: 24px; height: 450px; display: flex; flex-direction: column; }
 .admin-showcase-preview {
   position: relative;
   width: 100%;
-  aspect-ratio: 4/3;
+  flex: 1;
+  min-height: 0;
   border-radius: 12px;
   overflow: hidden;
   background: #0d0d0d;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 @media (max-width: 768px) {
   .admin-showcase-grid { grid-template-columns: 1fr; }
