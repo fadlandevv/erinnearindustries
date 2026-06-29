@@ -71,25 +71,25 @@ function EntriesModal({ entries, onClose }: { entries: ManualEntry[]; onClose: (
 
   return (
     <AdminModal
-      title="Detail Input Manual"
-      subtitle={`${entries.length} entri · Marketplace & Offline`}
+      title="Manual Entry Details"
+      subtitle={`${entries.length} entries · Marketplace & Offline`}
       onClose={onClose}
     >
       {entries.length === 0 ? (
         <p style={{ textAlign: 'center', color: '#bbb', padding: '3rem', fontSize: '0.875rem' }}>
-          Belum ada entri manual.
+          No manual entries yet.
         </p>
       ) : (
         <table className="admin-table">
           <thead>
             <tr>
-              <th>Tanggal</th>
-              <th>Sumber</th>
+              <th>Date</th>
+              <th>Source</th>
               <th>Platform</th>
-              <th>Jumlah</th>
-              <th>Catatan</th>
-              <th>Diisi oleh</th>
-              <th style={{ width: 70 }}>Aksi</th>
+              <th>Amount</th>
+              <th>Note</th>
+              <th>Filled by</th>
+              <th style={{ width: 70 }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -194,7 +194,7 @@ export default function RekapClient({ mingguan, bulanan, tahunan, entries, initi
     [bulanan, bulananYearFilter]
   )
 
-  const rows = tab === 'mingguan' ? filteredMingguan : tab === 'bulanan' ? filteredBulanan : tahunan.slice(-3)
+  const rows = tab === 'weekly' ? filteredMingguan : tab === 'monthly' ? filteredBulanan : tahunan.slice(-3)
 
   const totalWeb = rows.reduce((s, r) => s + r.web, 0)
   const totalMarket = rows.reduce((s, r) => s + r.marketplace, 0)
@@ -275,22 +275,22 @@ export default function RekapClient({ mingguan, bulanan, tahunan, entries, initi
                 </select>
               </div>
               <div className="admin-form-group" style={{ flex: '1 1 150px', margin: 0 }}>
-                <label>Platform / Tempat</label>
+                <label>Platform / Location</label>
                 <select className="admin-form-select" name="platform" required>
                   <option value="WhatsApp">WhatsApp</option>
                   <option value="Offline">Offline</option>
                 </select>
               </div>
               <div className="admin-form-group" style={{ flex: '1 1 150px', margin: 0 }}>
-                <label>Jumlah (Rp)</label>
+                <label>Amount (Rp)</label>
                 <input className="admin-form-input" name="amount" type="number" min="1" placeholder="cth. 500000" required />
               </div>
               <div className="admin-form-group" style={{ flex: '1 1 180px', margin: 0 }}>
-                <label>Catatan <span style={{ color: '#bbb' }}>(opsional)</span></label>
-                <input className="admin-form-input" name="note" placeholder="cth. Flash sale weekend" />
+                <label>Note <span style={{ color: '#bbb' }}>(optional)</span></label>
+                <input className="admin-form-input" name="note" placeholder="e.g. Weekend flash sale" />
               </div>
               <div className="admin-form-group" style={{ flex: '0 0 auto', margin: 0 }}>
-                <label>Diisi oleh</label>
+                <label>Filled by</label>
                 <div className="admin-form-input" style={{
                   display: 'flex', alignItems: 'center', gap: '0.5rem',
                   background: '#f8f6f2', color: '#888', cursor: 'default', userSelect: 'none',
@@ -309,7 +309,7 @@ export default function RekapClient({ mingguan, bulanan, tahunan, entries, initi
               <div style={{ flexShrink: 0, paddingBottom: '0.05rem' }}>
                 <button type="submit" className="btn-admin-primary" disabled={pending}
                   style={{ fontSize: '0.82rem', whiteSpace: 'nowrap' }}>
-                  {pending ? 'Menyimpan...' : '+ Simpan'}
+                  {pending ? 'Saving...' : '+ Save'}
                 </button>
               </div>
             </div>
@@ -322,11 +322,11 @@ export default function RekapClient({ mingguan, bulanan, tahunan, entries, initi
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
           <div>
             <h2 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, lineHeight: 1.2, textTransform: 'capitalize' }}>
-              Rekap {tab}
+              {tab} Recap
             </h2>
-            <span style={{ fontSize: '0.78rem', color: '#aaa', marginTop: '2px', display: 'block' }}>Semua sumber digabung per periode</span>
+            <span style={{ fontSize: '0.78rem', color: '#aaa', marginTop: '2px', display: 'block' }}>All sources combined per period</span>
           </div>
-          {tab === 'mingguan' && (
+          {tab === 'weekly' && (
             <select className="admin-select-inline" value={weekMonthFilter}
               onChange={e => setWeekMonthFilter(e.target.value)} style={{ marginLeft: 'auto' }}>
               {monthOptions.map(opt => (
@@ -334,7 +334,7 @@ export default function RekapClient({ mingguan, bulanan, tahunan, entries, initi
               ))}
             </select>
           )}
-          {tab === 'bulanan' && yearOptions.length > 1 && (
+          {tab === 'monthly' && yearOptions.length > 1 && (
             <select className="admin-select-inline" value={bulananYearFilter}
               onChange={e => setBulananYearFilter(e.target.value)} style={{ marginLeft: 'auto' }}>
               {yearOptions.map(opt => (
@@ -347,12 +347,12 @@ export default function RekapClient({ mingguan, bulanan, tahunan, entries, initi
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Periode</th>
+                <th>Period</th>
                 <th style={{ color: '#3b82f6' }}>Web</th>
                 <th style={{ color: '#8b5cf6' }}>Marketplace</th>
                 <th style={{ color: '#10b981' }}>Offline</th>
                 <th>Total</th>
-                <th style={{ width: 140 }}>Proporsi</th>
+                <th style={{ width: 140 }}>Proportion</th>
               </tr>
             </thead>
             <tbody>

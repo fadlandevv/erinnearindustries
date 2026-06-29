@@ -1453,13 +1453,21 @@
 .wh-product-name-wrap { display: flex; align-items: center; gap: 6.4px; }
 .wh-visibility-btn {
   display: flex; align-items: center; justify-content: center;
-  width: 24px; height: 24px; flex-shrink: 0;
-  background: none; border: none; cursor: pointer;
-  color: #bbb; border-radius: 5px;
-  transition: color 0.15s, background 0.15s;
+  width: 26px; height: 26px; flex-shrink: 0;
+  background: #f5f4f1; border: 1px solid #e8e5e0; border-radius: 7px;
+  cursor: pointer; color: #999;
+  transition: background 0.18s, color 0.18s, border-color 0.18s, box-shadow 0.18s, transform 0.12s;
 }
-.wh-visibility-btn:hover { color: #555; background: #f0ede8; }
-.wh-row-hidden td { background: #fafafa; }
+.wh-visibility-btn:hover {
+  background: #eceae5; color: #444; border-color: #d8d4cc;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.wh-visibility-btn:active { transform: scale(0.9); }
+.wh-chevron {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.wh-visibility-btn.collapsed .wh-chevron { transform: rotate(-90deg); }
+.wh-row-hidden td { background: #fafafa; opacity: 0.7; }
 .wh-price-edit-btn {
   font-size: 12px; padding: 1.6px 5.6px;
   border: 1px solid #d1d5db; border-radius: 4px;
