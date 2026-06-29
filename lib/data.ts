@@ -109,6 +109,7 @@ export async function saveProducts(products: Product[]): Promise<void> {
       sizes: p.sizes, sizechart: p.sizechart ?? null,
       image: p.image ?? null, images: p.images ?? null,
       price_reseller: p.priceReseller ?? null,
+      updated_at: new Date().toISOString(),
     })
     if (error) throw new Error(error.message)
   }
