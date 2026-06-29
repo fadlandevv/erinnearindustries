@@ -246,7 +246,7 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
                     <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
-                <span style={{ opacity: isHidden ? 0.45 : 1 }}>{product.title}</span>
+                <span>{product.title}</span>
                 <InlineDisplayPriceCell productId={product.id} currentPrice={product.price} />
               </div>
             ) : null}

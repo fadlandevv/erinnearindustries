@@ -29,18 +29,18 @@ export default async function MembersPage() {
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Account Member</h1>
-          <p className="admin-page-subtitle">Daftar member terdaftar</p>
+          <p className="admin-page-subtitle">List of registered members</p>
         </div>
       </div>
 
       {/* Stats */}
       <div className="admin-stats-grid" style={{ marginBottom: '1.5rem', gridTemplateColumns: 'repeat(2,1fr)' }}>
         <div className="admin-stat-card">
-          <p className="admin-stat-label">Total Member</p>
+          <p className="admin-stat-label">Total Members</p>
           <p className="admin-stat-num">{users.length}</p>
         </div>
         <div className="admin-stat-card">
-          <p className="admin-stat-label">Baru Bulan Ini</p>
+          <p className="admin-stat-label">New This Month</p>
           <p className="admin-stat-num">{newThisMonth}</p>
         </div>
       </div>
@@ -49,7 +49,7 @@ export default async function MembersPage() {
       <div className="admin-form-card">
         {users.length === 0 ? (
           <p style={{ textAlign: 'center', padding: '3rem', color: '#888' }}>
-            Belum ada member terdaftar.
+            No members registered yet.
           </p>
         ) : (
           <div style={{ overflowX: 'auto' }}>
@@ -57,11 +57,11 @@ export default async function MembersPage() {
               <thead>
                 <tr>
                   <th>No.</th>
-                  <th>Nama</th>
+                  <th>Name</th>
                   <th>Email</th>
-                  <th>Total Pesanan</th>
-                  <th>Tanggal Daftar</th>
-                  <th>Aksi</th>
+                  <th>Total Orders</th>
+                  <th>Registration Date</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -82,7 +82,7 @@ export default async function MembersPage() {
                       </td>
                       <td style={{ color: '#666', fontSize: '0.875rem' }}>{user.email}</td>
                       <td style={{ textAlign: 'center' }}>
-                        <span className="admin-badge">{orderCounts[idx]} pesanan</span>
+                        <span className="admin-badge">{orderCounts[idx]} orders</span>
                       </td>
                       <td style={{ fontSize: '0.8rem', color: '#888', whiteSpace: 'nowrap' }}>
                         {formatDateTime(user.createdAt)}

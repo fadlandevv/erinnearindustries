@@ -6,7 +6,7 @@ export default function DeleteMemberBtn({ id, name }: { id: string; name: string
   const [pending, startTransition] = useTransition()
 
   function handleDelete() {
-    if (!confirm(`Hapus akun "${name}"? Tindakan ini tidak bisa dibatalkan.`)) return
+    if (!confirm(`Delete account "${name}"? This action cannot be undone.`)) return
     startTransition(() => { deleteMemberAction(id) })
   }
 

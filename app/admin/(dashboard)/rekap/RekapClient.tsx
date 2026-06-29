@@ -133,11 +133,11 @@ function EntriesModal({ entries, onClose }: { entries: ManualEntry[]; onClose: (
                     style={{ fontSize: '0.72rem', padding: '0.25rem 0.6rem' }}
                     disabled={deletingId}
                     onClick={() => {
-                      if (!confirm('Hapus entri ini?')) return
+                      if (!confirm('Delete this entry?')) return
                       startDelete(() => { deleteManualEntryAction(e.id) })
                     }}
                   >
-                    Hapus
+                    Delete
                   </button>
                 </td>
               </tr>
@@ -283,7 +283,7 @@ export default function RekapClient({ mingguan, bulanan, tahunan, entries, initi
               </div>
               <div className="admin-form-group" style={{ flex: '1 1 150px', margin: 0 }}>
                 <label>Amount (Rp)</label>
-                <input className="admin-form-input" name="amount" type="number" min="1" placeholder="cth. 500000" required />
+                <input className="admin-form-input" name="amount" type="number" min="1" placeholder="e.g. 500000" required />
               </div>
               <div className="admin-form-group" style={{ flex: '1 1 180px', margin: 0 }}>
                 <label>Note <span style={{ color: '#bbb' }}>(optional)</span></label>
