@@ -55,35 +55,121 @@ function InlinePriceCell({ value, onSave, pending }: {
 
   if (editing) {
     return (
-      <input
-        ref={inputRef}
-        type="text"
-        className="admin-form-input"
+      <input ref={inputRef} type="text" className="admin-form-input"
         style={{ width: 110, padding: '0.3rem 0.5rem', fontSize: '0.82rem' }}
         value={input}
         onChange={e => setInput(e.target.value)}
-        onBlur={commit}
-        onKeyDown={onKeyDown}
-        autoFocus
-      />
+        onBlur={commit} onKeyDown={onKeyDown} autoFocus />
     )
   }
 
   return (
-    <span
-      onClick={startEdit}
-      title="Klik untuk edit"
-      style={{
-        cursor: 'pointer',
-        color: value ? 'inherit' : '#ccc',
-        fontWeight: value ? 600 : 400,
-        borderBottom: '1px dashed #ccc',
-        paddingBottom: 1,
-        opacity: pending ? 0.5 : 1,
-      }}
-    >
+    <span onClick={startEdit} title="Klik untuk edit"
+      style={{ cursor: 'pointer', color: value ? 'inherit' : '#ccc', fontWeight: value ? 600 : 400,
+        borderBottom: '1px dashed #ccc', paddingBottom: 1, opacity: pending ? 0.5 : 1 }}>
       {formatRp(value)}
     </span>
+  )
+}
+
+function InlineStockCell({ qty, onSave, pending }: {
+  qty: number
+  onSave: (type: 'restock' | 'keluar' | 'koreksi', amount: number) => void
+  pending: boolean
+}) {
+  const [editing, setEditing] = useState(false)
+  const [type, setType] = useState<'restock' | 'keluar' | 'koreksi'>('koreksi')
+  const [amount, setAmount] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  function startEdit() {
+    setType('koreksi')
+    setAmount(String(qty))
+    setEditing(true)
+    setTimeout(() => { inputRef.current?.select() }, 0)
+  }
+
+  function commit() {
+    const n = parseInt(amount, 10)
+    if (!isNaN(n) && n >= 0) onSave(type, n)
+    setEditing(false)
+  }
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter') commit()
+    if (e.key === 'Escape') setEditing(false)
+  }
+
+  if (editing) {
+    return (
+      <div style={{ display: 'flex', gap: 4, alignItems: 'center', flexWrap: 'wrap' }}>
+        <select className="admin-form-input" value={type}
+          style={{ padding: '0.3rem 0.4rem', fontSize: '0.75rem', width: 'auto' }}
+          onChange={e => setType(e.target.value as typeof type)}>
+          <option value="koreksi">Set</option>
+          <option value="restock">+ Masuk</option>
+          <option value="keluar">− Keluar</option>
+        </select>
+        <input ref={inputRef} type="number" min={0} className="admin-form-input"
+          style={{ width: 64, padding: '0.3rem 0.5rem', fontSize: '0.82rem' }}
+          value={amount} onChange={e => setAmount(e.target.value)}
+          onBlur={commit} onKeyDown={onKeyDown} autoFocus />
+      </div>
+    )
+  }
+
+  const badgeClass = qty === 0 ? 'wh-badge-empty' : qty <= 10 ? 'wh-badge-low' : 'wh-badge-ok'
+  return (
+    <span className={`wh-badge ${badgeClass}`} onClick={startEdit} title="Klik untuk edit"
+      style={{ cursor: 'pointer', borderBottom: '1px dashed #ccc', opacity: pending ? 0.5 : 1 }}>
+      {qty === 0 ? 'Habis' : `${qty} pcs`}
+    </span>
+  )
+}
+
+function InlineDisplayPriceCell({ productId, currentPrice }: { productId: string; currentPrice: string }) {
+  const router = useRouter()
+  const [editing, setEditing] = useState(false)
+  const [input, setInput] = useState('')
+  const [pending, startTransition] = useTransition()
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  function startEdit() {
+    setInput(currentPrice === '—' ? '' : currentPrice)
+    setEditing(true)
+    setTimeout(() => inputRef.current?.select(), 0)
+  }
+
+  function commit() {
+    const val = input.trim()
+    setEditing(false)
+    if (val && val !== currentPrice) {
+      startTransition(async () => {
+        await updateProductPriceAction(productId, val)
+        router.refresh()
+      })
+    }
+  }
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter') commit()
+    if (e.key === 'Escape') setEditing(false)
+  }
+
+  if (editing) {
+    return (
+      <input ref={inputRef} type="text" className="admin-form-input"
+        style={{ width: '100%', padding: '0.25rem 0.4rem', fontSize: '0.82rem', marginTop: 4 }}
+        value={input} onChange={e => setInput(e.target.value)}
+        onBlur={commit} onKeyDown={onKeyDown} autoFocus placeholder="cth. Rp 150.000" />
+    )
+  }
+
+  return (
+    <button className={`wh-price-edit-btn${pending ? ' active' : ''}`}
+      onClick={startEdit} title="Edit harga tampilan website" style={{ opacity: pending ? 0.5 : 1 }}>
+      {pending ? '…' : '✎'}
+    </button>
   )
 }
 
@@ -91,23 +177,8 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
   const router = useRouter()
   const [tab, setTab] = useState<'stock' | 'log'>('stock')
   const [search, setSearch] = useState('')
-
-  // stock edit state
-  const [activeStockKey, setActiveStockKey] = useState<string | null>(null)
-  const [formType, setFormType] = useState<'restock' | 'keluar' | 'koreksi'>('restock')
-  const [formAmount, setFormAmount] = useState('')
-  const [formNote, setFormNote] = useState('')
-  const [stockError, setStockError] = useState('')
-  const [stockPending, startStockTransition] = useTransition()
-
-  // inline price save pending (per key)
   const [savingKey, setSavingKey] = useState<string | null>(null)
-
-  // display price edit
-  const [activeDisplayPriceId, setActiveDisplayPriceId] = useState<string | null>(null)
-  const [displayPriceInput, setDisplayPriceInput] = useState('')
-  const [displayPriceError, setDisplayPriceError] = useState('')
-  const [displayPricePending, startDisplayPriceTransition] = useTransition()
+  const [stockSavingKey, setStockSavingKey] = useState<string | null>(null)
 
   const totalItems = Object.values(stockMap).reduce((a, b) => a + b, 0)
   const outOfStock = products.reduce((acc, p) => {
@@ -120,91 +191,42 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
     (p.tag ?? '').toLowerCase().includes(search.toLowerCase())
   )
 
-  function openStockEdit(key: string) {
-    if (activeStockKey === key) { setActiveStockKey(null); return }
-    setActiveStockKey(key)
-    setActiveDisplayPriceId(null)
-    setFormType('restock')
-    setFormAmount('')
-    setFormNote('')
-    setStockError('')
-  }
-
-  function openDisplayPriceEdit(productId: string, currentPrice: string) {
-    if (activeDisplayPriceId === productId) { setActiveDisplayPriceId(null); return }
-    setActiveDisplayPriceId(productId)
-    setActiveStockKey(null)
-    setDisplayPriceInput(currentPrice === '—' ? '' : currentPrice)
-    setDisplayPriceError('')
-  }
-
   function handlePriceSave(productId: string, productTitle: string, size: string, field: 'harga' | 'hpp', newVal: number | null) {
     const key = `${productId}:${size}`
     const entry = priceMap[key]
-    const currentHarga = field === 'harga' ? newVal : (entry?.harga ?? null)
-    const currentHpp   = field === 'hpp'   ? newVal : (entry?.hpp   ?? null)
-    const currentQty = stockMap[key] ?? 0
+    const harga = field === 'harga' ? newVal : (entry?.harga ?? null)
+    const hpp   = field === 'hpp'   ? newVal : (entry?.hpp   ?? null)
     setSavingKey(key)
-    upsertSizeEntryAction({ productId, productTitle, size, quantity: currentQty, harga: currentHarga, hpp: currentHpp })
+    upsertSizeEntryAction({ productId, productTitle, size, quantity: stockMap[key] ?? 0, harga, hpp })
       .then(() => router.refresh())
       .finally(() => setSavingKey(null))
   }
 
-  function handleStockSave(productId: string, productTitle: string, size: string) {
-    const qty = parseInt(formAmount)
-    if (!qty || qty <= 0) { setStockError('Masukkan jumlah yang valid.'); return }
-    setStockError('')
-    startStockTransition(async () => {
-      const res = await adjustStockAction({ productId, productTitle, size, type: formType, amount: qty, note: formNote })
-      if (res?.error) { setStockError(res.error); return }
-      setActiveStockKey(null)
-      router.refresh()
-    })
-  }
-
-  function handleDisplayPriceSave(productId: string) {
-    const val = displayPriceInput.trim()
-    if (!val) { setDisplayPriceError('Harga tidak boleh kosong.'); return }
-    setDisplayPriceError('')
-    startDisplayPriceTransition(async () => {
-      const res = await updateProductPriceAction(productId, val)
-      if (res?.error) { setDisplayPriceError(res.error); return }
-      setActiveDisplayPriceId(null)
-      router.refresh()
-    })
-  }
-
-  function StockBadge({ qty, onClick }: { qty: number; onClick: () => void }) {
-    const base: React.CSSProperties = { cursor: 'pointer', borderBottom: '1px dashed #ccc', paddingBottom: 1 }
-    if (qty === 0) return <span className="wh-badge wh-badge-empty" style={base} onClick={onClick}>Habis</span>
-    if (qty <= 10) return <span className="wh-badge wh-badge-low" style={base} onClick={onClick}>{qty} pcs</span>
-    return <span className="wh-badge wh-badge-ok" style={base} onClick={onClick}>{qty} pcs</span>
+  function handleStockSave(productId: string, productTitle: string, size: string, type: 'restock' | 'keluar' | 'koreksi', amount: number) {
+    const key = `${productId}:${size}`
+    setStockSavingKey(key)
+    adjustStockAction({ productId, productTitle, size, type, amount, note: '' })
+      .then(() => router.refresh())
+      .finally(() => setStockSavingKey(null))
   }
 
   const rows = filtered.flatMap(product => {
     const sizes = product.sizes?.length ? product.sizes : ['-']
-    return sizes.flatMap((size, sizeIdx) => {
+    return sizes.map((size, sizeIdx) => {
       const key = `${product.id}:${size}`
       const qty = stockMap[key] ?? 0
       const entry = priceMap[key]
       const harga = entry?.harga ?? null
       const hpp = entry?.hpp ?? null
       const reseller = harga ? Math.round(harga * 0.85) : null
-      const isSaving = savingKey === key
 
-      const result = [
+      return (
         <tr key={key} className={`wh-row${sizeIdx === 0 ? ' wh-row-group-start' : ''}`}>
           <td className="wh-product-cell">
             {sizeIdx === 0 ? (
               <div className="wh-product-name-wrap">
                 <span>{product.title}</span>
-                <button
-                  className={`wh-price-edit-btn${activeDisplayPriceId === product.id ? ' active' : ''}`}
-                  onClick={() => openDisplayPriceEdit(product.id, product.price)}
-                  title="Edit harga tampilan website"
-                >
-                  {activeDisplayPriceId === product.id ? '↑' : '✎'}
-                </button>
+                <InlineDisplayPriceCell productId={product.id} currentPrice={product.price} />
               </div>
             ) : null}
           </td>
@@ -214,109 +236,22 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
               : <span style={{ color: '#aaa', fontSize: '0.8rem' }}>—</span>}
           </td>
           <td>
-            <InlinePriceCell
-              value={harga}
-              pending={isSaving}
-              onSave={v => handlePriceSave(product.id, product.title, size, 'harga', v)}
-            />
+            <InlinePriceCell value={harga} pending={savingKey === key}
+              onSave={v => handlePriceSave(product.id, product.title, size, 'harga', v)} />
           </td>
           <td>
-            <InlinePriceCell
-              value={hpp}
-              pending={isSaving}
-              onSave={v => handlePriceSave(product.id, product.title, size, 'hpp', v)}
-            />
+            <InlinePriceCell value={hpp} pending={savingKey === key}
+              onSave={v => handlePriceSave(product.id, product.title, size, 'hpp', v)} />
           </td>
           <td style={{ color: reseller ? '#16a34a' : '#ccc', fontWeight: reseller ? 600 : 400 }}>
             {formatRp(reseller)}
           </td>
           <td>
-            <StockBadge qty={qty} onClick={() => openStockEdit(key)} />
+            <InlineStockCell qty={qty} pending={stockSavingKey === key}
+              onSave={(type, amount) => handleStockSave(product.id, product.title, size, type, amount)} />
           </td>
-        </tr>,
-      ]
-
-      // Display price edit row
-      if (sizeIdx === 0 && activeDisplayPriceId === product.id) {
-        result.push(
-          <tr key={`${product.id}-display-price-form`} className="wh-form-row">
-            <td colSpan={6}>
-              <div className="wh-inline-form">
-                <p style={{ fontSize: '0.78rem', color: '#888', margin: '0 0 8px' }}>
-                  Harga tampilan di website (misal: Rp 150.000 atau Mulai Rp 150.000)
-                </p>
-                <div className="wh-form-row-inner">
-                  <div className="wh-form-group wh-form-group-grow">
-                    <label>Harga Display</label>
-                    <input type="text" className="admin-form-input"
-                      placeholder="cth. Rp 150.000"
-                      value={displayPriceInput}
-                      onChange={e => setDisplayPriceInput(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && handleDisplayPriceSave(product.id)}
-                    />
-                  </div>
-                  <div className="wh-form-group wh-form-group-btn">
-                    <label>&nbsp;</label>
-                    <button className="btn-admin-primary" style={{ whiteSpace: 'nowrap' }}
-                      disabled={displayPricePending}
-                      onClick={() => handleDisplayPriceSave(product.id)}>
-                      {displayPricePending ? 'Menyimpan…' : 'Simpan'}
-                    </button>
-                  </div>
-                </div>
-                {displayPriceError && <div className="admin-error" style={{ marginTop: '0.5rem' }}>{displayPriceError}</div>}
-              </div>
-            </td>
-          </tr>
-        )
-      }
-
-      // Stock edit row
-      if (activeStockKey === key) {
-        result.push(
-          <tr key={`${key}-stock-form`} className="wh-form-row">
-            <td colSpan={6}>
-              <div className="wh-inline-form">
-                <div className="wh-form-row-inner">
-                  <div className="wh-form-group">
-                    <label>Tipe</label>
-                    <select className="admin-form-input wh-select" value={formType}
-                      onChange={e => setFormType(e.target.value as typeof formType)}>
-                      <option value="restock">Masuk (tambah stok)</option>
-                      <option value="keluar">Keluar (kurangi stok)</option>
-                      <option value="koreksi">Koreksi (set ke angka ini)</option>
-                    </select>
-                  </div>
-                  <div className="wh-form-group">
-                    <label>Jumlah (pcs)</label>
-                    <input type="number" min={1} className="admin-form-input wh-num-input"
-                      placeholder="0" value={formAmount}
-                      onChange={e => setFormAmount(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && handleStockSave(product.id, product.title, size)} />
-                  </div>
-                  <div className="wh-form-group wh-form-group-grow">
-                    <label>Keterangan (opsional)</label>
-                    <input type="text" className="admin-form-input"
-                      placeholder="cth. restock batch Maret" value={formNote}
-                      onChange={e => setFormNote(e.target.value)} />
-                  </div>
-                  <div className="wh-form-group wh-form-group-btn">
-                    <label>&nbsp;</label>
-                    <button className="btn-admin-primary" style={{ whiteSpace: 'nowrap' }}
-                      disabled={stockPending}
-                      onClick={() => handleStockSave(product.id, product.title, size)}>
-                      {stockPending ? 'Menyimpan…' : 'Simpan'}
-                    </button>
-                  </div>
-                </div>
-                {stockError && <div className="admin-error" style={{ marginTop: '0.5rem' }}>{stockError}</div>}
-              </div>
-            </td>
-          </tr>
-        )
-      }
-
-      return result
+        </tr>
+      )
     })
   })
 
@@ -357,7 +292,6 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
               placeholder="Cari nama produk atau tag..."
               value={search} onChange={e => setSearch(e.target.value)} />
           </div>
-
           {filtered.length === 0 ? (
             <div className="admin-empty">Tidak ada produk ditemukan.</div>
           ) : (
@@ -370,7 +304,7 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
                     <th style={{ width: 130 }}>Harga Jual</th>
                     <th style={{ width: 120 }}>HPP</th>
                     <th style={{ width: 130 }}>H. Reseller</th>
-                    <th style={{ width: 110 }}>Stok</th>
+                    <th style={{ width: 130 }}>Stok</th>
                   </tr>
                 </thead>
                 <tbody>{rows}</tbody>
@@ -378,7 +312,7 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
             </div>
           )}
           <p style={{ fontSize: '0.75rem', color: '#aaa', marginTop: '0.75rem' }}>
-            Klik nilai Harga Jual / HPP / Stok untuk mengedit langsung.
+            Klik nilai untuk mengedit langsung.
           </p>
         </>
       )}
@@ -391,8 +325,7 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th>Waktu</th>
-                  <th>Produk</th>
+                  <th>Waktu</th><th>Produk</th>
                   <th style={{ width: 70 }}>Ukuran</th>
                   <th style={{ width: 90 }}>Tipe</th>
                   <th style={{ width: 100 }}>Perubahan</th>
