@@ -25,7 +25,6 @@ export default async function AdminProductsPage() {
               <th>Warna</th>
               <th>Nama Produk</th>
               <th>Tag</th>
-              <th>Harga</th>
               <th>Diperbarui</th>
               <th>Aksi</th>
             </tr>
@@ -33,7 +32,7 @@ export default async function AdminProductsPage() {
           <tbody>
             {products.length === 0 && (
               <tr>
-                <td colSpan={6} className="admin-empty">Belum ada produk. Tambahkan produk pertama.</td>
+                <td colSpan={5} className="admin-empty">Belum ada produk. Tambahkan produk pertama.</td>
               </tr>
             )}
             {products.map((p) => {
@@ -50,7 +49,6 @@ export default async function AdminProductsPage() {
                   </td>
                   <td style={{ fontWeight: 500 }}>{p.title}</td>
                   <td><span className="admin-badge">{p.tag}</span></td>
-                  <td>{p.price}</td>
                   <td>
                     {p.updatedAt
                       ? <RelativeTime iso={p.updatedAt} />
