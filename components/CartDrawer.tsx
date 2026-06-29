@@ -43,8 +43,8 @@ export default function CartDrawer() {
             </div>
           ) : (
             <ul className="cart-list">
-              {items.map((item) => (
-                <li key={`${item.product.id}-${item.size}`} className="cart-item">
+              {items.map((item, i) => (
+                <li key={`${item.product.id}-${item.size}-${i}`} className="cart-item">
                   {item.customSpec ? (
                     <div
                       className="cart-item-visual cart-item-visual--custom"
