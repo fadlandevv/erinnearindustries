@@ -1429,7 +1429,7 @@
   border: 1px solid #e5e5e5;
   background: #fafafa;
   font-size: 0.85rem;
-  min-width: 90px;
+  white-space: nowrap;
   transition: background 0.12s;
 }
 .wh-inline-val:hover { background: #f0ede8; }

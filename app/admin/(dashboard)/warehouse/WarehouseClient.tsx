@@ -302,10 +302,10 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
                   <tr>
                     <th>Produk</th>
                     <th style={{ width: 70 }}>Ukuran</th>
-                    <th style={{ width: 130 }}>Harga Jual</th>
-                    <th style={{ width: 120 }}>HPP</th>
-                    <th style={{ width: 130 }}>H. Reseller</th>
-                    <th style={{ width: 130 }}>Stok</th>
+                    <th style={{ whiteSpace: 'nowrap' }}>Harga Jual</th>
+                    <th style={{ whiteSpace: 'nowrap' }}>HPP</th>
+                    <th style={{ whiteSpace: 'nowrap' }}>H. Reseller</th>
+                    <th style={{ whiteSpace: 'nowrap' }}>Stok</th>
                     <th style={{ width: 32 }}></th>
                   </tr>
                 </thead>
