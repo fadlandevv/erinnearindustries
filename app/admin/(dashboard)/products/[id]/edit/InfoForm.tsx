@@ -92,16 +92,17 @@ export default function InfoForm({ product, sizechartData }: Props) {
         </div>
 
         <div className="admin-form-group">
-          <label>Harga Reseller (Rp)</label>
-          <input
-            name="price_reseller"
-            type="number"
-            min={0}
-            className="admin-form-input"
-            defaultValue={product.priceReseller ?? ''}
-            placeholder="cth. 85000"
-          />
-          <p className="admin-form-hint">Harga khusus untuk reseller (kosongkan jika belum diset)</p>
+          <label>Harga Reseller</label>
+          <div className="admin-form-input" style={{ background: '#f5f4f1', color: '#888', cursor: 'default', userSelect: 'none' }}>
+            {(() => {
+              const normal = parseInt(product.price.replace(/[^\d]/g, '')) || 0
+              const reseller = normal > 0 ? Math.round(normal * 0.85) : 0
+              return reseller > 0
+                ? `Rp ${reseller.toLocaleString('id-ID')} (85% dari harga normal)`
+                : 'Otomatis dihitung saat simpan'
+            })()}
+          </div>
+          <p className="admin-form-hint">Dihitung otomatis 15% lebih murah dari harga normal</p>
         </div>
 
         <div className="admin-form-group">

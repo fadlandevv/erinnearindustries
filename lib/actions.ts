@@ -842,7 +842,9 @@ export async function updateProductPriceAction(
   const jar = await cookies()
   if (!jar.get('admin-token')) return { error: 'Unauthorized' }
   const products = await getProducts()
-  const updated = products.map(p => p.id === productId ? { ...p, price } : p)
+  const normalPrice = parseInt(price.replace(/[^\d]/g, '')) || 0
+  const priceReseller = normalPrice > 0 ? Math.round(normalPrice * 0.85) : undefined
+  const updated = products.map(p => p.id === productId ? { ...p, price, priceReseller } : p)
   await saveProducts(updated)
   revalidatePath('/product')
   revalidatePath(`/product/${productId}`)
@@ -860,10 +862,8 @@ export async function updateProductInfo(
     if (!existing) return { error: 'Produk tidak ditemukan' }
     const colorsRaw = (formData.get('colors') as string | null) ?? ''
     const colors = colorsRaw.split(',').map(c => c.trim()).filter(Boolean)
-    const priceResellerRaw = formData.get('price_reseller') as string | null
-    const priceReseller = priceResellerRaw && priceResellerRaw.trim() !== ''
-      ? parseInt(priceResellerRaw.trim(), 10) || undefined
-      : undefined
+    const normalPrice = parsePrice(existing.price)
+    const priceReseller = normalPrice > 0 ? Math.round(normalPrice * 0.85) : undefined
     const updated = products.map(p =>
       p.id === id ? {
         ...p,
