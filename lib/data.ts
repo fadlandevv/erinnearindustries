@@ -17,6 +17,7 @@ export type Product = {
   image?: string
   images?: string[]
   updatedAt?: string
+  sortOrder?: number
 }
 
 export type ServiceItem = {
@@ -83,12 +84,13 @@ function toProduct(row: Record<string, unknown>): Product {
     image: (row.image as string) ?? undefined,
     images: (row.images as string[]) ?? undefined,
     updatedAt: (row.updated_at as string) ?? undefined,
+    sortOrder: (row.sort_order as number) ?? 0,
   }
 }
 
 export const getProducts = unstable_cache(
   async (): Promise<Product[]> => {
-    const { data } = await db.from('products').select('*').order('created_at', { ascending: true })
+    const { data } = await db.from('products').select('*').order('sort_order', { ascending: true })
     return (data ?? []).map(toProduct)
   },
   ['products'],

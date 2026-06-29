@@ -170,6 +170,14 @@ export async function updateProduct(id: string, formData: FormData) {
   redirect('/admin/products?toast=Produk+berhasil+diperbarui')
 }
 
+export async function reorderProducts(orderedIds: string[]): Promise<void> {
+  for (let i = 0; i < orderedIds.length; i++) {
+    await db.from('products').update({ sort_order: i }).eq('id', orderedIds[i])
+  }
+  revalidateTag('products', {})
+  revalidatePath('/product')
+}
+
 export async function duplicateProduct(id: string) {
   const products = await getProducts()
   const source = products.find((p) => p.id === id)

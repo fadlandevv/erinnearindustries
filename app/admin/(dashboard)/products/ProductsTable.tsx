@@ -1,68 +1,70 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
-import { deleteProduct, duplicateProduct } from '@/lib/actions'
+import { useRouter } from 'next/navigation'
+import { deleteProduct, duplicateProduct, reorderProducts } from '@/lib/actions'
 import RelativeTime from '@/components/RelativeTime'
 import type { Product } from '@/lib/data'
 
-type SortKey = 'title' | 'tag' | 'updatedAt'
-type SortDir = 'asc' | 'desc'
-
 export default function ProductsTable({ products }: { products: Product[] }) {
-  const [sortKey, setSortKey] = useState<SortKey>('updatedAt')
-  const [sortDir, setSortDir] = useState<SortDir>('desc')
+  const router = useRouter()
+  const [items, setItems] = useState(products)
+  const dragIdx = useRef<number | null>(null)
+  const [saving, setSaving] = useState(false)
 
-  function toggleSort(key: SortKey) {
-    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc')
-    else { setSortKey(key); setSortDir('asc') }
+  function onDragStart(i: number) {
+    dragIdx.current = i
   }
 
-  const sorted = [...products].sort((a, b) => {
-    let av: string, bv: string
-    if (sortKey === 'updatedAt') {
-      av = a.updatedAt ?? ''
-      bv = b.updatedAt ?? ''
-    } else {
-      av = (a[sortKey] ?? '').toLowerCase()
-      bv = (b[sortKey] ?? '').toLowerCase()
-    }
-    if (av < bv) return sortDir === 'asc' ? -1 : 1
-    if (av > bv) return sortDir === 'asc' ? 1 : -1
-    return 0
-  })
+  function onDragOver(e: React.DragEvent, i: number) {
+    e.preventDefault()
+    if (dragIdx.current === null || dragIdx.current === i) return
+    const next = [...items]
+    const [moved] = next.splice(dragIdx.current, 1)
+    next.splice(i, 0, moved)
+    dragIdx.current = i
+    setItems(next)
+  }
 
-  function SortTh({ label, k }: { label: string; k: SortKey }) {
-    const active = sortKey === k
-    return (
-      <th onClick={() => toggleSort(k)} style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}>
-        {label} {active ? (sortDir === 'asc' ? '↑' : '↓') : <span style={{ opacity: 0.3 }}>↕</span>}
-      </th>
-    )
+  async function onDrop() {
+    if (saving) return
+    setSaving(true)
+    await reorderProducts(items.map(p => p.id))
+    setSaving(false)
+    router.refresh()
   }
 
   return (
     <div className="admin-table-wrap">
+      {saving && <p style={{ fontSize: '0.8rem', color: '#999', marginBottom: 8 }}>Menyimpan urutan...</p>}
       <table className="admin-table">
         <thead>
           <tr>
+            <th style={{ width: 28 }}></th>
             <th>Warna</th>
-            <SortTh label="Nama Produk" k="title" />
-            <SortTh label="Tag" k="tag" />
-            <SortTh label="Diperbarui" k="updatedAt" />
+            <th>Nama Produk</th>
+            <th>Tag</th>
+            <th>Diperbarui</th>
             <th>Aksi</th>
           </tr>
         </thead>
         <tbody>
-          {sorted.length === 0 && (
+          {items.length === 0 && (
             <tr>
-              <td colSpan={5} className="admin-empty">Belum ada produk. Tambahkan produk pertama.</td>
+              <td colSpan={6} className="admin-empty">Belum ada produk. Tambahkan produk pertama.</td>
             </tr>
           )}
-          {sorted.map((p) => {
+          {items.map((p, i) => {
             const deleteAction = deleteProduct.bind(null, p.id)
             const duplicateAction = duplicateProduct.bind(null, p.id)
             return (
-              <tr key={p.id}>
+              <tr key={p.id}
+                draggable
+                onDragStart={() => onDragStart(i)}
+                onDragOver={e => onDragOver(e, i)}
+                onDrop={onDrop}
+                style={{ cursor: 'grab' }}>
+                <td style={{ color: '#ccc', fontSize: '0.9rem', textAlign: 'center' }}>⠿</td>
                 <td>
                   <div style={{ display: 'flex', gap: '3px' }}>
                     {(p.colors ?? [p.bg]).slice(0, 3).map((c) => (
