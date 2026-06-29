@@ -66,7 +66,7 @@ function InlinePriceCell({ value, onSave, pending }: {
   return (
     <span onClick={startEdit} title="Klik untuk edit"
       style={{ cursor: 'pointer', color: value ? 'inherit' : '#ccc', fontWeight: value ? 600 : 400,
-        borderBottom: '1px dashed #ccc', paddingBottom: 1, opacity: pending ? 0.5 : 1 }}>
+        opacity: pending ? 0.5 : 1 }}>
       {formatRp(value)}
     </span>
   )
@@ -121,7 +121,7 @@ function InlineStockCell({ qty, onSave, pending }: {
   const badgeClass = qty === 0 ? 'wh-badge-empty' : qty <= 10 ? 'wh-badge-low' : 'wh-badge-ok'
   return (
     <span className={`wh-badge ${badgeClass}`} onClick={startEdit} title="Klik untuk edit"
-      style={{ cursor: 'pointer', borderBottom: '1px dashed #ccc', opacity: pending ? 0.5 : 1 }}>
+      style={{ cursor: 'pointer', opacity: pending ? 0.5 : 1 }}>
       {qty === 0 ? 'Habis' : `${qty} pcs`}
     </span>
   )
