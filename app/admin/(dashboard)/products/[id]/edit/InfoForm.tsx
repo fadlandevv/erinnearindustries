@@ -26,7 +26,7 @@ export default function InfoForm({ product, sizechartData }: Props) {
     if (!state) return
     if (state.ok) {
       toast('Informasi produk berhasil disimpan')
-      router.refresh()
+      router.push('/admin/products')
     } else if (state.error) {
       toast(state.error, 'error')
     }
