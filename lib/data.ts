@@ -90,7 +90,11 @@ function toProduct(row: Record<string, unknown>): Product {
 
 export const getProducts = unstable_cache(
   async (): Promise<Product[]> => {
-    const { data } = await db.from('products').select('*').order('sort_order', { ascending: true })
+    const { data, error } = await db.from('products').select('*').order('sort_order', { ascending: true })
+    if (error) {
+      const { data: fallback } = await db.from('products').select('*').order('created_at', { ascending: true })
+      return (fallback ?? []).map(toProduct)
+    }
     return (data ?? []).map(toProduct)
   },
   ['products'],
