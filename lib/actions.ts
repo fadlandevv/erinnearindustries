@@ -2,7 +2,7 @@
 import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { getProducts, saveProducts, getServices, saveServices, getGallery, saveGallery, getShowcase, saveShowcase, saveContent, type ContentData } from './data'
+import { getProducts, saveProducts, deleteProduct as _deleteProductFromDB, getServices, saveServices, getGallery, saveGallery, getShowcase, saveShowcase, saveContent, type ContentData } from './data'
 import { saveOrder, getOrderById, getOrdersByEmail, deleteOrder, updateOrderStatus, type OrderItem, type Order } from './orders'
 import { createSnapToken } from './midtrans'
 import { getUserByEmail, saveUser, updateUser, deleteUser, hashPassword, verifyPassword, createResetToken, validateAndConsumeResetToken } from './users'
@@ -180,8 +180,7 @@ export async function duplicateProduct(id: string) {
 }
 
 export async function deleteProduct(id: string) {
-  const products = await getProducts()
-  await saveProducts(products.filter((p) => p.id !== id))
+  await _deleteProductFromDB(id)
   revalidatePath('/product')
   redirect('/admin/products?toast=Produk+berhasil+dihapus&toastType=error')
 }
