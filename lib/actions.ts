@@ -199,7 +199,7 @@ export async function duplicateProduct(id: string) {
   redirect(`/admin/products/${newId}/edit?toast=Produk+berhasil+diduplikat`)
 }
 
-export async function copyPricingToAllSizes(productId: string, fromSize: string): Promise<{ ok: boolean; error?: string }> {
+export async function copyPricingToSizes(productId: string, fromSize: string, targetSizes: string[]): Promise<{ ok: boolean; error?: string }> {
   const { data: source } = await db
     .from('warehouse_stock')
     .select('harga,hpp,quantity')
@@ -209,14 +209,7 @@ export async function copyPricingToAllSizes(productId: string, fromSize: string)
 
   if (!source) return { ok: false, error: 'Data ukuran tidak ditemukan' }
 
-  const products = await getProducts()
-  const product = products.find(p => p.id === productId)
-  if (!product) return { ok: false, error: 'Produk tidak ditemukan' }
-
-  const sizes = product.sizes.length > 0 ? product.sizes : ['-']
-  const otherSizes = sizes.filter(s => s !== fromSize)
-
-  for (const size of otherSizes) {
+  for (const size of targetSizes) {
     const { data: existing } = await db
       .from('warehouse_stock')
       .select('id')

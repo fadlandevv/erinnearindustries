@@ -1,7 +1,7 @@
 'use client'
 import { useState, useTransition, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { adjustStockAction, updateProductPriceAction, upsertSizeEntryAction, copyPricingToAllSizes } from '@/lib/actions'
+import { adjustStockAction, updateProductPriceAction, upsertSizeEntryAction, copyPricingToSizes } from '@/lib/actions'
 import type { Product } from '@/lib/data'
 import type { StockLogEntry } from '@/lib/warehouse'
 
@@ -167,13 +167,22 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
   const [search, setSearch] = useState('')
   const [savingKey, setSavingKey] = useState<string | null>(null)
   const [stockSavingKey, setStockSavingKey] = useState<string | null>(null)
-  const [copyingKey, setCopyingKey] = useState<string | null>(null)
+  const [copyPopover, setCopyPopover] = useState<{ productId: string; fromSize: string; allSizes: string[] } | null>(null)
+  const [copyTargets, setCopyTargets] = useState<string[]>([])
+  const [copyPending, setCopyPending] = useState(false)
 
-  async function handleCopyPricing(productId: string, size: string) {
-    const key = `${productId}:${size}`
-    setCopyingKey(key)
-    await copyPricingToAllSizes(productId, size)
-    setCopyingKey(null)
+  function handleCopyClick(productId: string, fromSize: string, allSizes: string[]) {
+    const others = allSizes.filter(s => s !== fromSize)
+    setCopyPopover({ productId, fromSize, allSizes: others })
+    setCopyTargets(others)
+  }
+
+  async function handleCopyConfirm() {
+    if (!copyPopover || copyTargets.length === 0) return
+    setCopyPending(true)
+    await copyPricingToSizes(copyPopover.productId, copyPopover.fromSize, copyTargets)
+    setCopyPending(false)
+    setCopyPopover(null)
     router.refresh()
   }
 
@@ -252,10 +261,9 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
           <td>
             {product.sizes.length > 1 ? (
               <button className="btn-admin-secondary"
-                onClick={() => handleCopyPricing(product.id, size)}
-                disabled={copyingKey === `${product.id}:${size}`}
-                style={{ padding: '0.25rem', lineHeight: 1, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: copyingKey === `${product.id}:${size}` ? 0.5 : 1 }}
-                title="Copy harga & stok ke semua ukuran lain">
+                onClick={() => handleCopyClick(product.id, size, product.sizes)}
+                style={{ padding: '0.25rem', lineHeight: 1, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                title="Copy harga & stok ke ukuran lain">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
                 </svg>
@@ -268,6 +276,7 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
   })
 
   return (
+    <>
     <div className="wh-wrap">
       <div className="wh-stats">
         <div className="wh-stat-card">
@@ -368,5 +377,33 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
         </div>
       )}
     </div>
+
+    {copyPopover && (
+
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        onClick={e => { if (e.target === e.currentTarget) setCopyPopover(null) }}>
+        <div className="admin-form-card" style={{ width: 280, padding: '1.25rem', margin: 0 }}>
+          <p style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: 4 }}>Copy harga &amp; stok dari <strong>{copyPopover.fromSize}</strong></p>
+          <p style={{ fontSize: '0.78rem', color: '#999', marginBottom: 12 }}>Pilih ukuran tujuan:</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+            {copyPopover.allSizes.map(s => (
+              <label key={s} style={{ display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer', fontSize: '0.85rem' }}>
+                <input type="checkbox" checked={copyTargets.includes(s)}
+                  onChange={e => setCopyTargets(prev => e.target.checked ? [...prev, s] : prev.filter(x => x !== s))} />
+                {s}
+              </label>
+            ))}
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="btn-admin-primary" style={{ flex: 1 }}
+              onClick={handleCopyConfirm} disabled={copyPending || copyTargets.length === 0}>
+              {copyPending ? 'Menyalin...' : 'Apply'}
+            </button>
+            <button className="btn-admin-secondary" onClick={() => setCopyPopover(null)} disabled={copyPending}>Batal</button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }
