@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useAdminToast } from '@/context/AdminToastContext'
 
@@ -9,10 +9,12 @@ export default function AdminToastTrigger({ message, type = 'success' }: Props) 
   const { toast } = useAdminToast()
   const router    = useRouter()
   const pathname  = usePathname()
+  const shown     = useRef(false)
 
   useEffect(() => {
+    if (shown.current) return
+    shown.current = true
     toast(message, type)
-    // bersihkan ?toast= dari URL supaya tidak muncul lagi saat refresh
     router.replace(pathname, { scroll: false })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
