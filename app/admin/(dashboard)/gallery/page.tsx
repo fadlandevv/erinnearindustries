@@ -1,18 +1,12 @@
 import { getGallery } from '@/lib/data'
 import { updateGallerySlot } from '@/lib/actions'
-import AdminToastTrigger from '@/components/AdminToastTrigger'
-
 const slotNames = ['Slot A', 'Slot B', 'Slot C', 'Slot D', 'Slot E', 'Slot F']
 
-type SP = Promise<{ toast?: string; toastType?: string }>
-
-export default async function GalleryAdminPage({ searchParams }: { searchParams: SP }) {
-  const sp = await searchParams
+export default async function GalleryAdminPage() {
   const gallery = await getGallery()
 
   return (
     <>
-      {sp.toast && <AdminToastTrigger message={decodeURIComponent(sp.toast)} type={(sp.toastType ?? 'success') as 'success' | 'error'} />}
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Gallery</h1>

@@ -1,16 +1,10 @@
 import { getShowcase } from '@/lib/data'
 import { updateShowcaseItem } from '@/lib/actions'
-import AdminToastTrigger from '@/components/AdminToastTrigger'
-
-type SP = Promise<{ toast?: string; toastType?: string }>
-
-export default async function ShowcaseAdminPage({ searchParams }: { searchParams: SP }) {
-  const sp = await searchParams
+export default async function ShowcaseAdminPage() {
   const items = await getShowcase()
 
   return (
     <>
-      {sp.toast && <AdminToastTrigger message={decodeURIComponent(sp.toast)} type={(sp.toastType ?? 'success') as 'success' | 'error'} />}
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Showcase</h1>

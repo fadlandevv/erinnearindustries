@@ -1,5 +1,4 @@
 import { getCustomProductImages } from '@/lib/data'
-import AdminToastTrigger from '@/components/AdminToastTrigger'
 import CustomProductCard from '@/components/CustomProductCard'
 
 const PRODUCTS = [
@@ -11,20 +10,11 @@ const PRODUCTS = [
   { id: 'jersey',           name: 'Jersey',       sub: 'Sublimasi' },
 ]
 
-type SP = Promise<{ toast?: string; toastType?: string }>
-
-export default async function CustomProductsAdminPage({ searchParams }: { searchParams: SP }) {
-  const sp = await searchParams
+export default async function CustomProductsAdminPage() {
   const images = await getCustomProductImages()
 
   return (
     <>
-      {sp.toast && (
-        <AdminToastTrigger
-          message={decodeURIComponent(sp.toast)}
-          type={(sp.toastType ?? 'success') as 'success' | 'error'}
-        />
-      )}
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Custom Products</h1>

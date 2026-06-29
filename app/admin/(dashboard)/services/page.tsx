@@ -1,17 +1,11 @@
 import Link from 'next/link'
 import { getServices } from '@/lib/data'
 import { deleteService } from '@/lib/actions'
-import AdminToastTrigger from '@/components/AdminToastTrigger'
-
-type SP = Promise<{ toast?: string; toastType?: string }>
-
-export default async function AdminServicesPage({ searchParams }: { searchParams: SP }) {
-  const sp = await searchParams
+export default async function AdminServicesPage() {
   const services = await getServices()
 
   return (
     <>
-      {sp.toast && <AdminToastTrigger message={decodeURIComponent(sp.toast)} type={(sp.toastType ?? 'success') as 'success' | 'error'} />}
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Services</h1>

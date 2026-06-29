@@ -2,17 +2,12 @@ import Link from 'next/link'
 import { getProducts } from '@/lib/data'
 import { deleteProduct, duplicateProduct } from '@/lib/actions'
 import RelativeTime from '@/components/RelativeTime'
-import AdminToastTrigger from '@/components/AdminToastTrigger'
 
-type SP = Promise<{ toast?: string; toastType?: string }>
-
-export default async function AdminProductsPage({ searchParams }: { searchParams: SP }) {
-  const sp = await searchParams
+export default async function AdminProductsPage() {
   const products = await getProducts()
 
   return (
     <>
-      {sp.toast && <AdminToastTrigger message={decodeURIComponent(sp.toast)} type={(sp.toastType ?? 'success') as 'success' | 'error'} />}
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Products</h1>
