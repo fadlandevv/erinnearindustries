@@ -15,7 +15,7 @@ export default function ContentPageClient({ content, showcase }: { content: Cont
         </div>
         <button
           type="button"
-          className={preview ? 'btn-admin-danger' : 'btn-admin-secondary'}
+          className="btn-admin-secondary"
           onClick={() => setPreview(p => !p)}
           style={{ gap: '6px' }}
         >
