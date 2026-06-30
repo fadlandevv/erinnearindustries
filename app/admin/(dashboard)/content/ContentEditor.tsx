@@ -3,12 +3,10 @@ import { useState, useActionState } from 'react'
 import { saveContentAction } from '@/lib/actions'
 import type { ContentData } from '@/lib/data'
 
-type Tab = 'home-hero' | 'home-stats' | 'home-sections' | 'products' | 'services' | 'contact'
+type Tab = 'home-hero' | 'products' | 'services' | 'contact'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'home-hero', label: 'Homepage' },
-  { id: 'home-stats', label: 'Home Stats' },
-  { id: 'home-sections', label: 'Home Sections' },
   { id: 'products', label: 'Products' },
   { id: 'services', label: 'Services' },
   { id: 'contact', label: 'Contact' },
@@ -110,143 +108,134 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
         ))}
       </div>
 
-      <div className="admin-form-card">
+      {/* ── Homepage ── */}
+      {tab === 'home-hero' && (<>
+        <div className="admin-form-card">
+          <p className="admin-form-section-title">Banner</p>
+          <p className="admin-form-hint" style={{ marginBottom: '1rem' }}>
+            Use <code>*word*</code> for italic. Use a new line for line breaks in the title.
+          </p>
+          <BiField section="hero" field="badge" label="Badge / Pill" />
+          <BiField section="hero" field="title" label="Title (use *word* for italic, Enter = new line)" multiline />
+          <BiField section="hero" field="sub" label="Subtitle" multiline />
+        </div>
 
-        {/* ── Home Hero ── */}
-        {tab === 'home-hero' && (
-          <div>
-            <p className="admin-form-section-title">Banner</p>
-            <p className="admin-form-hint" style={{ marginBottom: '1rem' }}>
-              Use <code>*word*</code> for italic. Use a new line for line breaks in the title.
-            </p>
-            <BiField section="hero" field="badge" label="Badge / Pill" />
-            <BiField section="hero" field="title" label="Title (use *word* for italic, Enter = new line)" multiline />
-            <BiField section="hero" field="sub" label="Subtitle" multiline />
-          </div>
-        )}
-
-        {/* ── Home Stats ── */}
-        {tab === 'home-stats' && (
-          <div>
-            <p className="admin-form-section-title">Home — Stats Section</p>
-            <BiField section="stats" field="heading" label="Heading (Enter = new line)" multiline />
-            <BiField section="stats" field="desc" label="Description" multiline />
-            <div className="admin-form-section-title" style={{ marginTop: '1.5rem', fontSize: '0.8rem' }}>Stat Items</div>
-            {(content.id.stats?.items ?? []).map((_, idx) => (
-              <div key={idx} className="admin-card" style={{ padding: '1rem', marginBottom: '0.75rem' }}>
-                <p className="admin-form-hint" style={{ marginBottom: '0.75rem', fontWeight: 600 }}>
-                  Item #{idx + 1} — Angka: {content.id.stats?.items?.[idx]?.num}
-                </p>
-                <div className="admin-2col-grid" style={{ marginBottom: '0.75rem' }}>
-                  <div className={grp}>
-                    <label>Angka</label>
-                    <input className={inp} value={content.id.stats?.items?.[idx]?.num ?? ''} onChange={e => { setStatItem('id', idx, 'num', e.target.value); setStatItem('en', idx, 'num', e.target.value) }} />
-                  </div>
-                  <div className="admin-2col-grid" style={{ gap: '0.5rem' }}>
-                    <div className={grp}>
-                      <label>Unit 🇮🇩</label>
-                      <input className={inp} value={content.id.stats?.items?.[idx]?.unit ?? ''} onChange={e => setStatItem('id', idx, 'unit', e.target.value)} />
-                    </div>
-                    <div className={grp}>
-                      <label>Unit 🇬🇧</label>
-                      <input className={inp} value={content.en.stats?.items?.[idx]?.unit ?? ''} onChange={e => setStatItem('en', idx, 'unit', e.target.value)} />
-                    </div>
-                  </div>
+        <div className="admin-form-card" style={{ marginTop: '1rem' }}>
+          <p className="admin-form-section-title">Stats Section</p>
+          <BiField section="stats" field="heading" label="Heading (Enter = new line)" multiline />
+          <BiField section="stats" field="desc" label="Description" multiline />
+          <div className="admin-form-section-title" style={{ marginTop: '1.5rem', fontSize: '0.8rem' }}>Stat Items</div>
+          {(content.id.stats?.items ?? []).map((_, idx) => (
+            <div key={idx} className="admin-card" style={{ padding: '1rem', marginBottom: '0.75rem' }}>
+              <p className="admin-form-hint" style={{ marginBottom: '0.75rem', fontWeight: 600 }}>
+                Item #{idx + 1} — Angka: {content.id.stats?.items?.[idx]?.num}
+              </p>
+              <div className="admin-2col-grid" style={{ marginBottom: '0.75rem' }}>
+                <div className={grp}>
+                  <label>Angka</label>
+                  <input className={inp} value={content.id.stats?.items?.[idx]?.num ?? ''} onChange={e => { setStatItem('id', idx, 'num', e.target.value); setStatItem('en', idx, 'num', e.target.value) }} />
                 </div>
-                <div className="admin-2col-grid">
+                <div className="admin-2col-grid" style={{ gap: '0.5rem' }}>
                   <div className={grp}>
-                    <label>Description 🇮🇩</label>
-                    <textarea className={ta} rows={2} value={content.id.stats?.items?.[idx]?.desc ?? ''} onChange={e => setStatItem('id', idx, 'desc', e.target.value)} />
+                    <label>Unit 🇮🇩</label>
+                    <input className={inp} value={content.id.stats?.items?.[idx]?.unit ?? ''} onChange={e => setStatItem('id', idx, 'unit', e.target.value)} />
                   </div>
                   <div className={grp}>
-                    <label>Description 🇬🇧</label>
-                    <textarea className={ta} rows={2} value={content.en.stats?.items?.[idx]?.desc ?? ''} onChange={e => setStatItem('en', idx, 'desc', e.target.value)} />
+                    <label>Unit 🇬🇧</label>
+                    <input className={inp} value={content.en.stats?.items?.[idx]?.unit ?? ''} onChange={e => setStatItem('en', idx, 'unit', e.target.value)} />
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-
-        {/* ── Home Sections ── */}
-        {tab === 'home-sections' && (
-          <div>
-            <p className="admin-form-section-title">Home — Featured Products Section</p>
-            <BiField section="featuredProducts" field="badge" label="Badge" />
-            <BiField section="featuredProducts" field="title" label="Title (Enter = new line)" multiline />
-
-            <div style={{ borderTop: '1px solid var(--border,#e8e4de)', margin: '1.5rem 0' }} />
-
-            <p className="admin-form-section-title">Home — Services Section</p>
-            <BiField section="servicesSection" field="badge" label="Badge" />
-            <BiField section="servicesSection" field="title" label="Title (Enter = new line)" multiline />
-            <BiField section="servicesSection" field="sub" label="Subtitle" multiline />
-          </div>
-        )}
-
-        {/* ── Products Page ── */}
-        {tab === 'products' && (
-          <div>
-            <p className="admin-form-section-title">Products Page — Banner</p>
-            <BiField section="productPage" field="badge" label="Badge" />
-            <BiField section="productPage" field="title" label="Title (Enter = new line)" multiline />
-            <BiField section="productPage" field="sub" label="Subtitle" multiline />
-          </div>
-        )}
-
-        {/* ── Services Page ── */}
-        {tab === 'services' && (
-          <div>
-            <p className="admin-form-section-title">Services Page — Banner</p>
-            <BiField section="servicePage" field="badge" label="Badge" />
-            <BiField section="servicePage" field="title" label="Title (Enter = new line)" multiline />
-            <BiField section="servicePage" field="sub" label="Subtitle" multiline />
-
-            <div style={{ borderTop: '1px solid var(--border,#e8e4de)', margin: '1.5rem 0' }} />
-
-            <p className="admin-form-section-title">How We Work / Process Steps</p>
-            <BiField section="servicePage" field="processTitle" label="Section Title" />
-
-            {(content.id.servicePage?.steps ?? []).map((_, idx) => (
-              <div key={idx} className="admin-card" style={{ padding: '1rem', marginBottom: '0.75rem' }}>
-                <p className="admin-form-hint" style={{ fontWeight: 600, marginBottom: '0.75rem' }}>
-                  Step {content.id.servicePage?.steps?.[idx]?.num ?? idx + 1}
-                </p>
-                <div className="admin-2col-grid" style={{ marginBottom: '0.75rem' }}>
-                  <div className={grp}>
-                    <label>Title 🇮🇩</label>
-                    <input className={inp} value={content.id.servicePage?.steps?.[idx]?.title ?? ''} onChange={e => setStepField('id', idx, 'title', e.target.value)} />
-                  </div>
-                  <div className={grp}>
-                    <label>Title 🇬🇧</label>
-                    <input className={inp} value={content.en.servicePage?.steps?.[idx]?.title ?? ''} onChange={e => setStepField('en', idx, 'title', e.target.value)} />
-                  </div>
+              <div className="admin-2col-grid">
+                <div className={grp}>
+                  <label>Description 🇮🇩</label>
+                  <textarea className={ta} rows={2} value={content.id.stats?.items?.[idx]?.desc ?? ''} onChange={e => setStatItem('id', idx, 'desc', e.target.value)} />
                 </div>
-                <div className="admin-2col-grid">
-                  <div className={grp}>
-                    <label>Description 🇮🇩</label>
-                    <textarea className={ta} rows={2} value={content.id.servicePage?.steps?.[idx]?.desc ?? ''} onChange={e => setStepField('id', idx, 'desc', e.target.value)} />
-                  </div>
-                  <div className={grp}>
-                    <label>Description 🇬🇧</label>
-                    <textarea className={ta} rows={2} value={content.en.servicePage?.steps?.[idx]?.desc ?? ''} onChange={e => setStepField('en', idx, 'desc', e.target.value)} />
-                  </div>
+                <div className={grp}>
+                  <label>Description 🇬🇧</label>
+                  <textarea className={ta} rows={2} value={content.en.stats?.items?.[idx]?.desc ?? ''} onChange={e => setStatItem('en', idx, 'desc', e.target.value)} />
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
 
-        {/* ── Contact Page ── */}
-        {tab === 'contact' && (
-          <div>
-            <p className="admin-form-section-title">Contact Page — Banner</p>
-            <BiField section="contact" field="badge" label="Badge" />
-            <BiField section="contact" field="title" label="Title (Enter = new line)" multiline />
-            <BiField section="contact" field="sub" label="Subtitle" multiline />
-          </div>
-        )}
-      </div>
+        <div className="admin-form-card" style={{ marginTop: '1rem' }}>
+          <p className="admin-form-section-title">Featured Products Section</p>
+          <BiField section="featuredProducts" field="badge" label="Badge" />
+          <BiField section="featuredProducts" field="title" label="Title (Enter = new line)" multiline />
+
+          <div style={{ borderTop: '1px solid var(--border,#e8e4de)', margin: '1.5rem 0' }} />
+
+          <p className="admin-form-section-title">Services Section</p>
+          <BiField section="servicesSection" field="badge" label="Badge" />
+          <BiField section="servicesSection" field="title" label="Title (Enter = new line)" multiline />
+          <BiField section="servicesSection" field="sub" label="Subtitle" multiline />
+        </div>
+      </>)}
+
+      {/* ── Products Page ── */}
+      {tab === 'products' && (
+        <div className="admin-form-card">
+          <p className="admin-form-section-title">Products Page — Banner</p>
+          <BiField section="productPage" field="badge" label="Badge" />
+          <BiField section="productPage" field="title" label="Title (Enter = new line)" multiline />
+          <BiField section="productPage" field="sub" label="Subtitle" multiline />
+        </div>
+      )}
+
+      {/* ── Services Page ── */}
+      {tab === 'services' && (
+        <div className="admin-form-card">
+          <p className="admin-form-section-title">Services Page — Banner</p>
+          <BiField section="servicePage" field="badge" label="Badge" />
+          <BiField section="servicePage" field="title" label="Title (Enter = new line)" multiline />
+          <BiField section="servicePage" field="sub" label="Subtitle" multiline />
+
+          <div style={{ borderTop: '1px solid var(--border,#e8e4de)', margin: '1.5rem 0' }} />
+
+          <p className="admin-form-section-title">How We Work / Process Steps</p>
+          <BiField section="servicePage" field="processTitle" label="Section Title" />
+
+          {(content.id.servicePage?.steps ?? []).map((_, idx) => (
+            <div key={idx} className="admin-card" style={{ padding: '1rem', marginBottom: '0.75rem' }}>
+              <p className="admin-form-hint" style={{ fontWeight: 600, marginBottom: '0.75rem' }}>
+                Step {content.id.servicePage?.steps?.[idx]?.num ?? idx + 1}
+              </p>
+              <div className="admin-2col-grid" style={{ marginBottom: '0.75rem' }}>
+                <div className={grp}>
+                  <label>Title 🇮🇩</label>
+                  <input className={inp} value={content.id.servicePage?.steps?.[idx]?.title ?? ''} onChange={e => setStepField('id', idx, 'title', e.target.value)} />
+                </div>
+                <div className={grp}>
+                  <label>Title 🇬🇧</label>
+                  <input className={inp} value={content.en.servicePage?.steps?.[idx]?.title ?? ''} onChange={e => setStepField('en', idx, 'title', e.target.value)} />
+                </div>
+              </div>
+              <div className="admin-2col-grid">
+                <div className={grp}>
+                  <label>Description 🇮🇩</label>
+                  <textarea className={ta} rows={2} value={content.id.servicePage?.steps?.[idx]?.desc ?? ''} onChange={e => setStepField('id', idx, 'desc', e.target.value)} />
+                </div>
+                <div className={grp}>
+                  <label>Description 🇬🇧</label>
+                  <textarea className={ta} rows={2} value={content.en.servicePage?.steps?.[idx]?.desc ?? ''} onChange={e => setStepField('en', idx, 'desc', e.target.value)} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Contact Page ── */}
+      {tab === 'contact' && (
+        <div className="admin-form-card">
+          <p className="admin-form-section-title">Contact Page — Banner</p>
+          <BiField section="contact" field="badge" label="Badge" />
+          <BiField section="contact" field="title" label="Title (Enter = new line)" multiline />
+          <BiField section="contact" field="sub" label="Subtitle" multiline />
+        </div>
+      )}
 
       {/* Save bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
