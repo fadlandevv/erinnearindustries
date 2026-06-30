@@ -163,39 +163,35 @@ export default function ContentEditor({
             {initialShowcase.map((item, idx) => {
               const action = updateShowcaseItem.bind(null, item.id)
               return (
-                <form key={item.id} action={action} encType="multipart/form-data"
-                  style={{ marginBottom: idx < initialShowcase.length - 1 ? '1rem' : 0 }}>
-                  <div className="admin-card" style={{ padding: '1rem' }}>
-                    <p className="admin-form-hint" style={{ fontWeight: 600, marginBottom: '0.75rem' }}>
-                      Card {idx + 1}
-                    </p>
+                <form key={item.id} action={action} encType="multipart/form-data">
+                  {idx > 0 && divider}
+                  <p className="admin-form-section-title" style={{ marginBottom: '1rem' }}>Card {idx + 1}</p>
+                  <div className={grp}>
+                    <label>Photo</label>
+                    <input type="file" name="image" accept="image/*" className="admin-gallery-file-input" />
+                  </div>
+                  <div className={grp}>
+                    <label>Title</label>
+                    <input name="title" type="text" className={inp} defaultValue={item.title} required />
+                  </div>
+                  <div className={grp}>
+                    <label>Description</label>
+                    <textarea name="desc" className={ta} defaultValue={item.desc} required />
+                  </div>
+                  <div className="admin-2col-grid">
                     <div className={grp}>
-                      <label>Photo</label>
-                      <input type="file" name="image" accept="image/*" className="admin-gallery-file-input" />
+                      <label>Button Text</label>
+                      <input name="buttonText" type="text" className={inp} defaultValue={item.buttonText} required />
                     </div>
                     <div className={grp}>
-                      <label>Title</label>
-                      <input name="title" type="text" className={inp} defaultValue={item.title} required />
+                      <label>Button Link</label>
+                      <input name="buttonHref" type="text" className={inp} defaultValue={item.buttonHref} required placeholder="/product" />
                     </div>
-                    <div className={grp}>
-                      <label>Description</label>
-                      <textarea name="desc" className={ta} defaultValue={item.desc} required />
-                    </div>
-                    <div className="admin-2col-grid">
-                      <div className={grp}>
-                        <label>Button Text</label>
-                        <input name="buttonText" type="text" className={inp} defaultValue={item.buttonText} required />
-                      </div>
-                      <div className={grp}>
-                        <label>Button Link</label>
-                        <input name="buttonHref" type="text" className={inp} defaultValue={item.buttonHref} required placeholder="/product" />
-                      </div>
-                    </div>
-                    <div style={{ marginTop: '0.75rem' }}>
-                      <button type="submit" className="btn-admin-primary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.85rem' }}>
-                        Save Card {idx + 1}
-                      </button>
-                    </div>
+                  </div>
+                  <div style={{ marginTop: '0.75rem' }}>
+                    <button type="submit" className="btn-admin-primary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.85rem' }}>
+                      Save Card {idx + 1}
+                    </button>
                   </div>
                 </form>
               )
