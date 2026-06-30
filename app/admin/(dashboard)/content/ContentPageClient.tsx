@@ -10,8 +10,8 @@ export default function ContentPageClient({ content, showcase }: { content: Cont
     <>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title">Page Content</h1>
-          <p className="admin-page-subtitle">Edit banner text, titles, and descriptions for each page</p>
+          <h1 className="admin-page-title">Content Manager</h1>
+          <p className="admin-page-subtitle">Manage titles, descriptions, and text across all pages</p>
         </div>
         <button
           type="button"
