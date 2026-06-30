@@ -1,9 +1,9 @@
 'use client'
 import { useState } from 'react'
-import type { ContentData } from '@/lib/data'
+import type { ContentData, ShowcaseItem } from '@/lib/data'
 import ContentEditor from './ContentEditor'
 
-export default function ContentPageClient({ content }: { content: ContentData }) {
+export default function ContentPageClient({ content, showcase }: { content: ContentData; showcase: ShowcaseItem[] }) {
   const [preview, setPreview] = useState(false)
 
   return (
@@ -41,7 +41,7 @@ export default function ContentPageClient({ content }: { content: ContentData })
           minWidth: 0,
           transition: 'flex 0.4s cubic-bezier(0.4,0,0.2,1)',
         }}>
-          <ContentEditor initialContent={content} />
+          <ContentEditor initialContent={content} initialShowcase={showcase} />
         </div>
 
         {/* Preview panel — always rendered, animates in/out */}
