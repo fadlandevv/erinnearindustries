@@ -165,7 +165,7 @@ export default function ContentEditor({
               return (
                 <form key={item.id} action={action} encType="multipart/form-data">
                   {idx > 0 && divider}
-                  <p className="admin-form-section-title" style={{ marginBottom: '1rem' }}>Card {idx + 1}</p>
+                  <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>Card {idx + 1}</p>
                   <div className={grp}>
                     <label>Photo</label>
                     <input type="file" name="image" accept="image/*" className="admin-gallery-file-input" />
