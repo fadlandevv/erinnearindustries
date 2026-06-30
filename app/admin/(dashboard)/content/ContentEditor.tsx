@@ -122,8 +122,8 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
     <form action={formAction} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <input type="hidden" name="content" value={JSON.stringify(content)} />
 
-      {/* Tab bar */}
-      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+      {/* Tab bar — fixed */}
+      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', paddingBottom: '1rem', flexShrink: 0 }}>
         {TABS.map(t => (
           <button
             key={t.id}
@@ -136,6 +136,9 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
           </button>
         ))}
       </div>
+
+      {/* Scrollable cards area */}
+      <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none' }}>
 
       {/* ── Homepage ── */}
       {tab === 'home-hero' && (<>
@@ -264,8 +267,10 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
         </div>
       )}
 
-      {/* Save bar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
+      </div>{/* end scrollable */}
+
+      {/* Save bar — fixed */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingTop: '1rem', flexShrink: 0 }}>
         <button type="submit" className="btn-admin-primary" disabled={pending}>
           {pending ? 'Saving...' : 'Save Changes'}
         </button>

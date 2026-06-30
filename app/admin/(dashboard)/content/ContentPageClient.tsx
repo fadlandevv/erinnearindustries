@@ -39,8 +39,6 @@ export default function ContentPageClient({ content }: { content: ContentData })
         <div style={{
           flex: preview ? '0 0 420px' : '1',
           minWidth: 0,
-          overflowY: 'auto',
-          scrollbarWidth: 'none',
           transition: 'flex 0.4s cubic-bezier(0.4,0,0.2,1)',
         }}>
           <ContentEditor initialContent={content} />
