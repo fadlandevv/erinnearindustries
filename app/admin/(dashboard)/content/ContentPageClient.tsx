@@ -9,7 +9,7 @@ export default function ContentPageClient({ content, showcase }: { content: Cont
 
   const handleSaved = useCallback(() => {
     if (iframeRef.current) {
-      iframeRef.current.src = iframeRef.current.src
+      iframeRef.current.src = window.location.origin
     }
   }, [])
 
@@ -80,7 +80,7 @@ export default function ContentPageClient({ content, showcase }: { content: Cont
           </div>
           <iframe
             ref={iframeRef}
-            src="http://localhost:3000"
+            src={typeof window !== 'undefined' ? window.location.origin : ''}
             style={{ flex: 1, border: 'none', width: '100%', minWidth: 0 }}
             title="Website Preview"
           />
