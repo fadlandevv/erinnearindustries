@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { getGallery } from '@/lib/data'
+import GalleryHeader from './GalleryHeader'
 
 const AREAS = ['a', 'b', 'c', 'd', 'e'] as const
 
@@ -20,28 +21,29 @@ export default async function GalleryMarquee() {
   return (
     <section className="gbn-section">
       <div className="gbn-inner">
-      <div className="gbn-grid">
-        {AREAS.map((area, i) => {
-          const item = items[i % items.length]
-          return (
-            <div
-              key={area}
-              className={`gbn-item gbn-${area}`}
-              style={{ background: item?.image ? undefined : PLACEHOLDER_GRADIENTS[i] }}
-            >
-              {item?.image && (
-                <Image
-                  src={item.image}
-                  alt={item.label || ''}
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  sizes="(max-width: 400px) 50vw, 33vw"
-                />
-              )}
-            </div>
-          )
-        })}
-      </div>
+        <GalleryHeader />
+        <div className="gbn-grid">
+          {AREAS.map((area, i) => {
+            const item = items[i % items.length]
+            return (
+              <div
+                key={area}
+                className={`gbn-item gbn-${area}`}
+                style={{ background: item?.image ? undefined : PLACEHOLDER_GRADIENTS[i] }}
+              >
+                {item?.image && (
+                  <Image
+                    src={item.image}
+                    alt={item.label || ''}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    sizes="(max-width: 400px) 50vw, 33vw"
+                  />
+                )}
+              </div>
+            )
+          })}
+        </div>
       </div>
     </section>
   )

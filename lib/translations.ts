@@ -32,6 +32,10 @@ export const translations = {
       title: 'Layanan pakaian\n& presentasi brand',
       sub: 'Semua yang Anda butuhkan untuk membangun kehadiran digital premium untuk brand Anda.',
     },
+    gallerySection: {
+      title: 'Karya yang\nkami banggakan',
+      sub: 'Koleksi hasil kerja terbaik kami — dari pakaian hingga identitas brand.',
+    },
     contact: {
       badge: 'Hubungi Kami',
       title: 'Ayo buat sesuatu\nbersama',
@@ -98,6 +102,10 @@ export const translations = {
       badge: 'What We Offer',
       title: 'Full service clothing\n& brand presentation',
       sub: 'Everything you need to establish a premium digital presence for your brand.',
+    },
+    gallerySection: {
+      title: 'Work we\nare proud of',
+      sub: 'A collection of our best work — from clothing to brand identity.',
     },
     contact: {
       badge: 'Get In Touch',
