@@ -6,7 +6,7 @@ import type { ContentData } from '@/lib/data'
 type Tab = 'home-hero' | 'home-stats' | 'home-sections' | 'products' | 'services' | 'contact'
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'home-hero', label: 'Home Hero' },
+  { id: 'home-hero', label: 'Homepage' },
   { id: 'home-stats', label: 'Home Stats' },
   { id: 'home-sections', label: 'Home Sections' },
   { id: 'products', label: 'Products' },
@@ -115,7 +115,7 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
         {/* ── Home Hero ── */}
         {tab === 'home-hero' && (
           <div>
-            <p className="admin-form-section-title">Home — Hero Banner</p>
+            <p className="admin-form-section-title">Banner</p>
             <p className="admin-form-hint" style={{ marginBottom: '1rem' }}>
               Use <code>*word*</code> for italic. Use a new line for line breaks in the title.
             </p>

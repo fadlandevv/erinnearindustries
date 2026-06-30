@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { POSTS } from './dummyPosts'
 
 export const metadata: Metadata = {
   title: 'Berita & Artikel — Erinnear Industries',
@@ -7,6 +8,8 @@ export const metadata: Metadata = {
 }
 
 export default function BeritaPage() {
+  const [featured, ...rest] = POSTS
+
   return (
     <>
       <div className="svc-detail-back-wrap">
@@ -24,24 +27,43 @@ export default function BeritaPage() {
         </div>
       </section>
 
-      <section style={{ padding: '60px 24px 120px', textAlign: 'center' }}>
-        <div style={{ maxWidth: 480, margin: '0 auto' }}>
-          <div style={{
-            width: 72, height: 72, borderRadius: '50%',
-            background: '#f5f0ea', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', margin: '0 auto 24px',
-          }}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#b0905a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
-              <path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/>
-            </svg>
+      <section className="berita-section">
+        <div className="berita-inner">
+
+          {/* Featured post */}
+          <Link href={`/berita/${featured.slug}`} className="berita-featured">
+            <div className="berita-featured-img" />
+            <div className="berita-featured-body">
+              <span className="berita-cat">{featured.category}</span>
+              <h2 className="berita-featured-title">{featured.title}</h2>
+              <p className="berita-featured-excerpt">{featured.excerpt}</p>
+              <div className="berita-meta">
+                <span>{featured.date}</span>
+                <span>·</span>
+                <span>{featured.readTime} baca</span>
+              </div>
+            </div>
+          </Link>
+
+          {/* Grid */}
+          <div className="berita-grid">
+            {rest.map(post => (
+              <Link key={post.slug} href={`/berita/${post.slug}`} className="berita-card">
+                <div className="berita-card-img" />
+                <div className="berita-card-body">
+                  <span className="berita-cat">{post.category}</span>
+                  <h3 className="berita-card-title">{post.title}</h3>
+                  <p className="berita-card-excerpt">{post.excerpt}</p>
+                  <div className="berita-meta">
+                    <span>{post.date}</span>
+                    <span>·</span>
+                    <span>{post.readTime} baca</span>
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 10px', letterSpacing: '-0.02em' }}>
-            Segera hadir
-          </h2>
-          <p style={{ color: '#888', fontSize: '0.95rem', lineHeight: 1.6, margin: 0 }}>
-            Halaman berita sedang dalam pengembangan. Pantau terus untuk update terbaru dari kami.
-          </p>
+
         </div>
       </section>
     </>

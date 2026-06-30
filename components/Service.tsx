@@ -10,16 +10,14 @@ export default function Service({ services }: { services: ServiceItem[] }) {
   return (
     <section className="service-section" id="service">
       <div className="service-inner">
-        <div className="service-top">
-          <div className="service-header">
-            <h2>
-              {(t as any).servicesSection.title.split('\n').map((line: string, i: number) => (
-                <span key={i}>{line}{i === 0 && <br />}</span>
-              ))}
-            </h2>
-            <p>{(t as any).servicesSection.sub}</p>
-          </div>
-          <Link href="/service" className="btn-outline service-view-all-btn">View All Services →</Link>
+        <div className="service-header">
+          <h2>
+            {(t as any).servicesSection.title.split('\n').map((line: string, i: number) => (
+              <span key={i}>{line}{i === 0 && <br />}</span>
+            ))}
+          </h2>
+          <p>{(t as any).servicesSection.sub}</p>
+          <Link href="/service" className="btn-dark">View All Services →</Link>
         </div>
         <div className="service-grid">
           {services.map((s) => (
