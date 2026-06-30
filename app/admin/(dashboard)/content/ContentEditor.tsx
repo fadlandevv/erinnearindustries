@@ -33,10 +33,7 @@ function CollapsibleCard({ title, defaultOpen = true, children }: { title: strin
         </svg>
       </button>
       {open && (
-        <div style={{
-          padding: '0 1.1rem 1rem', borderTop: '1px solid var(--border,#e8e4de)',
-          maxHeight: 480, overflowY: 'auto', scrollbarWidth: 'none',
-        }}>
+        <div style={{ padding: '0 1.1rem 1rem', borderTop: '1px solid var(--border,#e8e4de)' }}>
           <div style={{ paddingTop: '1rem' }}>{children}</div>
         </div>
       )}

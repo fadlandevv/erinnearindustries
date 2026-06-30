@@ -33,12 +33,14 @@ export default function ContentPageClient({ content }: { content: ContentData })
         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: preview ? '1.5rem' : 0, alignItems: 'stretch', minHeight: 'calc(100vh - 140px)', transition: 'gap 0.4s cubic-bezier(0.4,0,0.2,1)' }}>
+      <div style={{ display: 'flex', gap: preview ? '1.5rem' : 0, alignItems: 'stretch', height: 'calc(100vh - 140px)', transition: 'gap 0.4s cubic-bezier(0.4,0,0.2,1)' }}>
 
         {/* Editor */}
         <div style={{
           flex: preview ? '0 0 420px' : '1',
           minWidth: 0,
+          overflowY: 'auto',
+          scrollbarWidth: 'none',
           transition: 'flex 0.4s cubic-bezier(0.4,0,0.2,1)',
         }}>
           <ContentEditor initialContent={content} />
