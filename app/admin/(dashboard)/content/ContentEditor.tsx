@@ -12,6 +12,35 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'contact', label: 'Contact' },
 ]
 
+function CollapsibleCard({ title, defaultOpen = true, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = useState(defaultOpen)
+  return (
+    <div className="admin-form-card" style={{ marginTop: '1rem', padding: 0, overflow: 'hidden' }}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '1rem 1.25rem', background: 'none', border: 'none', cursor: 'pointer',
+          fontWeight: 600, fontSize: '0.875rem', color: '#111', letterSpacing: '-0.01em',
+        }}
+      >
+        {title}
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          width: 24, height: 24, borderRadius: '50%', background: '#f0ede7',
+          fontSize: '0.7rem', transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+        }}>▼</span>
+      </button>
+      {open && (
+        <div style={{ padding: '0 1.25rem 1.25rem', borderTop: '1px solid var(--border,#e8e4de)' }}>
+          <div style={{ paddingTop: '1.25rem' }}>{children}</div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function ContentEditor({ initialContent }: { initialContent: ContentData }) {
   const [content, setContent] = useState<ContentData>(initialContent)
   const [tab, setTab] = useState<Tab>('home-hero')
@@ -110,18 +139,16 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
 
       {/* ── Homepage ── */}
       {tab === 'home-hero' && (<>
-        <div className="admin-form-card">
-          <p className="admin-form-section-title">Banner</p>
+        <CollapsibleCard title="Banner">
           <p className="admin-form-hint" style={{ marginBottom: '1rem' }}>
             Use <code>*word*</code> for italic. Use a new line for line breaks in the title.
           </p>
           <BiField section="hero" field="badge" label="Badge / Pill" />
           <BiField section="hero" field="title" label="Title (use *word* for italic, Enter = new line)" multiline />
           <BiField section="hero" field="sub" label="Subtitle" multiline />
-        </div>
+        </CollapsibleCard>
 
-        <div className="admin-form-card" style={{ marginTop: '1rem' }}>
-          <p className="admin-form-section-title">Stats Section</p>
+        <CollapsibleCard title="Stats Section" defaultOpen={false}>
           <BiField section="stats" field="heading" label="Heading (Enter = new line)" multiline />
           <BiField section="stats" field="desc" label="Description" multiline />
           <div className="admin-form-section-title" style={{ marginTop: '1.5rem', fontSize: '0.8rem' }}>Stat Items</div>
@@ -158,9 +185,9 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
               </div>
             </div>
           ))}
-        </div>
+        </CollapsibleCard>
 
-        <div className="admin-form-card" style={{ marginTop: '1rem' }}>
+        <CollapsibleCard title="Featured Products & Services" defaultOpen={false}>
           <p className="admin-form-section-title">Featured Products Section</p>
           <BiField section="featuredProducts" field="badge" label="Badge" />
           <BiField section="featuredProducts" field="title" label="Title (Enter = new line)" multiline />
@@ -171,7 +198,7 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
           <BiField section="servicesSection" field="badge" label="Badge" />
           <BiField section="servicesSection" field="title" label="Title (Enter = new line)" multiline />
           <BiField section="servicesSection" field="sub" label="Subtitle" multiline />
-        </div>
+        </CollapsibleCard>
       </>)}
 
       {/* ── Products Page ── */}
