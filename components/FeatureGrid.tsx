@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import type { Product } from '@/lib/data'
 import ProductCard from './ProductCard'
@@ -21,6 +22,9 @@ export default function FeatureGrid({ products }: { products: Product[] }) {
           {products.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
+        </div>
+        <div className="products-view-all">
+          <Link href="/product" className="btn-outline">View All Products →</Link>
         </div>
       </div>
     </section>
