@@ -306,6 +306,7 @@ p:last-child { margin-bottom: 0; }
   line-height: 1.1;
   margin-top: 16px;
 }
+.products-header p { font-size: 14.4px; color: #666; margin: 8px 0 0; }
 .products-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

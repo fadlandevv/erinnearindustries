@@ -26,7 +26,7 @@ export const translations = {
         { num: '99%', unit: 'kepuasan', desc: 'Berdasarkan feedback klien yang dikumpulkan selama lima tahun terakhir.' },
       ],
     },
-    featuredProducts: { badge: 'Terus Bergerak', title: 'Produk yang kami\nbuat saat ini' },
+    featuredProducts: { badge: 'Terus Bergerak', title: 'Produk yang kami\nbuat saat ini', sub: 'Pilihan pakaian berkualitas yang kami produksi — siap untuk dipesan sesuai kebutuhan Anda.' },
     servicesSection: {
       badge: 'Yang Kami Tawarkan',
       title: 'Layanan pakaian\n& presentasi brand',
@@ -97,7 +97,7 @@ export const translations = {
         { num: '99%', unit: 'satisfaction', desc: 'Based on client feedback collected over the last five years.' },
       ],
     },
-    featuredProducts: { badge: 'Keep Moving On', title: "Products we're building\nat the moment" },
+    featuredProducts: { badge: 'Keep Moving On', title: "Products we're building\nat the moment", sub: 'Quality clothing we produce — ready to order based on your needs.' },
     servicesSection: {
       badge: 'What We Offer',
       title: 'Full service clothing\n& brand presentation',

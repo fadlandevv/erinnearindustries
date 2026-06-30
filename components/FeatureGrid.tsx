@@ -15,6 +15,7 @@ export default function FeatureGrid({ products }: { products: Product[] }) {
               <span key={i}>{line}{i === 0 && <br />}</span>
             ))}
           </h2>
+          <p>{(t.featuredProducts as any).sub}</p>
         </div>
         <div className="products-grid">
           {products.map((p) => (
