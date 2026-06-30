@@ -86,7 +86,7 @@ function StatCard({ label, value, sub, color }: { label: string; value: string; 
   return (
     <div className="admin-stat-card" style={{ borderTop: `3px solid ${color ?? '#e5e1d8'}` }}>
       <div className="admin-stat-label">{label}</div>
-      <div className="admin-stat-value" style={{ color: color ?? undefined }}>{value}</div>
+      <div className="admin-stat-num" style={{ color: color ?? undefined }}>{value}</div>
       {sub && <div style={{ fontSize: '0.72rem', color: '#aaa', marginTop: 2 }}>{sub}</div>}
     </div>
   )
