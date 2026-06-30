@@ -158,7 +158,6 @@ export default function ContentEditor({
             <p className="admin-form-hint" style={{ marginBottom: '1rem' }}>
               Use <code>*word*</code> for italic. Use a new line for line breaks in the title.
             </p>
-            <BiField section="hero" field="badge" label="Badge / Pill" />
             <BiField section="hero" field="title" label="Title (use *word* for italic, Enter = new line)" multiline />
             <BiField section="hero" field="sub" label="Subtitle" multiline />
 
@@ -232,13 +231,11 @@ export default function ContentEditor({
 
           <CollapsibleCard title="Featured Products & Services" defaultOpen={false}>
             <p className="admin-form-section-title">Featured Products Section</p>
-            <BiField section="featuredProducts" field="badge" label="Badge" />
             <BiField section="featuredProducts" field="title" label="Title (Enter = new line)" multiline />
 
             {divider}
 
             <p className="admin-form-section-title">Services Section</p>
-            <BiField section="servicesSection" field="badge" label="Badge" />
             <BiField section="servicesSection" field="title" label="Title (Enter = new line)" multiline />
             <BiField section="servicesSection" field="sub" label="Subtitle" multiline />
           </CollapsibleCard>
@@ -248,7 +245,6 @@ export default function ContentEditor({
         {tab === 'products' && (
           <div className="admin-form-card">
             <p className="admin-form-section-title">Products Page — Banner</p>
-            <BiField section="productPage" field="badge" label="Badge" />
             <BiField section="productPage" field="title" label="Title (Enter = new line)" multiline />
             <BiField section="productPage" field="sub" label="Subtitle" multiline />
           </div>
@@ -258,7 +254,6 @@ export default function ContentEditor({
         {tab === 'services' && (
           <div className="admin-form-card">
             <p className="admin-form-section-title">Services Page — Banner</p>
-            <BiField section="servicePage" field="badge" label="Badge" />
             <BiField section="servicePage" field="title" label="Title (Enter = new line)" multiline />
             <BiField section="servicePage" field="sub" label="Subtitle" multiline />
 
@@ -301,7 +296,6 @@ export default function ContentEditor({
         {tab === 'contact' && (
           <div className="admin-form-card">
             <p className="admin-form-section-title">Contact Page — Banner</p>
-            <BiField section="contact" field="badge" label="Badge" />
             <BiField section="contact" field="title" label="Title (Enter = new line)" multiline />
             <BiField section="contact" field="sub" label="Subtitle" multiline />
           </div>
