@@ -15,10 +15,21 @@ export default function ContentPageClient({ content }: { content: ContentData })
         </div>
         <button
           type="button"
-          className={preview ? 'btn-admin-primary' : 'btn-admin-secondary'}
+          className={preview ? 'btn-admin-danger' : 'btn-admin-secondary'}
           onClick={() => setPreview(p => !p)}
+          style={{ gap: '6px' }}
         >
-          {preview ? '✕ Close Preview' : '↗ Preview Website'}
+          {preview ? (
+            <>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2L12 12M12 2L2 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+              Close Preview
+            </>
+          ) : (
+            <>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7C2 7 4 3 7 3C10 3 12 7 12 7C12 7 10 11 7 11C4 11 2 7 2 7Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/><circle cx="7" cy="7" r="1.8" stroke="currentColor" strokeWidth="1.6"/></svg>
+              Preview Page
+            </>
+          )}
         </button>
       </div>
 
