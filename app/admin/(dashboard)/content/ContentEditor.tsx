@@ -157,9 +157,9 @@ export default function ContentEditor({
             <BiField section="hero" field="title" label="Title (use *word* for italic, Enter = new line)" multiline />
             <BiField section="hero" field="sub" label="Subtitle" multiline />
 
-            {/* Showcase cards — separate forms, valid here since BiField inputs don't use form submission */}
-            {divider}
-            <p className="admin-form-section-title" style={{ marginBottom: '1rem' }}>Showcase Cards</p>
+          </CollapsibleCard>
+
+          <CollapsibleCard title="Showcase Cards" defaultOpen={false}>
             {initialShowcase.map((item, idx) => {
               const action = updateShowcaseItem.bind(null, item.id)
               return (
