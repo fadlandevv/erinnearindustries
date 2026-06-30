@@ -5,7 +5,9 @@
   z-index: 9999;
   background: #f5f4f1;
   overflow-y: auto;
+  scrollbar-width: none;
 }
+.admin-overlay::-webkit-scrollbar { display: none; }
 
 /* ===== LOGIN ===== */
 .admin-login-page {

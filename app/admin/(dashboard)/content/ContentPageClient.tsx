@@ -22,7 +22,7 @@ export default function ContentPageClient({ content }: { content: ContentData })
         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', overflow: 'hidden' }}>
         <div style={{ flex: preview ? '0 0 420px' : '1', minWidth: 0, transition: 'flex 0.3s' }}>
           <ContentEditor initialContent={content} />
         </div>
