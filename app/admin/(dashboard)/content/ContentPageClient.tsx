@@ -7,8 +7,8 @@ export default function ContentPageClient({ content }: { content: ContentData })
   const [preview, setPreview] = useState(false)
 
   return (
-    <>
-      <div className="admin-page-header">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      <div className="admin-page-header" style={{ flexShrink: 0 }}>
         <div>
           <h1 className="admin-page-title">Page Content</h1>
           <p className="admin-page-subtitle">Edit banner text, titles, and descriptions for each page</p>
@@ -22,25 +22,32 @@ export default function ContentPageClient({ content }: { content: ContentData })
         </button>
       </div>
 
-      <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', overflow: 'hidden' }}>
-        <div style={{ flex: preview ? '0 0 420px' : '1', minWidth: 0, transition: 'flex 0.3s' }}>
+      <div style={{ display: 'flex', gap: '1.5rem', flex: 1, minHeight: 0 }}>
+        {/* Editor — scrolls internally */}
+        <div style={{
+          flex: preview ? '0 0 420px' : '1',
+          minWidth: 0,
+          overflowY: 'auto',
+          scrollbarWidth: 'none',
+          paddingBottom: '2rem',
+        }}>
           <ContentEditor initialContent={content} />
         </div>
 
+        {/* Preview iframe — fills remaining height */}
         {preview && (
           <div style={{
-            flex: 1, minWidth: 0, position: 'sticky', top: '1.5rem',
+            flex: 1, minWidth: 0,
             borderRadius: 16, overflow: 'hidden',
             border: '1px solid var(--border, #e8e4de)',
             boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
-            height: 'calc(100vh - 120px)',
             display: 'flex', flexDirection: 'column',
           }}>
             <div style={{
               padding: '0.6rem 1rem', background: '#f8f7f5',
               borderBottom: '1px solid var(--border, #e8e4de)',
               display: 'flex', alignItems: 'center', gap: '0.5rem',
-              fontSize: '0.75rem', color: '#888',
+              fontSize: '0.75rem', color: '#888', flexShrink: 0,
             }}>
               <div style={{ display: 'flex', gap: 5 }}>
                 <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ff5f57' }} />
@@ -57,6 +64,6 @@ export default function ContentPageClient({ content }: { content: ContentData })
           </div>
         )}
       </div>
-    </>
+    </div>
   )
 }

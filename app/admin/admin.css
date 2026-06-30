@@ -347,10 +347,11 @@
 .admin-sidebar-brand-toggle { cursor: pointer; }
 .admin-content {
   flex: 1;
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   min-width: 0;
+  overflow: hidden;
 }
 @media (min-width: 769px) {
   .admin-content { margin-left: 230px; }
@@ -431,7 +432,13 @@
 .admin-main {
   padding: 32px 40px;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
+.admin-main::-webkit-scrollbar { display: none; }
 
 /* ===== MODAL ===== */
 .admin-modal-overlay {
