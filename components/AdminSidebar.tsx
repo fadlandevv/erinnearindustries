@@ -49,7 +49,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: 'Orders',     href: '/admin/orders',     icon: '◷', permission: 'orders'     },
       { label: 'Rekap',      href: '/admin/rekap',      icon: '◱', permission: 'rekap'      },
       { label: 'Pembukuan',  href: '/admin/pembukuan',  icon: '◫', permission: 'pembukuan'  },
-      { label: 'Analytics',  href: '/admin/analytics',  icon: '◈', permission: 'rekap'      },
+      { label: 'Analytics',  href: '/admin/analytics',  icon: '◈', permission: 'dashboard'  },
     ],
   },
   {
