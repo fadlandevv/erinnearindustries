@@ -63,7 +63,7 @@ function weekKeyToMonthKey(key: string): string {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`
 }
 
-const MONTH_LABELS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']
+const MONTH_LABELS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 // ── Entries modal ─────────────────────────────────────────────────────────────
 function EntriesModal({ entries, onClose }: { entries: ManualEntry[]; onClose: () => void }) {

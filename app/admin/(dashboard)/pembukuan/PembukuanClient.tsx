@@ -10,7 +10,7 @@ import AdminDatePicker from '@/components/AdminDatePicker'
 type Filter = 'all' | 'pemasukan' | 'pengeluaran'
 type Mode = 'monthly' | 'yearly'
 
-const MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 const START_YEAR = 2023
 
 function rp(n: number) {
@@ -21,8 +21,8 @@ function rp(n: number) {
 function rpCompact(n: number) {
   if (n === 0) return '—'
   if (n >= 1_000_000_000) return `Rp ${(n / 1_000_000_000).toFixed(1)}M`
-  if (n >= 1_000_000) return `Rp ${(n / 1_000_000).toFixed(1)} jt`
-  if (n >= 1_000) return `Rp ${(n / 1_000).toFixed(0)} rb`
+  if (n >= 1_000_000) return `Rp ${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000) return `Rp ${(n / 1_000).toFixed(0)}K`
   return 'Rp ' + n.toLocaleString('id-ID')
 }
 
