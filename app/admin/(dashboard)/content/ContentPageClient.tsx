@@ -1,10 +1,17 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import type { ContentData, ShowcaseItem } from '@/lib/data'
 import ContentEditor from './ContentEditor'
 
 export default function ContentPageClient({ content, showcase }: { content: ContentData; showcase: ShowcaseItem[] }) {
   const [preview, setPreview] = useState(false)
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+
+  const handleSaved = useCallback(() => {
+    if (iframeRef.current) {
+      iframeRef.current.src = iframeRef.current.src
+    }
+  }, [])
 
   return (
     <>
@@ -41,10 +48,10 @@ export default function ContentPageClient({ content, showcase }: { content: Cont
           minWidth: 0,
           transition: 'flex 0.4s cubic-bezier(0.4,0,0.2,1)',
         }}>
-          <ContentEditor initialContent={content} initialShowcase={showcase} />
+          <ContentEditor initialContent={content} initialShowcase={showcase} onSaved={handleSaved} />
         </div>
 
-        {/* Preview panel — always rendered, animates in/out */}
+        {/* Preview panel */}
         <div style={{
           flex: preview ? '1' : '0 0 0px',
           minWidth: 0,
@@ -72,6 +79,7 @@ export default function ContentPageClient({ content, showcase }: { content: Cont
             <span style={{ flex: 1, textAlign: 'center' }}>localhost:3000</span>
           </div>
           <iframe
+            ref={iframeRef}
             src="http://localhost:3000"
             style={{ flex: 1, border: 'none', width: '100%', minWidth: 0 }}
             title="Website Preview"

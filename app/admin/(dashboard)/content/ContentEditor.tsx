@@ -1,5 +1,5 @@
 'use client'
-import { useState, useActionState } from 'react'
+import { useState, useActionState, useRef } from 'react'
 import { saveContentAction } from '@/lib/actions'
 import type { ContentData, ShowcaseItem } from '@/lib/data'
 
@@ -44,14 +44,24 @@ function CollapsibleCard({ title, defaultOpen = true, children }: { title: strin
 export default function ContentEditor({
   initialContent,
   initialShowcase,
+  onSaved,
 }: {
   initialContent: ContentData
   initialShowcase: ShowcaseItem[]
+  onSaved?: () => void
 }) {
   const [content, setContent] = useState<ContentData>(initialContent)
   const [showcase, setShowcase] = useState<ShowcaseItem[]>(initialShowcase)
   const [tab, setTab] = useState<Tab>('home-hero')
   const [state, formAction, pending] = useActionState(saveContentAction, null)
+
+  const prevOk = useRef(false)
+  if (state?.ok && !prevOk.current) {
+    prevOk.current = true
+    onSaved?.()
+  } else if (!state?.ok) {
+    prevOk.current = false
+  }
 
   function setShowcaseField(idx: number, field: keyof ShowcaseItem, value: string) {
     setShowcase(prev => prev.map((item, i) => i === idx ? { ...item, [field]: value } : item))
