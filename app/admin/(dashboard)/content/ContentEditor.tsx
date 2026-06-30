@@ -9,7 +9,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'home-hero', label: 'Homepage' },
   { id: 'products', label: 'Page Products' },
   { id: 'services', label: 'Page Services' },
-  { id: 'contact', label: 'Contact' },
+  { id: 'contact', label: 'Page Contacts' },
 ]
 
 function CollapsibleCard({ title, defaultOpen = true, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
