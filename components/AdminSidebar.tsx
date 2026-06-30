@@ -23,7 +23,6 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: 'Services', href: '/admin/services', icon: '✦', permission: 'services' },
       { label: 'Content',  href: '/admin/content',  icon: '✎', permission: 'content'  },
-      { label: 'Showcase', href: '/admin/showcase', icon: '▣', permission: 'showcase' },
       { label: 'Gallery',  href: '/admin/gallery',  icon: '◧', permission: 'gallery'  },
     ],
   },
