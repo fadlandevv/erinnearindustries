@@ -122,7 +122,7 @@ export default function ContentEditor({ initialContent }: { initialContent: Cont
   }
 
   return (
-    <form action={formAction}>
+    <form action={formAction} style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <input type="hidden" name="content" value={JSON.stringify(content)} />
 
       {/* Tab bar */}
