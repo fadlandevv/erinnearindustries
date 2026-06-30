@@ -672,6 +672,12 @@ export async function saveContentAction(_prev: unknown, formData: FormData): Pro
   const raw = formData.get('content') as string
   const data = JSON.parse(raw) as ContentData
   await saveContent(data)
+
+  const showcaseRaw = formData.get('showcase') as string | null
+  if (showcaseRaw) {
+    await saveShowcase(JSON.parse(showcaseRaw))
+  }
+
   revalidateTag('content', {})
   revalidatePath('/', 'layout')
   return { ok: true }

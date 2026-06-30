@@ -1,6 +1,6 @@
 'use client'
 import { useState, useActionState } from 'react'
-import { saveContentAction, updateShowcaseItem } from '@/lib/actions'
+import { saveContentAction } from '@/lib/actions'
 import type { ContentData, ShowcaseItem } from '@/lib/data'
 
 type Tab = 'home-hero' | 'products' | 'services' | 'contact'
@@ -49,8 +49,13 @@ export default function ContentEditor({
   initialShowcase: ShowcaseItem[]
 }) {
   const [content, setContent] = useState<ContentData>(initialContent)
+  const [showcase, setShowcase] = useState<ShowcaseItem[]>(initialShowcase)
   const [tab, setTab] = useState<Tab>('home-hero')
   const [state, formAction, pending] = useActionState(saveContentAction, null)
+
+  function setShowcaseField(idx: number, field: keyof ShowcaseItem, value: string) {
+    setShowcase(prev => prev.map((item, i) => i === idx ? { ...item, [field]: value } : item))
+  }
 
   function setField(lang: 'id' | 'en', section: keyof ContentData['id'], field: string, value: string) {
     setContent(prev => ({
@@ -160,42 +165,30 @@ export default function ContentEditor({
           </CollapsibleCard>
 
           <CollapsibleCard title="Showcase Cards" defaultOpen={false}>
-            {initialShowcase.map((item, idx) => {
-              const action = updateShowcaseItem.bind(null, item.id)
-              return (
-                <form key={item.id} action={action} encType="multipart/form-data">
-                  {idx > 0 && divider}
-                  <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>Card {idx + 1}</p>
+            {showcase.map((item, idx) => (
+              <div key={item.id}>
+                {idx > 0 && divider}
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>Card {idx + 1}</p>
+                <div className={grp}>
+                  <label>Title</label>
+                  <input type="text" className={inp} value={item.title} onChange={e => setShowcaseField(idx, 'title', e.target.value)} />
+                </div>
+                <div className={grp}>
+                  <label>Description</label>
+                  <textarea className={ta} value={item.desc} onChange={e => setShowcaseField(idx, 'desc', e.target.value)} />
+                </div>
+                <div className="admin-2col-grid">
                   <div className={grp}>
-                    <label>Photo</label>
-                    <input type="file" name="image" accept="image/*" className="admin-gallery-file-input" />
+                    <label>Button Text</label>
+                    <input type="text" className={inp} value={item.buttonText} onChange={e => setShowcaseField(idx, 'buttonText', e.target.value)} />
                   </div>
                   <div className={grp}>
-                    <label>Title</label>
-                    <input name="title" type="text" className={inp} defaultValue={item.title} required />
+                    <label>Button Link</label>
+                    <input type="text" className={inp} value={item.buttonHref} onChange={e => setShowcaseField(idx, 'buttonHref', e.target.value)} placeholder="/product" />
                   </div>
-                  <div className={grp}>
-                    <label>Description</label>
-                    <textarea name="desc" className={ta} defaultValue={item.desc} required />
-                  </div>
-                  <div className="admin-2col-grid">
-                    <div className={grp}>
-                      <label>Button Text</label>
-                      <input name="buttonText" type="text" className={inp} defaultValue={item.buttonText} required />
-                    </div>
-                    <div className={grp}>
-                      <label>Button Link</label>
-                      <input name="buttonHref" type="text" className={inp} defaultValue={item.buttonHref} required placeholder="/product" />
-                    </div>
-                  </div>
-                  <div style={{ marginTop: '0.75rem' }}>
-                    <button type="submit" className="btn-admin-primary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.85rem' }}>
-                      Save Card {idx + 1}
-                    </button>
-                  </div>
-                </form>
-              )
-            })}
+                </div>
+              </div>
+            ))}
           </CollapsibleCard>
 
           <CollapsibleCard title="Stats Section" defaultOpen={false}>
@@ -319,6 +312,7 @@ export default function ContentEditor({
       {/* Save bar — fixed, only for page content (not showcase) */}
       <form action={formAction} style={{ flexShrink: 0 }}>
         <input type="hidden" name="content" value={JSON.stringify(content)} />
+        <input type="hidden" name="showcase" value={JSON.stringify(showcase)} />
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingTop: '1rem' }}>
           <button type="submit" className="btn-admin-primary" disabled={pending}>
             {pending ? 'Saving...' : 'Save Changes'}
