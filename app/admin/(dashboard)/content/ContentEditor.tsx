@@ -15,26 +15,26 @@ const TABS: { id: Tab; label: string }[] = [
 function CollapsibleCard({ title, defaultOpen = true, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
   const [open, setOpen] = useState(defaultOpen)
   return (
-    <div className="admin-form-card" style={{ marginTop: '1rem', padding: 0, overflow: 'hidden' }}>
+    <div className="admin-form-card" style={{ marginTop: '1rem', padding: 0 }}>
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '1rem 1.25rem', background: 'none', border: 'none', cursor: 'pointer',
-          fontWeight: 600, fontSize: '0.875rem', color: '#111', letterSpacing: '-0.01em',
+          padding: '0.85rem 1.1rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
         }}
       >
-        {title}
-        <span style={{
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          width: 24, height: 24, borderRadius: '50%', background: '#f0ede7',
-          fontSize: '0.7rem', transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-        }}>▼</span>
+        <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{title}</span>
+        <svg
+          width="14" height="14" viewBox="0 0 10 10" fill="none"
+          style={{ transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'rotate(0deg)', flexShrink: 0 }}
+        >
+          <path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
       </button>
       {open && (
-        <div style={{ padding: '0 1.25rem 1.25rem', borderTop: '1px solid var(--border,#e8e4de)' }}>
-          <div style={{ paddingTop: '1.25rem' }}>{children}</div>
+        <div style={{ padding: '0 1.1rem 1rem', borderTop: '1px solid var(--border,#e8e4de)' }}>
+          <div style={{ paddingTop: '1rem' }}>{children}</div>
         </div>
       )}
     </div>
