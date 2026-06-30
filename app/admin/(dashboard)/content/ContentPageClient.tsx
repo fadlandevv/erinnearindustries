@@ -1,16 +1,17 @@
 'use client'
-import { useState, useRef, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import type { ContentData, ShowcaseItem } from '@/lib/data'
 import ContentEditor from './ContentEditor'
+import ContentPreview from './ContentPreview'
 
 export default function ContentPageClient({ content, showcase }: { content: ContentData; showcase: ShowcaseItem[] }) {
   const [preview, setPreview] = useState(false)
-  const iframeRef = useRef<HTMLIFrameElement>(null)
+  const [previewContent, setPreviewContent] = useState<ContentData>(content)
+  const [previewShowcase, setPreviewShowcase] = useState<ShowcaseItem[]>(showcase)
 
-  const handleSaved = useCallback(() => {
-    if (iframeRef.current) {
-      iframeRef.current.src = window.location.origin
-    }
+  const handleContentChange = useCallback((c: ContentData, s: ShowcaseItem[]) => {
+    setPreviewContent(c)
+    setPreviewShowcase(s)
   }, [])
 
   return (
@@ -48,10 +49,14 @@ export default function ContentPageClient({ content, showcase }: { content: Cont
           minWidth: 0,
           transition: 'flex 0.4s cubic-bezier(0.4,0,0.2,1)',
         }}>
-          <ContentEditor initialContent={content} initialShowcase={showcase} onSaved={handleSaved} />
+          <ContentEditor
+            initialContent={content}
+            initialShowcase={showcase}
+            onContentChange={handleContentChange}
+          />
         </div>
 
-        {/* Preview panel */}
+        {/* Live preview panel */}
         <div style={{
           flex: preview ? '1' : '0 0 0px',
           minWidth: 0,
@@ -64,26 +69,22 @@ export default function ContentPageClient({ content, showcase }: { content: Cont
           flexDirection: 'column',
           transition: 'flex 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease, box-shadow 0.3s ease',
         }}>
+          {/* Browser chrome */}
           <div style={{
             padding: '0.6rem 1rem', background: '#f8f7f5',
             borderBottom: '1px solid var(--border, #e8e4de)',
             display: 'flex', alignItems: 'center', gap: '0.5rem',
             fontSize: '0.75rem', color: '#888', flexShrink: 0,
-            whiteSpace: 'nowrap', overflow: 'hidden',
           }}>
             <div style={{ display: 'flex', gap: 5 }}>
               <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ff5f57' }} />
               <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ffbd2e' }} />
               <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#28ca41' }} />
             </div>
-            <span style={{ flex: 1, textAlign: 'center' }}>localhost:3000</span>
+            <span style={{ flex: 1, textAlign: 'center' }}>Live Preview — Homepage</span>
           </div>
-          <iframe
-            ref={iframeRef}
-            src={typeof window !== 'undefined' ? window.location.origin : ''}
-            style={{ flex: 1, border: 'none', width: '100%', minWidth: 0 }}
-            title="Website Preview"
-          />
+
+          <ContentPreview content={previewContent} showcase={previewShowcase} />
         </div>
 
       </div>

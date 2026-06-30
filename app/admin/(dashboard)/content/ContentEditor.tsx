@@ -1,5 +1,5 @@
 'use client'
-import { useState, useActionState, useRef } from 'react'
+import { useState, useActionState, useRef, useEffect } from 'react'
 import { saveContentAction } from '@/lib/actions'
 import type { ContentData, ShowcaseItem } from '@/lib/data'
 
@@ -45,15 +45,21 @@ export default function ContentEditor({
   initialContent,
   initialShowcase,
   onSaved,
+  onContentChange,
 }: {
   initialContent: ContentData
   initialShowcase: ShowcaseItem[]
   onSaved?: () => void
+  onContentChange?: (content: ContentData, showcase: ShowcaseItem[]) => void
 }) {
   const [content, setContent] = useState<ContentData>(initialContent)
   const [showcase, setShowcase] = useState<ShowcaseItem[]>(initialShowcase)
   const [tab, setTab] = useState<Tab>('home-hero')
   const [state, formAction, pending] = useActionState(saveContentAction, null)
+
+  useEffect(() => {
+    onContentChange?.(content, showcase)
+  }, [content, showcase]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const prevOk = useRef(false)
   if (state?.ok && !prevOk.current) {
