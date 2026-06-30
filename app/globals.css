@@ -436,15 +436,18 @@ p:last-child { margin-bottom: 0; }
 .service-header {
   text-align: center;
   max-width: 560px;
-  margin: 0 auto 48px;
+  margin: 0 auto 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 .service-header h2 {
   font-size: clamp(28px, 3vw, 40px);
   font-weight: 700;
   letter-spacing: -0.03em;
-  margin-top: 12px;
+  margin: 0;
 }
-.service-header p { font-size: 14.4px; color: #666; margin: 12px 0 0; }
+.service-header p { font-size: 14.4px; color: #666; margin: 0; }
 .service-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
