@@ -37,7 +37,7 @@ export default function ResetLinkBtn({ email }: { email: string }) {
           style={{ fontSize: '0.72rem', padding: '0.3rem 0.7rem', whiteSpace: 'nowrap' }}
           onClick={handleCopy}
         >
-          {copied ? '✓ Tersalin' : 'Salin'}
+          {copied ? '✓ Copied' : 'Copy'}
         </button>
       </div>
     )

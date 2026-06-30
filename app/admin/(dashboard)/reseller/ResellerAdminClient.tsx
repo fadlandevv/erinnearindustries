@@ -16,12 +16,12 @@ const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
 
 const STATUS_OPTIONS: { value: ResellerOrderStatus; label: string }[] = [
-  { value: 'pending',     label: 'Menunggu' },
-  { value: 'confirmed',   label: 'Terkonfirmasi' },
-  { value: 'processing',  label: 'Diproses' },
-  { value: 'shipped',     label: 'Dikirim' },
-  { value: 'delivered',   label: 'Selesai' },
-  { value: 'cancelled',   label: 'Dibatalkan' },
+  { value: 'pending',     label: 'Pending' },
+  { value: 'confirmed',   label: 'Confirmed' },
+  { value: 'processing',  label: 'Processing' },
+  { value: 'shipped',     label: 'Shipped' },
+  { value: 'delivered',   label: 'Delivered' },
+  { value: 'cancelled',   label: 'Cancelled' },
 ]
 
 type Props = {
@@ -58,7 +58,7 @@ function OrderRow({ order }: { order: ResellerOrder }) {
     const result = await updateResellerOrderStatusAction({}, fd)
     setSaving(false)
     if (result?.error) toast(result.error, 'error')
-    else toast('Status pesanan diperbarui')
+    else toast('Order status updated')
   }
 
   return (
@@ -106,7 +106,7 @@ function OrderRow({ order }: { order: ResellerOrder }) {
             className="admin-order-status-btn"
             onClick={handleSave}
             disabled={saving}
-            title="Simpan"
+            title="Save"
           >
             {saving ? '…' : '✓'}
           </button>
@@ -123,7 +123,7 @@ function CreateResellerForm({ onCreated }: { onCreated: () => void }) {
 
   useEffect(() => {
     if (state.ok) {
-      toast('Akun reseller berhasil dibuat')
+      toast('Reseller account created successfully')
       router.refresh()
       onCreated()
     } else if (state.error) {
@@ -133,7 +133,7 @@ function CreateResellerForm({ onCreated }: { onCreated: () => void }) {
 
   return (
     <form action={action} className="admin-form-card" style={{ marginTop: '1.5rem' }}>
-      <p className="admin-form-section-title">Tambah Akun Reseller</p>
+      <p className="admin-form-section-title">Add Reseller Account</p>
       <div className="admin-form-grid">
         <div className="admin-form-group">
           <label>Username *</label>
@@ -141,11 +141,11 @@ function CreateResellerForm({ onCreated }: { onCreated: () => void }) {
         </div>
         <div className="admin-form-group">
           <label>Password *</label>
-          <input name="password" type="password" className="admin-form-input" placeholder="min. 6 karakter" required />
+          <input name="password" type="password" className="admin-form-input" placeholder="min. 6 characters" required />
         </div>
         <div className="admin-form-group">
-          <label>Nama *</label>
-          <input name="name" type="text" className="admin-form-input" placeholder="Nama reseller" required />
+          <label>Name *</label>
+          <input name="name" type="text" className="admin-form-input" placeholder="Reseller name" required />
         </div>
         <div className="admin-form-group">
           <label>No. HP</label>
@@ -162,7 +162,7 @@ function CreateResellerForm({ onCreated }: { onCreated: () => void }) {
       </div>
       <div className="admin-form-actions">
         <button type="submit" className="btn-admin-primary" disabled={isPending}>
-          {isPending ? 'Menyimpan...' : '+ Tambah Reseller'}
+          {isPending ? 'Saving...' : '+ Add Reseller'}
         </button>
       </div>
     </form>
@@ -176,9 +176,9 @@ export default function ResellerAdminClient({ resellers, orders }: Props) {
   const [showAddForm, setShowAddForm] = useState(false)
 
   async function handleDelete(id: string, name: string) {
-    if (!confirm(`Hapus akun reseller "${name}"? Pesanan tidak akan terhapus.`)) return
+    if (!confirm(`Delete reseller account "${name}"? Orders will not be deleted.`)) return
     await deleteResellerAction(id)
-    toast(`Akun "${name}" dihapus`)
+    toast(`Account "${name}" deleted`)
     router.refresh()
   }
 
@@ -191,14 +191,14 @@ export default function ResellerAdminClient({ resellers, orders }: Props) {
           className={`wh-tab${tab === 'akun' ? ' active' : ''}`}
           onClick={() => setTab('akun')}
         >
-          Akun Reseller ({resellers.length})
+          Reseller Accounts ({resellers.length})
         </button>
         <button
           type="button"
           className={`wh-tab${tab === 'pesanan' ? ' active' : ''}`}
           onClick={() => setTab('pesanan')}
         >
-          Pesanan Reseller ({orders.length})
+          Reseller Orders ({orders.length})
         </button>
       </div>
 
@@ -211,7 +211,7 @@ export default function ResellerAdminClient({ resellers, orders }: Props) {
               className="btn-admin-primary"
               onClick={() => setShowAddForm(f => !f)}
             >
-              {showAddForm ? 'Tutup Form' : '+ Tambah Reseller'}
+              {showAddForm ? 'Close Form' : '+ Add Reseller'}
             </button>
           </div>
 
@@ -221,17 +221,17 @@ export default function ResellerAdminClient({ resellers, orders }: Props) {
 
           <div className="admin-table-wrap" style={{ marginTop: showAddForm ? '1.25rem' : 0 }}>
             {resellers.length === 0 ? (
-              <div className="admin-empty">Belum ada akun reseller. Tambahkan akun pertama di atas.</div>
+              <div className="admin-empty">No reseller accounts yet. Add the first one above.</div>
             ) : (
               <table className="admin-table">
                 <thead>
                   <tr>
-                    <th>Nama</th>
+                    <th>Name</th>
                     <th>Username</th>
                     <th>Level</th>
                     <th>No. HP</th>
                     <th>Status</th>
-                    <th>Dibuat</th>
+                    <th>Created</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -244,8 +244,8 @@ export default function ResellerAdminClient({ resellers, orders }: Props) {
                       <td>{r.phone || '—'}</td>
                       <td>
                         {r.active
-                          ? <span className="admin-badge admin-badge-green">Aktif</span>
-                          : <span className="admin-badge admin-badge-red">Nonaktif</span>}
+                          ? <span className="admin-badge admin-badge-green">Active</span>
+                          : <span className="admin-badge admin-badge-red">Inactive</span>}
                       </td>
                       <td style={{ whiteSpace: 'nowrap' }}>{fmtDate(r.createdAt)}</td>
                       <td>
@@ -255,7 +255,7 @@ export default function ResellerAdminClient({ resellers, orders }: Props) {
                             className="btn-admin-danger"
                             onClick={() => handleDelete(r.id, r.name)}
                           >
-                            Hapus
+                            Delete
                           </button>
                         </div>
                       </td>
@@ -272,17 +272,17 @@ export default function ResellerAdminClient({ resellers, orders }: Props) {
       {tab === 'pesanan' && (
         <div className="admin-table-wrap">
           {orders.length === 0 ? (
-            <div className="admin-empty">Belum ada pesanan dari reseller.</div>
+            <div className="admin-empty">No reseller orders yet.</div>
           ) : (
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th>Tanggal</th>
+                  <th>Date</th>
                   <th>Reseller</th>
                   <th>Customer</th>
                   <th>Items</th>
                   <th>Total</th>
-                  <th>Komisi (Rp)</th>
+                  <th>Commission (Rp)</th>
                   <th>Status</th>
                 </tr>
               </thead>

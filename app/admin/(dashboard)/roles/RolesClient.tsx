@@ -69,7 +69,7 @@ function RoleRow({ role }: { role: Role }) {
                 style={{ fontSize: '0.72rem', padding: '0.25rem 0.65rem' }}
                 onClick={() => setEditing(e => !e)}
               >
-                {editing ? 'Tutup' : 'Edit'}
+                {editing ? 'Close' : 'Edit'}
               </button>
               <button
                 type="button"
@@ -77,11 +77,11 @@ function RoleRow({ role }: { role: Role }) {
                 style={{ fontSize: '0.72rem', padding: '0.25rem 0.65rem' }}
                 disabled={deleting}
                 onClick={() => {
-                  if (!confirm(`Hapus role "${role.name}"?`)) return
+                  if (!confirm(`Delete role "${role.name}"?`)) return
                   startDelete(() => { deleteRoleAction(role.id); window.location.reload() })
                 }}
               >
-                Hapus
+                Delete
               </button>
             </div>
           )}
@@ -97,16 +97,16 @@ function RoleRow({ role }: { role: Role }) {
               {state.error && <div className="admin-error" style={{ marginBottom: '0.5rem' }}>{state.error}</div>}
               <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
                 <div className="admin-form-group" style={{ margin: 0, flex: '0 0 200px' }}>
-                  <label>Nama Role</label>
+                  <label>Role Name</label>
                   <input className="admin-form-input" name="name" defaultValue={role.name} required />
                 </div>
               </div>
               <div className="admin-form-group" style={{ marginBottom: '0.75rem' }}>
-                <label>Akses Halaman</label>
+                <label>Page Access</label>
                 <InlinePermissions selected={role.permissions} name="permissions" />
               </div>
               <button type="submit" className="btn-admin-primary" disabled={pending} style={{ fontSize: '0.8rem' }}>
-                {pending ? 'Menyimpan...' : 'Simpan'}
+                {pending ? 'Saving...' : 'Save'}
               </button>
             </form>
           </td>
@@ -129,33 +129,33 @@ export default function RolesClient({ roles, admins }: Props) {
       {/* ── Roles ── */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>Daftar Role</h2>
+          <h2 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>Roles</h2>
           <button
             type="button"
             className="btn-admin-primary"
             style={{ fontSize: '0.78rem', padding: '0.35rem 0.85rem', marginLeft: 'auto' }}
             onClick={() => setShowCreateRole(s => !s)}
           >
-            {showCreateRole ? 'Tutup' : '+ Buat Role'}
+            {showCreateRole ? 'Close' : '+ Create Role'}
           </button>
         </div>
 
         {/* Create role form */}
         {showCreateRole && (
           <div className="admin-form-card" style={{ marginBottom: '1rem', borderColor: '#f47c2f', borderWidth: 1.5 }}>
-            <p className="admin-form-section-title" style={{ marginBottom: '0.75rem' }}>Role Baru</p>
+            <p className="admin-form-section-title" style={{ marginBottom: '0.75rem' }}>New Role</p>
             <form action={createRoleFormAction} onSubmit={() => setTimeout(() => { setShowCreateRole(false); window.location.reload() }, 300)}>
               {createRoleState.error && <div className="admin-error" style={{ marginBottom: '0.5rem' }}>{createRoleState.error}</div>}
               <div className="admin-form-group">
-                <label>Nama Role</label>
-                <input className="admin-form-input" name="name" placeholder="cth. Editor" required style={{ maxWidth: 280 }} />
+                <label>Role Name</label>
+                <input className="admin-form-input" name="name" placeholder="e.g. Editor" required style={{ maxWidth: 280 }} />
               </div>
               <div className="admin-form-group">
-                <label>Akses Halaman</label>
+                <label>Page Access</label>
                 <InlinePermissions selected={[]} name="permissions" />
               </div>
               <button type="submit" className="btn-admin-primary" disabled={creatingRole} style={{ fontSize: '0.8rem' }}>
-                {creatingRole ? 'Membuat...' : 'Buat Role'}
+                {creatingRole ? 'Creating...' : 'Create Role'}
               </button>
             </form>
           </div>
@@ -168,8 +168,8 @@ export default function RolesClient({ roles, admins }: Props) {
               <thead>
                 <tr>
                   <th style={{ width: 160 }}>Role</th>
-                  <th>Akses Halaman</th>
-                  <th style={{ width: 130 }}>Aksi</th>
+                  <th>Page Access</th>
+                  <th style={{ width: 130 }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -183,21 +183,21 @@ export default function RolesClient({ roles, admins }: Props) {
       {/* ── Admin Accounts ── */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>Akun Admin</h2>
+          <h2 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>Admin Accounts</h2>
           <button
             type="button"
             className="btn-admin-primary"
             style={{ fontSize: '0.78rem', padding: '0.35rem 0.85rem', marginLeft: 'auto' }}
             onClick={() => setShowCreateAdmin(s => !s)}
           >
-            {showCreateAdmin ? 'Tutup' : '+ Tambah Admin'}
+            {showCreateAdmin ? 'Close' : '+ Add Admin'}
           </button>
         </div>
 
         {/* Create admin form */}
         {showCreateAdmin && (
           <div className="admin-form-card" style={{ marginBottom: '1rem', borderColor: '#f47c2f', borderWidth: 1.5 }}>
-            <p className="admin-form-section-title" style={{ marginBottom: '0.75rem' }}>Admin Baru</p>
+            <p className="admin-form-section-title" style={{ marginBottom: '0.75rem' }}>New Admin</p>
             <form action={createAdminFormAction} onSubmit={() => setTimeout(() => { setShowCreateAdmin(false); window.location.reload() }, 300)}>
               {createAdminState.error && <div className="admin-error" style={{ marginBottom: '0.5rem' }}>{createAdminState.error}</div>}
               <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -207,7 +207,7 @@ export default function RolesClient({ roles, admins }: Props) {
                 </div>
                 <div className="admin-form-group" style={{ flex: '1 1 180px' }}>
                   <label>Password</label>
-                  <input className="admin-form-input" name="password" type="password" placeholder="Min. 6 karakter" required />
+                  <input className="admin-form-input" name="password" type="password" placeholder="Min. 6 characters" required />
                 </div>
                 <div className="admin-form-group" style={{ flex: '1 1 160px' }}>
                   <label>Role</label>
@@ -217,7 +217,7 @@ export default function RolesClient({ roles, admins }: Props) {
                 </div>
               </div>
               <button type="submit" className="btn-admin-primary" disabled={creatingAdmin} style={{ fontSize: '0.8rem' }}>
-                {creatingAdmin ? 'Menambahkan...' : 'Tambah Admin'}
+                {creatingAdmin ? 'Adding...' : 'Add Admin'}
               </button>
             </form>
           </div>
@@ -226,7 +226,7 @@ export default function RolesClient({ roles, admins }: Props) {
         {/* Admin listing */}
         <div className="admin-form-card" style={{ padding: 0, overflow: 'hidden' }}>
           {admins.length === 0 ? (
-            <p style={{ color: '#aaa', textAlign: 'center', padding: '2rem' }}>Belum ada admin.</p>
+            <p style={{ color: '#aaa', textAlign: 'center', padding: '2rem' }}>No admin accounts yet.</p>
           ) : (
             <div style={{ overflowX: 'auto' }}>
               <table className="admin-table" style={{ margin: 0 }}>
@@ -234,8 +234,8 @@ export default function RolesClient({ roles, admins }: Props) {
                   <tr>
                     <th>Username</th>
                     <th>Role</th>
-                    <th>Dibuat</th>
-                    <th style={{ width: 90 }}>Aksi</th>
+                    <th>Created</th>
+                    <th style={{ width: 90 }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -273,11 +273,11 @@ export default function RolesClient({ roles, admins }: Props) {
                               style={{ fontSize: '0.72rem', padding: '0.25rem 0.6rem' }}
                               disabled={deletingAdmin}
                               onClick={() => {
-                                if (!confirm(`Hapus admin "${admin.username}"?`)) return
+                                if (!confirm(`Delete admin "${admin.username}"?`)) return
                                 startDeleteAdmin(() => { deleteAdminAction(admin.id); window.location.reload() })
                               }}
                             >
-                              Hapus
+                              Delete
                             </button>
                           ) : (
                             <span style={{ fontSize: '0.68rem', color: '#bbb', fontStyle: 'italic' }}>default</span>

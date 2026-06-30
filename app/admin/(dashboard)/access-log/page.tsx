@@ -4,7 +4,7 @@ import type { AccessAction } from '@/lib/access-log'
 const ACTION_LABEL: Record<AccessAction, string> = {
   login:        'Login',
   logout:       'Logout',
-  login_failed: 'Login Gagal',
+  login_failed: 'Login Failed',
 }
 
 const ACTION_BADGE: Record<AccessAction, string> = {
@@ -28,20 +28,20 @@ export default async function AccessLogPage() {
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Access Log</h1>
-          <p className="admin-page-subtitle">Riwayat 200 aktivitas login & logout admin terbaru.</p>
+          <p className="admin-page-subtitle">Last 200 admin login &amp; logout activity records.</p>
         </div>
       </div>
 
       <div className="admin-table-wrap">
         {logs.length === 0 ? (
-          <p className="admin-empty">Belum ada log aktivitas.</p>
+          <p className="admin-empty">No activity log yet.</p>
         ) : (
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Waktu</th>
+                <th>Time</th>
                 <th>Admin</th>
-                <th>Aksi</th>
+                <th>Action</th>
                 <th>IP Address</th>
               </tr>
             </thead>

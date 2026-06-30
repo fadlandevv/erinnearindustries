@@ -21,8 +21,8 @@ function formatCurrency(amount: number) {
 }
 
 const STATUS_LABEL: Record<string, string> = {
-  pending: 'Menunggu', paid: 'Dibayar', processing: 'Diproses',
-  shipped: 'Dikirim', delivered: 'Selesai', failed: 'Gagal', expired: 'Kedaluwarsa',
+  pending: 'Pending', paid: 'Paid', processing: 'Processing',
+  shipped: 'Shipped', delivered: 'Delivered', failed: 'Failed', expired: 'Expired',
 }
 const STATUS_COLOR: Record<string, string> = {
   pending: '#f59e0b', paid: '#22c55e', processing: '#3b82f6',
@@ -51,10 +51,10 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
     <>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title">Profil Member</h1>
+          <h1 className="admin-page-title">Member Profile</h1>
           <p className="admin-page-subtitle">{user.email}</p>
         </div>
-        <Link href="/admin/members" className="btn-admin-secondary">← Kembali</Link>
+        <Link href="/admin/members" className="btn-admin-secondary">← Back</Link>
       </div>
 
       <div className="admin-member-layout">
@@ -81,11 +81,11 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', textAlign: 'center' }}>
               <div style={{ background: 'var(--bg-muted,#f8f6f2)', borderRadius: 10, padding: '0.65rem' }}>
                 <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{orders.length}</div>
-                <div style={{ color: '#888', fontSize: '0.72rem', marginTop: 2 }}>Pesanan</div>
+                <div style={{ color: '#888', fontSize: '0.72rem', marginTop: 2 }}>Orders</div>
               </div>
               <div style={{ background: 'var(--bg-muted,#f8f6f2)', borderRadius: 10, padding: '0.65rem' }}>
                 <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{diffDays}</div>
-                <div style={{ color: '#888', fontSize: '0.72rem', marginTop: 2 }}>Hari bergabung</div>
+                <div style={{ color: '#888', fontSize: '0.72rem', marginTop: 2 }}>Days since joining</div>
               </div>
             </div>
           </div>
@@ -93,7 +93,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
           {/* Registration timeline */}
           <div className="admin-form-card">
             <p className="admin-form-section-title" style={{ marginBottom: '1rem' }}>
-              Timeline Pendaftaran
+              Registration Timeline
             </p>
             <div style={{ position: 'relative', paddingLeft: '1.5rem' }}>
               {/* vertical line */}
@@ -110,7 +110,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
                   background: '#f47c2f', border: '2px solid #fff',
                   boxShadow: '0 0 0 2px #f47c2f',
                 }} />
-                <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>Akun dibuat</div>
+                <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>Account created</div>
                 <div style={{ color: '#888', fontSize: '0.78rem', marginTop: '0.1rem' }}>
                   {formatDateTime(user.createdAt)}
                 </div>
@@ -127,7 +127,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
                     boxShadow: `0 0 0 2px ${STATUS_COLOR[order.status] ?? '#ccc'}`,
                   }} />
                   <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                    Pesanan #{order.id.slice(-6).toUpperCase()}
+                    Order #{order.id.slice(-6).toUpperCase()}
                   </div>
                   <div style={{ color: '#888', fontSize: '0.78rem', marginTop: '0.1rem' }}>
                     {formatDateTime(order.createdAt)}
@@ -151,18 +151,18 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
 
           {/* Total spent */}
           <div className="admin-form-card">
-            <p className="admin-form-section-title" style={{ marginBottom: '0.75rem' }}>Ringkasan</p>
+            <p className="admin-form-section-title" style={{ marginBottom: '0.75rem' }}>Summary</p>
             <div className="admin-3col-grid">
               <div style={{ background: 'var(--bg-muted,#f8f6f2)', borderRadius: 10, padding: '0.75rem 1rem' }}>
-                <div style={{ color: '#888', fontSize: '0.75rem', marginBottom: 4 }}>Total Pesanan</div>
+                <div style={{ color: '#888', fontSize: '0.75rem', marginBottom: 4 }}>Total Orders</div>
                 <div style={{ fontWeight: 700, fontSize: '1.15rem' }}>{orders.length}</div>
               </div>
               <div style={{ background: 'var(--bg-muted,#f8f6f2)', borderRadius: 10, padding: '0.75rem 1rem' }}>
-                <div style={{ color: '#888', fontSize: '0.75rem', marginBottom: 4 }}>Total Belanja</div>
+                <div style={{ color: '#888', fontSize: '0.75rem', marginBottom: 4 }}>Total Spent</div>
                 <div style={{ fontWeight: 700, fontSize: '1rem' }}>{formatCurrency(totalSpent)}</div>
               </div>
               <div style={{ background: 'var(--bg-muted,#f8f6f2)', borderRadius: 10, padding: '0.75rem 1rem' }}>
-                <div style={{ color: '#888', fontSize: '0.75rem', marginBottom: 4 }}>Bergabung</div>
+                <div style={{ color: '#888', fontSize: '0.75rem', marginBottom: 4 }}>Member since</div>
                 <div style={{ fontWeight: 700, fontSize: '0.875rem' }}>{formatDate(user.createdAt)}</div>
               </div>
             </div>
@@ -170,10 +170,10 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
 
           {/* Order history */}
           <div className="admin-form-card">
-            <p className="admin-form-section-title" style={{ marginBottom: '1rem' }}>Riwayat Pesanan</p>
+            <p className="admin-form-section-title" style={{ marginBottom: '1rem' }}>Order History</p>
             {orders.length === 0 ? (
               <p style={{ color: '#aaa', fontSize: '0.875rem', textAlign: 'center', padding: '2rem 0' }}>
-                Belum ada pesanan.
+                No orders yet.
               </p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

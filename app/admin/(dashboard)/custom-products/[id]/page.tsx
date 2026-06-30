@@ -55,7 +55,7 @@ type Params = Promise<{ id: string }>
 export async function generateMetadata({ params }: { params: Params }) {
   const { id } = await params
   const p = PRODUCTS[id]
-  return { title: p ? `Edit ${p.name} — Admin` : 'Edit Produk — Admin' }
+  return { title: p ? `Edit ${p.name} — Admin` : 'Edit Product — Admin' }
 }
 
 export default async function CustomProductEditPage({ params }: { params: Params }) {

@@ -129,7 +129,7 @@ export async function createProduct(formData: FormData) {
   await saveProducts(products)
   revalidateTag('products', {})
   revalidatePath('/product')
-  redirect('/admin/products?toast=Produk+berhasil+ditambah')
+  redirect('/admin/products?toast=Product+successfully+added')
 }
 
 export async function updateProduct(id: string, formData: FormData) {
@@ -169,7 +169,7 @@ export async function updateProduct(id: string, formData: FormData) {
   revalidateTag('products', {})
   revalidatePath('/product')
   revalidatePath(`/product/${id}`)
-  redirect('/admin/products?toast=Produk+berhasil+diperbarui')
+  redirect('/admin/products?toast=Product+successfully+updated')
 }
 
 export async function reorderProducts(orderedIds: string[]): Promise<void> {
@@ -207,7 +207,7 @@ export async function duplicateProduct(id: string) {
 
   revalidateTag('products', {})
   revalidatePath('/product')
-  redirect(`/admin/products/${newId}/edit?toast=Produk+berhasil+diduplikat`)
+  redirect(`/admin/products/${newId}/edit?toast=Product+successfully+duplicated`)
 }
 
 export async function copyPricingToSizes(productId: string, fromSize: string, targetSizes: string[]): Promise<{ ok: boolean; error?: string }> {
@@ -218,7 +218,7 @@ export async function copyPricingToSizes(productId: string, fromSize: string, ta
     .eq('size', fromSize)
     .maybeSingle()
 
-  if (!source) return { ok: false, error: 'Data ukuran tidak ditemukan' }
+  if (!source) return { ok: false, error: 'Size data not found' }
 
   for (const size of targetSizes) {
     const { data: existing } = await db
@@ -245,7 +245,7 @@ export async function deleteProduct(id: string) {
   await _deleteProductFromDB(id)
   revalidateTag('products', {})
   revalidatePath('/product')
-  redirect('/admin/products?toast=Produk+berhasil+dihapus&toastType=success')
+  redirect('/admin/products?toast=Product+successfully+deleted&toastType=success')
 }
 
 export async function createService(formData: FormData) {
@@ -265,7 +265,7 @@ export async function createService(formData: FormData) {
   await saveServices(services)
   revalidateTag('services', {})
   revalidatePath('/service')
-  redirect('/admin/services?toast=Layanan+berhasil+ditambah')
+  redirect('/admin/services?toast=Service+successfully+added')
 }
 
 export async function updateService(id: string, formData: FormData) {
@@ -288,7 +288,7 @@ export async function updateService(id: string, formData: FormData) {
   revalidateTag('services', {})
   revalidatePath('/service')
   revalidatePath(`/service/${id}`)
-  redirect('/admin/services?toast=Layanan+berhasil+diperbarui')
+  redirect('/admin/services?toast=Service+successfully+updated')
 }
 
 export async function updateShowcaseItem(itemId: string, formData: FormData): Promise<void> {
@@ -320,7 +320,7 @@ export async function updateShowcaseItem(itemId: string, formData: FormData): Pr
 
   await saveShowcase(showcase.map((s) => (s.id === itemId ? item : s)))
   revalidatePath('/')
-  redirect('/admin/showcase?toast=Showcase+berhasil+disimpan')
+  redirect('/admin/showcase?toast=Showcase+successfully+saved')
 }
 
 export async function updateGallerySlot(slotId: string, formData: FormData): Promise<void> {
@@ -352,7 +352,7 @@ export async function updateGallerySlot(slotId: string, formData: FormData): Pro
 
   await saveGallery(gallery.map((g) => (g.id === slotId ? slot : g)))
   revalidatePath('/')
-  redirect('/admin/gallery?toast=Gallery+berhasil+disimpan')
+  redirect('/admin/gallery?toast=Gallery+successfully+saved')
 }
 
 export async function deleteService(id: string) {
@@ -360,7 +360,7 @@ export async function deleteService(id: string) {
   await saveServices(services.filter((s) => s.id !== id))
   revalidateTag('services', {})
   revalidatePath('/service')
-  redirect('/admin/services?toast=Layanan+berhasil+dihapus&toastType=success')
+  redirect('/admin/services?toast=Service+successfully+deleted&toastType=success')
 }
 
 function parsePrice(str: string): number {
@@ -378,7 +378,7 @@ export async function addCustomProductOptionAction(
   const label       = (formData.get('label') as string)?.trim()
   const value       = (formData.get('value') as string) ?? ''
   const price       = parseInt(formData.get('price') as string) || 0
-  if (!productType || !category || !label) return { error: 'Data tidak lengkap.' }
+  if (!productType || !category || !label) return { error: 'Incomplete data.' }
   const { error } = await db.from('custom_product_options').insert({
     product_type: productType, category, label, value, price, sort_order: Math.floor(Date.now() / 1000),
   })
@@ -536,7 +536,7 @@ export async function registerUser(
 
   if (!name || !email || !password) return { error: 'Semua field wajib diisi.' }
   if (password.length < 6) return { error: 'Password minimal 6 karakter.' }
-  if (await getUserByEmail(email)) return { error: 'Email sudah terdaftar.' }
+  if (await getUserByEmail(email)) return { error: 'Email already registered.' }
 
   await saveUser({ id: generateId(8), name, email, passwordHash: hashPassword(password), createdAt: new Date().toISOString() })
 
@@ -612,8 +612,8 @@ export async function renewSnapToken(orderId: string): Promise<{ snapToken: stri
     if (!email) return { error: 'Tidak terautentikasi.' }
     const orders = await getOrdersByEmail(email)
     const order = orders.find((o) => o.id === orderId)
-    if (!order) return { error: 'Pesanan tidak ditemukan.' }
-    if (order.status !== 'pending') return { error: 'Pesanan ini sudah diproses.' }
+    if (!order) return { error: 'Order not found.' }
+    if (order.status !== 'pending') return { error: 'This order has already been processed.' }
     const retryMidtransId = `${orderId}-r${Date.now()}`
     const snapToken = await createSnapToken(retryMidtransId, order.totalPrice, order.customer, order.items)
     await saveOrder({ ...order, snapToken })
@@ -629,7 +629,7 @@ export async function deleteUserOrder(orderId: string): Promise<{ error?: string
   const email = jar.get('user-session')?.value
   if (!email) return { error: 'Tidak terautentikasi.' }
   const orders = await getOrdersByEmail(email)
-  if (!orders.find((o) => o.id === orderId)) return { error: 'Pesanan tidak ditemukan.' }
+  if (!orders.find((o) => o.id === orderId)) return { error: 'Order not found.' }
   await deleteOrder(orderId)
   revalidatePath('/orders')
   return {}
@@ -641,11 +641,11 @@ export async function updateProfile(
 ): Promise<{ error?: string; success?: boolean }> {
   const jar = await cookies()
   const email = jar.get('user-session')?.value
-  if (!email) return { error: 'Sesi habis, silakan login ulang.' }
+  if (!email) return { error: 'Session expired, please log in again.' }
   const user = await getUserByEmail(email)
-  if (!user) return { error: 'Akun tidak ditemukan.' }
+  if (!user) return { error: 'Account not found.' }
   const name = (formData.get('name') as string).trim()
-  if (!name) return { error: 'Nama tidak boleh kosong.' }
+  if (!name) return { error: 'Name cannot be empty.' }
   await updateUser({ ...user, name })
   revalidatePath('/profile')
   return { success: true }
@@ -657,13 +657,13 @@ export async function changePassword(
 ): Promise<{ error?: string; success?: boolean }> {
   const jar = await cookies()
   const email = jar.get('user-session')?.value
-  if (!email) return { error: 'Sesi habis, silakan login ulang.' }
+  if (!email) return { error: 'Session expired, please log in again.' }
   const user = await getUserByEmail(email)
-  if (!user) return { error: 'Akun tidak ditemukan.' }
+  if (!user) return { error: 'Account not found.' }
   const oldPassword = formData.get('oldPassword') as string
   const newPassword = formData.get('newPassword') as string
-  if (!verifyPassword(oldPassword, user.passwordHash)) return { error: 'Password lama tidak sesuai.' }
-  if (newPassword.length < 6) return { error: 'Password baru minimal 6 karakter.' }
+  if (!verifyPassword(oldPassword, user.passwordHash)) return { error: 'Old password is incorrect.' }
+  if (newPassword.length < 6) return { error: 'New password must be at least 6 characters.' }
   await updateUser({ ...user, passwordHash: hashPassword(newPassword) })
   return { success: true }
 }
@@ -688,7 +688,7 @@ export async function generateResetLinkAction(
   const jar = await cookies()
   if (!jar.get('admin-token')) return { error: 'Unauthorized' }
   const user = await getUserByEmail(email)
-  if (!user) return { error: 'User tidak ditemukan.' }
+  if (!user) return { error: 'User not found.' }
   const token = await createResetToken(email)
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
   return { link: `${base}/reset-password?token=${token}` }
@@ -701,12 +701,12 @@ export async function resetPasswordAction(
   const token    = formData.get('token') as string
   const password = formData.get('password') as string
   const confirm  = formData.get('confirm') as string
-  if (password !== confirm)     return { error: 'Konfirmasi password tidak cocok.' }
-  if (password.length < 6)      return { error: 'Password minimal 6 karakter.' }
+  if (password !== confirm)     return { error: 'Password confirmation does not match.' }
+  if (password.length < 6)      return { error: 'Password must be at least 6 characters.' }
   const email = await validateAndConsumeResetToken(token)
-  if (!email)                   return { error: 'Link tidak valid atau sudah kedaluwarsa.' }
+  if (!email)                   return { error: 'Link is invalid or has expired.' }
   const user = await getUserByEmail(email)
-  if (!user)                    return { error: 'Akun tidak ditemukan.' }
+  if (!user)                    return { error: 'Account not found.' }
   await updateUser({ ...user, passwordHash: hashPassword(password) })
   return { success: true }
 }
@@ -729,8 +729,8 @@ export async function updateRoleAction(
 ): Promise<{ error?: string }> {
   const id = formData.get('id') as string
   const role = await getRoleById(id)
-  if (!role) return { error: 'Role tidak ditemukan.' }
-  if (role.locked) return { error: 'Role ini tidak bisa diedit.' }
+  if (!role) return { error: 'Role not found.' }
+  if (role.locked) return { error: 'This role cannot be edited.' }
   const name = (formData.get('name') as string).trim()
   const permissions = formData.getAll('permissions') as Permission[]
   await saveRole({ ...role, name, permissions })
@@ -752,10 +752,10 @@ export async function createAdminAction(
   const username = (formData.get('username') as string).trim()
   const password = (formData.get('password') as string).trim()
   const roleId = formData.get('roleId') as string
-  if (!username || !password) return { error: 'Username dan password wajib diisi.' }
-  if (password.length < 6) return { error: 'Password minimal 6 karakter.' }
+  if (!username || !password) return { error: 'Username and password are required.' }
+  if (password.length < 6) return { error: 'Password must be at least 6 characters.' }
   const exists = await getAdminByUsername(username)
-  if (exists) return { error: 'Username sudah digunakan.' }
+  if (exists) return { error: 'Username is already taken.' }
   await saveAdmin({ id: Date.now().toString(), username, passwordHash: hashAdminPassword(password), roleId, createdAt: new Date().toISOString() })
   revalidatePath('/admin/roles')
   return {}
@@ -778,9 +778,9 @@ export async function addManualEntryAction(
   const note = (formData.get('note') as string | null)?.trim() || undefined
 
   if (!date || !source || !platform || isNaN(amount) || amount <= 0)
-    return { error: 'Semua field wajib diisi dengan benar.' }
+    return { error: 'All fields must be filled in correctly.' }
   if (!['marketplace', 'offline'].includes(source))
-    return { error: 'Sumber tidak valid.' }
+    return { error: 'Invalid source.' }
 
   const jar = await cookies()
   const adminId = jar.get('admin-token')?.value
@@ -811,9 +811,9 @@ export async function addPembukuanAction(
   const note = (formData.get('note') as string | null)?.trim() || undefined
 
   if (!date || !type || !category || isNaN(amount) || amount <= 0)
-    return { error: 'Semua field wajib diisi dengan benar.' }
+    return { error: 'All fields must be filled in correctly.' }
   if (!['pemasukan', 'pengeluaran'].includes(type))
-    return { error: 'Tipe tidak valid.' }
+    return { error: 'Invalid type.' }
 
   const jar = await cookies()
   const adminId = jar.get('admin-token')?.value
@@ -918,7 +918,7 @@ export async function updateProductInfo(
   try {
     const products = await getProducts()
     const existing = products.find(p => p.id === id)
-    if (!existing) return { error: 'Produk tidak ditemukan' }
+    if (!existing) return { error: 'Product not found' }
     const colorsRaw = (formData.get('colors') as string | null) ?? ''
     const colors = colorsRaw.split(',').map(c => c.trim()).filter(Boolean)
     const normalPrice = parsePrice(existing.price)
@@ -944,7 +944,7 @@ export async function updateProductInfo(
     revalidatePath(`/admin/products/${id}/edit`)
     return { ok: true }
   } catch (e) {
-    return { error: e instanceof Error ? e.message : 'Gagal menyimpan' }
+    return { error: e instanceof Error ? e.message : 'Failed to save' }
   }
 }
 
@@ -956,7 +956,7 @@ export async function updateProductPhotos(
   try {
     const products = await getProducts()
     const existing = products.find(p => p.id === id)
-    if (!existing) return { error: 'Produk tidak ditemukan' }
+    if (!existing) return { error: 'Product not found' }
     let image = existing.image
     const mainFile = formData.get('image') as File | null
     if (mainFile && mainFile.size > 0) image = await saveImage(mainFile, id, 'main')
@@ -1203,14 +1203,14 @@ export async function sendOrderMessageAction(
   const email = jar.get('user-session')?.value
   if (!email) return { error: 'Sesi habis, silakan login ulang.' }
   const user = await getUserByEmail(email)
-  if (!user) return { error: 'Pengguna tidak ditemukan.' }
+  if (!user) return { error: 'User not found.' }
 
   const orderId = formData.get('orderId') as string
   const message = (formData.get('message') as string ?? '').trim()
   if (!message) return { error: 'Pesan tidak boleh kosong.' }
 
   const orders = await getOrdersByEmail(email)
-  if (!orders.find(o => o.id === orderId)) return { error: 'Pesanan tidak ditemukan.' }
+  if (!orders.find(o => o.id === orderId)) return { error: 'Order not found.' }
 
   await sendOrderMessage({ id: generateId(12), orderId, sender: 'customer', senderName: user.name, message })
   revalidatePath('/orders')
@@ -1273,7 +1273,7 @@ export async function resellerSendOrderMessageAction(
   if (!message) return { error: 'Pesan tidak boleh kosong.' }
 
   const orders = await getResellerOrders(resellerId)
-  if (!orders.find(o => o.id === orderId)) return { error: 'Pesanan tidak ditemukan.' }
+  if (!orders.find(o => o.id === orderId)) return { error: 'Order not found.' }
 
   await sendOrderMessage({ id: generateId(12), orderId, sender: 'customer', senderName: reseller.name, message })
   revalidatePath('/reseller/dashboard/orders')

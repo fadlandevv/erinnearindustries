@@ -11,8 +11,8 @@ export default async function AdminResellerPage() {
     <>
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title">Manajemen Reseller</h1>
-          <p className="admin-page-subtitle">Kelola akun reseller dan lihat/update status pesanan mereka.</p>
+          <h1 className="admin-page-title">Reseller Management</h1>
+          <p className="admin-page-subtitle">Manage reseller accounts and view/update their order status.</p>
         </div>
       </div>
 

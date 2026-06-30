@@ -17,7 +17,7 @@ export default function DeleteMemberBtn({ id, name }: { id: string; name: string
       className="btn-admin-danger"
       style={{ fontSize: '0.75rem', padding: '0.3rem 0.7rem' }}
     >
-      {pending ? '...' : 'Hapus'}
+      {pending ? '...' : 'Delete'}
     </button>
   )
 }

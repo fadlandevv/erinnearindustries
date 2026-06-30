@@ -26,7 +26,7 @@ function AddForm({ type }: { type: 'bahan' | 'sablon' }) {
       <input
         type="text"
         name="label"
-        placeholder={type === 'bahan' ? 'Nama bahan baru…' : 'Nama ukuran sablon…'}
+        placeholder={type === 'bahan' ? 'New material name…' : 'Screen print size name…'}
         className="admin-form-input"
         style={{ flex: 1 }}
         required
@@ -34,7 +34,7 @@ function AddForm({ type }: { type: 'bahan' | 'sablon' }) {
       <input
         type="number"
         name="price"
-        placeholder="Harga (Rp)"
+        placeholder="Price (Rp)"
         className="admin-form-input"
         style={{ width: 150 }}
         min={1000}
@@ -43,7 +43,7 @@ function AddForm({ type }: { type: 'bahan' | 'sablon' }) {
       />
       <button type="submit" className="btn-admin-primary" disabled={pending}
         style={{ whiteSpace: 'nowrap' }}>
-        {pending ? '…' : '+ Tambah'}
+        {pending ? '…' : '+ Add'}
       </button>
       {state.error && (
         <span style={{ fontSize: '0.78rem', color: '#ef4444', alignSelf: 'center' }}>{state.error}</span>
@@ -64,7 +64,7 @@ function DeleteBtn({ id }: { id: string }) {
         router.refresh()
       }}
     >
-      Hapus
+      Delete
     </button>
   )
 }
@@ -88,8 +88,8 @@ function PricingSection({
           <thead>
             <tr>
               <th>Label</th>
-              <th style={{ width: 180 }}>Harga (Rp)</th>
-              <th style={{ width: 130 }}>Nilai saat ini</th>
+              <th style={{ width: 180 }}>Price (Rp)</th>
+              <th style={{ width: 130 }}>Current value</th>
               <th style={{ width: 80 }}></th>
             </tr>
           </thead>
@@ -131,28 +131,28 @@ export default function PricingClient({ items }: { items: PricingItem[] }) {
   return (
     <form action={formAction}>
       {state.ok && (
-        <div className="admin-alert admin-alert-success">Harga berhasil disimpan.</div>
+        <div className="admin-alert admin-alert-success">Prices saved successfully.</div>
       )}
       {state.error && (
         <div className="admin-alert admin-alert-error">{state.error}</div>
       )}
 
       <PricingSection
-        title="Harga Baju per Bahan"
-        sub="Harga dasar baju sebelum ditambah biaya sablon."
+        title="Shirt Price per Material"
+        sub="Base shirt price before adding screen print cost."
         items={bahan}
         type="bahan"
       />
       <PricingSection
-        title="Harga Sablon per Ukuran"
-        sub="Biaya sablon per sisi (depan / belakang), ditambahkan di atas harga baju."
+        title="Screen Print Price per Size"
+        sub="Screen print cost per side (front / back), added on top of shirt price."
         items={sablon}
         type="sablon"
       />
 
       <div className="admin-form-actions" style={{ justifyContent: 'flex-end' }}>
         <button type="submit" className="btn-admin-primary" disabled={pending}>
-          {pending ? 'Menyimpan…' : 'Simpan Semua Harga'}
+          {pending ? 'Saving…' : 'Save All Prices'}
         </button>
       </div>
     </form>

@@ -48,10 +48,10 @@ function DeleteBtn({ id, label }: { id: string; label?: string }) {
       onClick={async () => {
         setBusy(true)
         await deleteCustomProductOptionAction(id)
-        toast(label ? `${label} dihapus` : 'Dihapus', 'error')
+        toast(label ? `${label} deleted` : 'Deleted', 'error')
         router.refresh()
       }}>
-      Hapus
+      Delete
     </button>
   )
 }
@@ -65,13 +65,13 @@ function AddColorForm({ productType }: { productType: string }) {
     <form ref={ref} action={action} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.75rem', flexWrap: 'wrap' }}>
       <input type="hidden" name="product_type" value={productType} />
       <input type="hidden" name="category" value="color" />
-      <input type="text" name="label" placeholder="Nama warna…" className="admin-form-input" style={{ flex: 1, minWidth: 110 }} required />
+      <input type="text" name="label" placeholder="Color name…" className="admin-form-input" style={{ flex: 1, minWidth: 110 }} required />
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <label style={{ fontSize: '0.78rem', color: '#666' }}>Hex:</label>
         <input type="color" name="value" defaultValue="#ffffff" style={{ width: 38, height: 32, padding: 2, border: '1px solid #ddd', borderRadius: 6, cursor: 'pointer' }} />
       </div>
       <button type="submit" className="btn-admin-primary" disabled={pending} style={{ whiteSpace: 'nowrap' }}>
-        {pending ? '…' : '+ Tambah'}
+        {pending ? '…' : '+ Add'}
       </button>
       {state.error && <span style={{ fontSize: '0.78rem', color: '#ef4444' }}>{state.error}</span>}
     </form>
@@ -84,19 +84,19 @@ function AddBahanForm({ productType }: { productType: string }) {
   const ref = useRef<HTMLFormElement>(null)
   const [state, action, pending] = useActionState(addCustomProductOptionAction, {})
   useEffect(() => {
-    if (state.ok) { ref.current?.reset(); toast('Bahan berhasil ditambahkan'); router.refresh() }
+    if (state.ok) { ref.current?.reset(); toast('Material successfully added'); router.refresh() }
     if (state.error) toast(state.error, 'error')
   }, [state.ok, state.error, router])
   return (
     <form ref={ref} action={action} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.75rem', flexWrap: 'wrap' }}>
       <input type="hidden" name="product_type" value={productType} />
       <input type="hidden" name="category" value="bahan" />
-      <input type="text" name="label" placeholder="Nama bahan baru…" className="admin-form-input" style={{ flex: 1, minWidth: 130 }} required />
-      <input type="number" name="price" placeholder="Harga/pcs" className="admin-form-input" style={{ width: 140 }} min={0} step={1000} defaultValue={0}
+      <input type="text" name="label" placeholder="New material name…" className="admin-form-input" style={{ flex: 1, minWidth: 130 }} required />
+      <input type="number" name="price" placeholder="Price/pcs" className="admin-form-input" style={{ width: 140 }} min={0} step={1000} defaultValue={0}
         onFocus={e => { if (e.target.value === '0') e.target.value = '' }}
         onBlur={e => { if (e.target.value === '') e.target.value = '0' }} />
       <button type="submit" className="btn-admin-primary" disabled={pending} style={{ whiteSpace: 'nowrap' }}>
-        {pending ? '…' : '+ Tambah'}
+        {pending ? '…' : '+ Add'}
       </button>
       {state.error && <span style={{ fontSize: '0.78rem', color: '#ef4444' }}>{state.error}</span>}
     </form>
@@ -112,12 +112,12 @@ function AddSizeForm({ productType }: { productType: string }) {
     <form ref={ref} action={action} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.75rem', flexWrap: 'wrap' }}>
       <input type="hidden" name="product_type" value={productType} />
       <input type="hidden" name="category" value="size" />
-      <input type="text" name="label" placeholder="Ukuran baru (misal: XXXL)" className="admin-form-input" style={{ flex: 1, minWidth: 130 }} required />
+      <input type="text" name="label" placeholder="New size (e.g. XXXL)" className="admin-form-input" style={{ flex: 1, minWidth: 130 }} required />
       <input type="number" name="price" placeholder="Surcharge (Rp)" className="admin-form-input" style={{ width: 150 }} min={0} step={1000} defaultValue={0}
         onFocus={e => { if (e.target.value === '0') e.target.value = '' }}
         onBlur={e => { if (e.target.value === '') e.target.value = '0' }} />
       <button type="submit" className="btn-admin-primary" disabled={pending} style={{ whiteSpace: 'nowrap' }}>
-        {pending ? '…' : '+ Tambah'}
+        {pending ? '…' : '+ Add'}
       </button>
       {state.error && <span style={{ fontSize: '0.72rem', color: '#ef4444' }}>{state.error}</span>}
     </form>
@@ -148,13 +148,13 @@ function PriceCell({ item, productType, category }: { item: BahanItem; productTy
               : await updateCustomProductOptionPriceAction(item.id, price)
             setSaving(false)
             if (res?.ok) {
-              toast(`Harga ${item.label} disimpan`)
+              toast(`Price for ${item.label} saved`)
               router.refresh()
             } else {
-              toast(res?.error ?? 'Gagal menyimpan harga', 'error')
+              toast(res?.error ?? 'Failed to save price', 'error')
             }
           }}>
-          {saving ? '…' : 'Simpan'}
+          {saving ? '…' : 'Save'}
         </button>
       )}
     </div>
@@ -182,8 +182,8 @@ function EditableRow({
       ? await upsertCustomProductOptionPriceAction(productType, category, label, price, item.sortOrder)
       : await updateCustomProductOptionAction(item.id, label, price)
     setSaving(false)
-    if (res?.ok) { toast(`${label} diperbarui`); onDone(); router.refresh() }
-    else toast(res?.error ?? 'Gagal menyimpan', 'error')
+    if (res?.ok) { toast(`${label} updated`); onDone(); router.refresh() }
+    else toast(res?.error ?? 'Failed to save', 'error')
   }
 
   return (
@@ -207,12 +207,12 @@ function EditableRow({
           <button type="button" className="btn-admin-primary"
             style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}
             disabled={saving} onClick={handleSave}>
-            {saving ? '…' : 'Simpan'}
+            {saving ? '…' : 'Save'}
           </button>
           <button type="button" className="btn-admin-secondary"
             style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem' }}
             onClick={onDone}>
-            Batal
+            Cancel
           </button>
         </div>
       </td>
@@ -245,7 +245,7 @@ function FotoCard({ productId, savedImage }: { productId: string; savedImage?: s
       const result = await updateCustomProductImageAction(productId, fd)
       if ('url' in result) {
         setCurrentImage(result.url); setPreview(null)
-        toast('Foto berhasil disimpan')
+        toast('Photo saved successfully')
       } else {
         toast(result.error, 'error')
       }
@@ -266,13 +266,13 @@ function FotoCard({ productId, savedImage }: { productId: string; savedImage?: s
             </div>
           )}
           <span style={{ fontSize: '0.82rem', color: fileName ? '#0d0d0d' : currentImage ? '#555' : '#aaa', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-            {fileName ?? (currentImage ? 'Foto terpasang — klik untuk ganti' : 'Klik untuk pilih foto…')}
+            {fileName ?? (currentImage ? 'Photo set — click to change' : 'Click to select photo…')}
           </span>
           {(fileName || currentImage) && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><polyline points="20 6 9 17 4 12"/></svg>}
         </div>
         <input ref={inputRef} type="file" name="image" accept="image/*" required={!currentImage} onChange={handleFileChange} style={{ display: 'none' }} />
         <button type="submit" className="btn-admin-primary" style={{ whiteSpace: 'nowrap' }} disabled={isPending || (!preview && !fileName)}>
-          {isPending ? '…' : currentImage && !preview ? 'Ganti Foto' : 'Simpan Foto'}
+          {isPending ? '…' : currentImage && !preview ? 'Change Photo' : 'Save Photo'}
         </button>
       </form>
   )
@@ -282,12 +282,12 @@ const hint = (text: string) => <p className="admin-form-hint" style={{ marginBot
 
 // Labels shown to admin per config key
 const CONFIG_LABELS: Record<string, string> = {
-  logo_combo_price: 'Harga Logo combo (depan+belakang)/sisi',
-  price_front:      'Harga depan saja/pcs',
-  price_both:       'Harga depan+belakang/pcs',
-  surcharge_a3:     'Surcharge ukuran A3/pcs',
-  perekat_a4:       'Biaya perekat A4/pcs',
-  perekat_a3:       'Biaya perekat A3/pcs',
+  logo_combo_price: 'Logo combo price (front+back)/side',
+  price_front:      'Front only price/pcs',
+  price_both:       'Front+back price/pcs',
+  surcharge_a3:     'A3 size surcharge/pcs',
+  perekat_a4:       'A4 adhesive cost/pcs',
+  perekat_a3:       'A3 adhesive cost/pcs',
   min_qty_a4:       'Min. order A4 (pcs)',
   min_qty_a3:       'Min. order A3 (pcs)',
   min_qty:          'Min. order (pcs)',
@@ -308,7 +308,7 @@ function ProductConfigSection({
       <input type="hidden" name="product_type" value={productId} />
       <div className="admin-table-wrap">
         <table className="admin-table">
-          <thead><tr><th>Ketentuan</th><th style={{ width: 170 }}>Nilai</th><th style={{ width: 130 }}>Saat ini</th></tr></thead>
+          <thead><tr><th>Setting</th><th style={{ width: 170 }}>Value</th><th style={{ width: 130 }}>Current</th></tr></thead>
           <tbody>
             {keys.map(key => (
               <tr key={key}>
@@ -328,10 +328,10 @@ function ProductConfigSection({
           </tbody>
         </table>
       </div>
-      {state.ok && <p style={{ fontSize: '0.78rem', color: '#16a34a', marginTop: 6 }}>Tersimpan.</p>}
+      {state.ok && <p style={{ fontSize: '0.78rem', color: '#16a34a', marginTop: 6 }}>Saved.</p>}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
         <button type="submit" className="btn-admin-primary" disabled={pending}>
-          {pending ? 'Menyimpan…' : 'Simpan Ketentuan'}
+          {pending ? 'Saving…' : 'Save Settings'}
         </button>
       </div>
     </form>
@@ -345,7 +345,7 @@ function SablonSection({ items }: { items: PricingItem[] }) {
     <form action={saveAction}>
       <div className="admin-table-wrap">
         <table className="admin-table">
-          <thead><tr><th>Ukuran</th><th style={{ width: 200 }}>Harga/sisi</th><th style={{ width: 140 }}>Nilai saat ini</th></tr></thead>
+          <thead><tr><th>Size</th><th style={{ width: 200 }}>Price/side</th><th style={{ width: 140 }}>Current value</th></tr></thead>
           <tbody>
             {items.map(item => (
               <tr key={item.id}>
@@ -360,10 +360,10 @@ function SablonSection({ items }: { items: PricingItem[] }) {
           </tbody>
         </table>
       </div>
-      {saveState.ok && <p style={{ fontSize: '0.78rem', color: '#16a34a', marginTop: 6 }}>Harga disimpan.</p>}
+      {saveState.ok && <p style={{ fontSize: '0.78rem', color: '#16a34a', marginTop: 6 }}>Price saved.</p>}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 10 }}>
         <button type="submit" className="btn-admin-primary" disabled={savePending}>
-          {savePending ? 'Menyimpan…' : 'Simpan Harga Sablon'}
+          {savePending ? 'Saving…' : 'Save Screen Print Prices'}
         </button>
       </div>
     </form>
@@ -423,7 +423,7 @@ export default function CustomProductEditClient({
             ← Custom Products
           </Link>
           <h1 className="admin-page-title">{productName} <span style={{ color: '#aaa', fontWeight: 400 }}>· {productSub}</span></h1>
-          <p className="admin-page-subtitle">Kelola foto, warna, bahan, dan ukuran untuk produk ini</p>
+          <p className="admin-page-subtitle">Manage photos, colors, materials, and sizes for this product</p>
         </div>
         <button type="button" className="btn-admin-secondary"
           style={{ fontSize: '0.82rem', alignSelf: 'center' }}
@@ -432,7 +432,7 @@ export default function CustomProductEditClient({
         </button>
       </div>
 
-      <CollapsibleCard title="Foto Background" open={!!openMap['foto']} onToggle={() => toggle('foto')}>
+      <CollapsibleCard title="Background Photo" open={!!openMap['foto']} onToggle={() => toggle('foto')}>
         <FotoCard productId={productId} savedImage={savedImage} />
       </CollapsibleCard>
 
@@ -442,7 +442,7 @@ export default function CustomProductEditClient({
           {options.colors.length > 0 && (
             <div className="admin-table-wrap">
               <table className="admin-table">
-                <thead><tr><th>Nama</th><th style={{ width: 140 }}>Warna</th><th style={{ width: 80 }}></th></tr></thead>
+                <thead><tr><th>Name</th><th style={{ width: 140 }}>Color</th><th style={{ width: 80 }}></th></tr></thead>
                 <tbody>
                   {options.colors.map(c => (
                     <tr key={c.id}>
@@ -465,10 +465,10 @@ export default function CustomProductEditClient({
       )}
 
       {hasBahan && (
-        <CollapsibleCard title="Jenis Bahan" open={!!openMap['bahan']} onToggle={() => toggle('bahan')}>
+        <CollapsibleCard title="Material Type" open={!!openMap['bahan']} onToggle={() => toggle('bahan')}>
           <div className="admin-table-wrap">
             <table className="admin-table">
-              <thead><tr><th>Label</th><th style={{ width: 200 }}>Harga/pcs</th><th style={{ width: 120 }}>Nilai</th><th style={{ width: 160 }}></th></tr></thead>
+              <thead><tr><th>Label</th><th style={{ width: 200 }}>Price/pcs</th><th style={{ width: 120 }}>Value</th><th style={{ width: 160 }}></th></tr></thead>
               <tbody>
                 {options.bahans.map(b => {
                   const isVirtual = b.id.startsWith('__new__:')
@@ -501,14 +501,14 @@ export default function CustomProductEditClient({
       )}
 
       {hasSizes && (
-        <CollapsibleCard title="Ukuran" open={!!openMap['ukuran']} onToggle={() => toggle('ukuran')}>
+        <CollapsibleCard title="Sizes" open={!!openMap['ukuran']} onToggle={() => toggle('ukuran')}>
           <div className="admin-table-wrap">
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th>Ukuran</th>
+                  <th>Size</th>
                   <th style={{ width: 200 }}>Surcharge/pcs</th>
-                  <th style={{ width: 120 }}>Nilai</th>
+                  <th style={{ width: 120 }}>Value</th>
                   <th style={{ width: 160 }}></th>
                 </tr>
               </thead>
@@ -544,20 +544,20 @@ export default function CustomProductEditClient({
       )}
 
       {hasSablon && (
-        <CollapsibleCard title="Harga Sablon" open={!!openMap['sablon']} onToggle={() => toggle('sablon')}>
+        <CollapsibleCard title="Print Price" open={!!openMap['sablon']} onToggle={() => toggle('sablon')}>
           <SablonSection items={sablonItems} />
         </CollapsibleCard>
       )}
 
       {hasConfig && (
-        <CollapsibleCard title="Harga & Ketentuan" open={!!openMap['config']} onToggle={() => toggle('config')}>
+        <CollapsibleCard title="Pricing & Terms" open={!!openMap['config']} onToggle={() => toggle('config')}>
           <ProductConfigSection productId={productId} config={productConfig} defaults={configDefaults} />
         </CollapsibleCard>
       )}
 
       {!hasColors && !hasBahan && !hasSizes && !hasSablon && !hasConfig && (
         <div className="admin-form-card" style={{ color: '#aaa', fontSize: '0.82rem', padding: '1rem 1.1rem' }}>
-          Tidak ada opsi yang bisa dikonfigurasi untuk produk ini.
+          No configurable options available for this product.
         </div>
       )}
     </div>
