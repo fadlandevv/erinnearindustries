@@ -301,7 +301,7 @@ p:last-child { margin-bottom: 0; }
 .products-header { margin-bottom: 40px; max-width: 650px; }
 .products-header h2 {
   font-size: 40px;
-  font-weight: 600;
+  font-weight: 650;
   letter-spacing: -0.03em;
   line-height: 1.1;
   margin-top: 16px;
@@ -441,7 +441,7 @@ p:last-child { margin-bottom: 0; }
 }
 .service-header h2 {
   font-size: 40px;
-  font-weight: 600;
+  font-weight: 650;
   letter-spacing: -0.03em;
   line-height: 1.1;
   margin-top: 16px;
@@ -3618,7 +3618,7 @@ p:last-child { margin-bottom: 0; }
 }
 .gbn-header h2 {
   font-size: 40px;
-  font-weight: 600;
+  font-weight: 650;
   letter-spacing: -0.03em;
   line-height: 1.1;
   margin-top: 16px;
