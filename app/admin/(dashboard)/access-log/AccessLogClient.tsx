@@ -184,67 +184,64 @@ export default function AccessLogClient({ logs }: { logs: AccessLogEntry[] }) {
       </div>
 
       {/* Filter bar */}
-      <div className="al-filter-bar">
-        <div className="al-filter-group">
-          <label className="al-filter-label">Admin</label>
-          <input
-            type="text"
-            className="admin-form-input al-filter-input"
-            placeholder="Cari username..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            list="al-admin-list"
-          />
-          <datalist id="al-admin-list">
-            {admins.map(a => <option key={a} value={a} />)}
-          </datalist>
-        </div>
-
-        <div className="al-filter-group">
-          <label className="al-filter-label">Action</label>
-          <div className="al-action-tabs">
-            {(['all', 'login', 'logout', 'login_failed'] as const).map(a => (
-              <button
-                key={a}
-                type="button"
-                className={`al-action-tab${filterAction === a ? ' active' : ''}`}
-                onClick={() => setFilterAction(a)}
-              >
-                {a === 'all' ? 'All' : ACTION_LABEL[a]}
-              </button>
-            ))}
+      <div className="admin-form-card" style={{ marginBottom: 16 }}>
+        <div className="admin-form-grid" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, alignItems: 'end' }}>
+          <div className="admin-form-group" style={{ marginBottom: 0 }}>
+            <label>Admin</label>
+            <input
+              type="text"
+              className="admin-form-input"
+              placeholder="Cari username..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              list="al-admin-list"
+            />
+            <datalist id="al-admin-list">
+              {admins.map(a => <option key={a} value={a} />)}
+            </datalist>
           </div>
-        </div>
 
-        <div className="al-filter-group">
-          <label className="al-filter-label">Date Range</label>
-          <div className="al-date-range">
+          <div className="admin-form-group" style={{ marginBottom: 0 }}>
+            <label>Action</label>
+            <select
+              className="admin-form-select"
+              value={filterAction}
+              onChange={e => setFilterAction(e.target.value as typeof filterAction)}
+            >
+              <option value="all">Semua</option>
+              <option value="login">Login</option>
+              <option value="logout">Logout</option>
+              <option value="login_failed">Login Failed</option>
+            </select>
+          </div>
+
+          <div className="admin-form-group" style={{ marginBottom: 0 }}>
+            <label>Dari Tanggal</label>
             <input
               type="date"
-              className="admin-form-input al-filter-input"
+              className="admin-form-input"
               value={dateFrom}
               onChange={e => setDateFrom(e.target.value)}
-              placeholder="From"
             />
-            <span className="al-date-sep">—</span>
+          </div>
+
+          <div className="admin-form-group" style={{ marginBottom: 0 }}>
+            <label>Sampai Tanggal</label>
             <input
               type="date"
-              className="admin-form-input al-filter-input"
+              className="admin-form-input"
               value={dateTo}
               onChange={e => setDateTo(e.target.value)}
-              placeholder="To"
             />
           </div>
         </div>
 
         {isFiltered && (
-          <button
-            type="button"
-            className="al-clear-btn"
-            onClick={clearFilters}
-          >
-            ✕ Reset Filter
-          </button>
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #f0f0f0' }}>
+            <button type="button" className="al-clear-btn" onClick={clearFilters}>
+              ✕ Reset Filter
+            </button>
+          </div>
         )}
       </div>
 
