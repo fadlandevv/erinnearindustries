@@ -20,7 +20,6 @@ export default async function AdminServicesPage() {
         <table className="admin-table">
           <thead>
             <tr>
-              <th>Icon</th>
               <th>Service Name</th>
               <th>Description</th>
               <th>Badge</th>
@@ -37,7 +36,6 @@ export default async function AdminServicesPage() {
               const deleteAction = deleteService.bind(null, s.id)
               return (
                 <tr key={s.id}>
-                  <td style={{ fontSize: '1.1rem' }}>{s.icon}</td>
                   <td style={{ fontWeight: 500 }}>{s.title}</td>
                   <td style={{ color: '#777', maxWidth: '260px' }}>
                     <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
