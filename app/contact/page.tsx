@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
 import { getServices, getProducts } from '@/lib/data'
+import { getUserByEmail } from '@/lib/users'
 import ContactForm from '@/components/ContactForm'
 import ContactHero from '@/components/ContactHero'
 
@@ -20,10 +22,14 @@ export default async function ContactPage({
 }: {
   searchParams: Promise<{ service?: string; product?: string }>
 }) {
-  const [services, products, params] = await Promise.all([
+  const jar = await cookies()
+  const sessionEmail = jar.get('user-session')?.value
+
+  const [services, products, params, user] = await Promise.all([
     getServices(),
     getProducts(),
     searchParams,
+    sessionEmail ? getUserByEmail(sessionEmail) : Promise.resolve(undefined),
   ])
 
   return (
@@ -57,6 +63,8 @@ export default async function ContactPage({
               products={products}
               defaultService={params.service}
               defaultProduct={params.product}
+              defaultName={user?.name}
+              defaultEmail={user?.email}
             />
           </div>
         </div>

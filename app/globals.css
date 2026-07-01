@@ -795,27 +795,109 @@ p:last-child { margin-bottom: 0; }
   box-shadow: 0 0 0 3px rgba(13, 13, 13, 0.06);
 }
 .form-textarea { resize: vertical; min-height: 130px; }
-.form-select {
+.form-label-opt { font-weight: 400; color: #bbb; }
+
+/* ── Contact interest dropdown ── */
+.cf-dropdown-wrap { position: relative; width: 100%; }
+.cf-dropdown-trigger {
   width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
   padding: 12px 16px;
   border: 1.5px solid #e5e5e5;
   border-radius: 12px;
   font-size: 14px;
   background: #fff;
   color: #0d0d0d;
-  outline: none;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
   cursor: pointer;
+  text-align: left;
   transition: border-color 0.15s, box-shadow 0.15s;
+  gap: 8px;
 }
-.form-select:focus {
+.cf-dropdown-trigger:hover { border-color: #ccc; }
+.cf-dropdown-trigger.open {
   border-color: #0d0d0d;
-  box-shadow: 0 0 0 3px rgba(13, 13, 13, 0.06);
+  box-shadow: 0 0 0 3px rgba(13,13,13,0.06);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
-.form-label-opt { font-weight: 400; color: #bbb; }
+.cf-dropdown-value { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cf-dropdown-placeholder { color: #aaa; }
+.cf-dropdown-group-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #f0ede8;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #888;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.cf-dropdown-chevron { color: #999; flex-shrink: 0; transition: transform 0.2s ease; }
+.cf-dropdown-chevron.rotated { transform: rotate(180deg); }
+
+.cf-dropdown-panel {
+  position: absolute;
+  top: 100%; left: 0; right: 0;
+  background: #fff;
+  border: 1.5px solid #0d0d0d;
+  border-top: none;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+  z-index: 100;
+  overflow: hidden;
+  animation: cfDropDown 0.15s cubic-bezier(0.4,0,0.2,1);
+  max-height: 280px;
+  overflow-y: auto;
+}
+@keyframes cfDropDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.cf-dropdown-group-label {
+  padding: 10px 16px 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #bbb;
+}
+.cf-dropdown-group-header {
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #999;
+  background: none;
+  border: none;
+  border-top: 1px solid #f0f0f0;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s, color 0.1s;
+}
+.cf-dropdown-group-header:first-of-type { border-top: none; }
+.cf-dropdown-group-header:hover { background: #fafafa; color: #555; }
+.cf-dropdown-item {
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+  font-size: 14px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: #333;
+  transition: background 0.1s;
+  gap: 8px;
+}
+.cf-dropdown-item:hover { background: #f8f7f5; }
+.cf-dropdown-item.selected { color: #0d0d0d; font-weight: 600; background: #f8f7f5; }
+.cf-dropdown-clear { color: #aaa; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
 .form-submit {
   width: 100%;
   padding: 13.6px;
@@ -4099,10 +4181,20 @@ p:last-child { margin-bottom: 0; }
 [data-theme="dark"] .contact-form-card { background: #141414; }
 [data-theme="dark"] .contact-form-card h3 { color: #f0ede8; }
 [data-theme="dark"] .form-group label { color: #888; }
-[data-theme="dark"] .form-input, [data-theme="dark"] .form-textarea, [data-theme="dark"] .form-select { background: #1a1a1a; border-color: #2a2a2a; color: #f0ede8; }
-[data-theme="dark"] .form-input:focus, [data-theme="dark"] .form-textarea:focus, [data-theme="dark"] .form-select:focus { border-color: #f0ede8; box-shadow: 0 0 0 3px rgba(240,237,232,0.06); }
+[data-theme="dark"] .form-input, [data-theme="dark"] .form-textarea { background: #1a1a1a; border-color: #2a2a2a; color: #f0ede8; }
+[data-theme="dark"] .form-input:focus, [data-theme="dark"] .form-textarea:focus { border-color: #f0ede8; box-shadow: 0 0 0 3px rgba(240,237,232,0.06); }
 [data-theme="dark"] .form-input::placeholder, [data-theme="dark"] .form-textarea::placeholder { color: #555; }
-[data-theme="dark"] .form-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); }
+[data-theme="dark"] .cf-dropdown-trigger { background: #1a1a1a; border-color: #2a2a2a; color: #f0ede8; }
+[data-theme="dark"] .cf-dropdown-trigger:hover { border-color: #3a3a3a; }
+[data-theme="dark"] .cf-dropdown-trigger.open { border-color: #f0ede8; box-shadow: 0 0 0 3px rgba(240,237,232,0.06); }
+[data-theme="dark"] .cf-dropdown-panel { background: #1a1a1a; border-color: #f0ede8; box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
+[data-theme="dark"] .cf-dropdown-item { color: #ccc; }
+[data-theme="dark"] .cf-dropdown-item:hover { background: #222; }
+[data-theme="dark"] .cf-dropdown-item.selected { color: #f0ede8; background: #222; }
+[data-theme="dark"] .cf-dropdown-group-tag { background: #2a2a2a; color: #888; }
+[data-theme="dark"] .cf-dropdown-clear { border-bottom-color: #2a2a2a; }
+[data-theme="dark"] .cf-dropdown-group-header { color: #666; border-top-color: #2a2a2a; }
+[data-theme="dark"] .cf-dropdown-group-header:hover { background: #222; color: #aaa; }
 
 /* Product detail */
 [data-theme="dark"] .breadcrumb a { color: #666; }
