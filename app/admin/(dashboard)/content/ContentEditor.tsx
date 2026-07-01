@@ -263,7 +263,7 @@ export default function ContentEditor({
         {/* ── Products Page ── */}
         {tab === 'products' && (
           <div className="admin-form-card">
-            <p className="admin-form-section-title">Banner</p>
+            <p className="admin-form-section-title">Banner Product</p>
             <BiField content={content} setField={setField} section="productPage" field="title" label="Title (Enter = new line)" multiline />
             <BiField content={content} setField={setField} section="productPage" field="sub" label="Subtitle" multiline />
           </div>
@@ -272,7 +272,7 @@ export default function ContentEditor({
         {/* ── Services Page ── */}
         {tab === 'services' && (
           <div className="admin-form-card">
-            <p className="admin-form-section-title">Services Page — Banner</p>
+            <p className="admin-form-section-title">Banner Service</p>
             <BiField content={content} setField={setField} section="servicePage" field="title" label="Title (Enter = new line)" multiline />
             <BiField content={content} setField={setField} section="servicePage" field="sub" label="Subtitle" multiline />
 
@@ -315,7 +315,7 @@ export default function ContentEditor({
         {/* ── Contact Page ── */}
         {tab === 'contact' && (
           <div className="admin-form-card">
-            <p className="admin-form-section-title">Contact Page — Banner</p>
+            <p className="admin-form-section-title">Banner Contacts</p>
             <BiField content={content} setField={setField} section="contact" field="title" label="Title (Enter = new line)" multiline />
             <BiField content={content} setField={setField} section="contact" field="sub" label="Subtitle" multiline />
           </div>
