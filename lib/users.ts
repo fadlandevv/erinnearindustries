@@ -5,12 +5,13 @@ export type User = {
   id: string
   name: string
   email: string
+  phone?: string
   passwordHash: string
   createdAt: string
 }
 
 function toUser(row: Record<string, string>): User {
-  return { id: row.id, name: row.name, email: row.email, passwordHash: row.password_hash, createdAt: row.created_at }
+  return { id: row.id, name: row.name, email: row.email, phone: row.phone ?? undefined, passwordHash: row.password_hash, createdAt: row.created_at }
 }
 
 export async function getUsers(): Promise<User[]> {
@@ -29,11 +30,11 @@ export async function getUserByEmail(email: string): Promise<User | undefined> {
 }
 
 export async function saveUser(user: User): Promise<void> {
-  await db.from('users').upsert({ id: user.id, name: user.name, email: user.email, password_hash: user.passwordHash, created_at: user.createdAt })
+  await db.from('users').upsert({ id: user.id, name: user.name, email: user.email, phone: user.phone ?? null, password_hash: user.passwordHash, created_at: user.createdAt })
 }
 
 export async function updateUser(user: User): Promise<void> {
-  await db.from('users').update({ name: user.name, email: user.email, password_hash: user.passwordHash }).eq('id', user.id)
+  await db.from('users').update({ name: user.name, email: user.email, phone: user.phone ?? null, password_hash: user.passwordHash }).eq('id', user.id)
 }
 
 export async function deleteUser(id: string): Promise<void> {

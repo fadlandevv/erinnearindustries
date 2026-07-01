@@ -660,7 +660,8 @@ export async function updateProfile(
   if (!user) return { error: 'Account not found.' }
   const name = (formData.get('name') as string).trim()
   if (!name) return { error: 'Name cannot be empty.' }
-  await updateUser({ ...user, name })
+  const phone = ((formData.get('phone') as string) ?? '').trim() || undefined
+  await updateUser({ ...user, name, phone })
   revalidatePath('/profile')
   return { success: true }
 }

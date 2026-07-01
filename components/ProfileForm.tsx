@@ -10,7 +10,7 @@ function ErrorBanner({ msg }: { msg: string }) {
   return <div className="profile-error">{msg}</div>
 }
 
-export default function ProfileForm({ currentName }: { currentName: string }) {
+export default function ProfileForm({ currentName, currentPhone }: { currentName: string; currentPhone?: string }) {
   const [profileState, profileAction, profilePending] = useActionState(updateProfile, {})
   const [passState, passAction, passPending] = useActionState(changePassword, {})
 
@@ -27,6 +27,14 @@ export default function ProfileForm({ currentName }: { currentName: string }) {
             <input
               id="pf-name" name="name" type="text" required
               defaultValue={currentName} className="profile-input"
+            />
+          </div>
+          <div className="profile-form-group">
+            <label htmlFor="pf-phone">Nomor Telepon <span style={{ fontWeight: 400, color: '#bbb' }}>(opsional)</span></label>
+            <input
+              id="pf-phone" name="phone" type="tel"
+              defaultValue={currentPhone ?? ''} className="profile-input"
+              placeholder="+62 8xx xxxx xxxx"
             />
           </div>
           <button type="submit" className="profile-save-btn" disabled={profilePending}>

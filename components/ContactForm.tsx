@@ -9,6 +9,7 @@ type Props = {
   defaultProduct?: string
   defaultName?: string
   defaultEmail?: string
+  defaultPhone?: string
 }
 
 function getDefaultInterest(services: ServiceItem[], products: Product[], defaultService?: string, defaultProduct?: string) {
@@ -166,17 +167,21 @@ function InterestDropdown({
   )
 }
 
-export default function ContactForm({ services, products, defaultService, defaultProduct, defaultName, defaultEmail }: Props) {
+export default function ContactForm({ services, products, defaultService, defaultProduct, defaultName, defaultEmail, defaultPhone }: Props) {
   const [sent, setSent] = useState(false)
-  const [interest, setInterest] = useState<{ value: string; label: string; group: string } | null>(
-    () => getDefaultInterest(services, products, defaultService, defaultProduct)
-  )
+  const [interest, setInterest] = useState<{ value: string; label: string; group: string } | null>(null)
   const [form, setForm] = useState({
     name: defaultName ?? '',
     email: defaultEmail ?? '',
-    phone: '',
+    phone: defaultPhone ?? '',
     message: '',
   })
+
+  useEffect(() => {
+    const initial = getDefaultInterest(services, products, defaultService, defaultProduct)
+    if (initial) setInterest(initial)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm({ ...form, [e.target.name]: e.target.value })

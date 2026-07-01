@@ -65,6 +65,7 @@ export default async function ContactPage({
               defaultProduct={params.product}
               defaultName={user?.name}
               defaultEmail={user?.email}
+              defaultPhone={user?.phone}
             />
           </div>
         </div>

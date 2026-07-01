@@ -59,7 +59,7 @@ export default async function ProfilePage() {
         </div>
 
         {/* Forms */}
-        <ProfileForm currentName={user.name} />
+        <ProfileForm currentName={user.name} currentPhone={user.phone} />
 
       </div>
     </section>
