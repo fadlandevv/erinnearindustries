@@ -47,13 +47,6 @@ export default function NewServicePage() {
             <p className="admin-form-hint">One item per line — displayed as a list on the detail page</p>
           </div>
 
-          <div className="admin-form-group">
-            <label htmlFor="tag">Badge <span style={{ color: '#aaa', fontWeight: 400 }}>(optional)</span></label>
-            <input id="tag" name="tag" type="text" className="admin-form-input"
-              placeholder="e.g. Most Popular or B2B" />
-            <p className="admin-form-hint">Leave blank to hide the badge</p>
-          </div>
-
           <div className="admin-form-actions">
             <button type="submit" className="btn-admin-primary">Save Service</button>
             <Link href="/admin/services" className="btn-admin-secondary">Cancel</Link>

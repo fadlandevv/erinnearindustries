@@ -22,14 +22,13 @@ export default async function AdminServicesPage() {
             <tr>
               <th>Service Name</th>
               <th>Description</th>
-              <th>Badge</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {services.length === 0 && (
               <tr>
-                <td colSpan={5} className="admin-empty">No services yet. Add your first service.</td>
+                <td colSpan={4} className="admin-empty">No services yet. Add your first service.</td>
               </tr>
             )}
             {services.map((s) => {
@@ -41,9 +40,6 @@ export default async function AdminServicesPage() {
                     <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {s.desc}
                     </span>
-                  </td>
-                  <td>
-                    {s.tag ? <span className="admin-badge">{s.tag}</span> : <span style={{ color: '#ccc' }}>—</span>}
                   </td>
                   <td>
                     <div className="admin-table-actions">
