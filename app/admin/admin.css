@@ -614,7 +614,7 @@
 
 /* ── Access Log ── */
 .al-clear-btn {
-  padding: 6px 12px;
+  padding: 5px 12px;
   border-radius: 8px;
   border: none;
   background: none;
@@ -625,6 +625,117 @@
   transition: background 0.15s;
 }
 .al-clear-btn:hover { background: #fee2e2; }
+
+/* ── Custom Date Picker ── */
+.al-datepicker { position: relative; width: 100%; }
+.al-datepicker-trigger {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+.al-datepicker-trigger.focused {
+  border-color: #f47c2f !important;
+  box-shadow: 0 0 0 3px rgba(244,124,47,0.08) !important;
+}
+.al-datepicker-icon { color: #aaa; flex-shrink: 0; }
+.al-datepicker-placeholder { color: #aaa; font-size: 14px; flex: 1; }
+.al-datepicker-trigger span:not(.al-datepicker-placeholder):not(.al-datepicker-clear):not(.al-datepicker-icon) {
+  flex: 1; font-size: 14px; color: #0d0d0d;
+}
+.al-datepicker-clear {
+  margin-left: auto;
+  color: #bbb;
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.1s;
+}
+.al-datepicker-clear:hover { color: #888; }
+
+.al-datepicker-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 200;
+  background: #fff;
+  border: 1.5px solid #e5e5e5;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+  padding: 16px;
+  width: 260px;
+  animation: cfDropDown 0.15s cubic-bezier(0.4,0,0.2,1);
+}
+.al-cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.al-cal-title { font-size: 13px; font-weight: 700; color: #0d0d0d; }
+.al-cal-nav {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  border: 1.5px solid #e5e5e5;
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #666;
+  transition: background 0.12s, border-color 0.12s;
+}
+.al-cal-nav:hover { background: #f4f4f4; border-color: #ccc; }
+
+.al-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.al-cal-day-label {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #bbb;
+  padding: 4px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.al-cal-day {
+  aspect-ratio: 1;
+  border: none;
+  background: none;
+  border-radius: 7px;
+  font-size: 12.5px;
+  color: #333;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.1s, color 0.1s;
+  font-family: inherit;
+}
+.al-cal-day:hover { background: #f4f4f4; }
+.al-cal-day.today { font-weight: 700; color: #f47c2f; }
+.al-cal-day.selected { background: #f47c2f; color: #fff; font-weight: 700; }
+.al-cal-day.selected:hover { background: #e06820; }
+
+.al-cal-footer {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: center;
+}
+.al-cal-today-btn {
+  border: none;
+  background: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: #f47c2f;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: background 0.1s;
+}
+.al-cal-today-btn:hover { background: #fff5ee; }
 
 .al-export-menu {
   position: absolute;
@@ -1322,6 +1433,14 @@
 [data-theme="dark"] .admin-table tr:hover td { background: #1a1a1a; }
 [data-theme="dark"] .admin-badge { background: #1e1e1e; color: #888; }
 [data-theme="dark"] .al-clear-btn:hover { background: #2a0a0a; }
+[data-theme="dark"] .al-datepicker-panel { background: #1a1a1a; border-color: #2a2a2a; box-shadow: 0 12px 32px rgba(0,0,0,0.5); }
+[data-theme="dark"] .al-cal-title { color: #f0ede8; }
+[data-theme="dark"] .al-cal-nav { background: #1a1a1a; border-color: #2a2a2a; color: #888; }
+[data-theme="dark"] .al-cal-nav:hover { background: #222; border-color: #3a3a3a; }
+[data-theme="dark"] .al-cal-day { color: #ccc; }
+[data-theme="dark"] .al-cal-day:hover { background: #222; }
+[data-theme="dark"] .al-cal-footer { border-top-color: #2a2a2a; }
+[data-theme="dark"] .al-cal-today-btn:hover { background: #2a1a0a; }
 [data-theme="dark"] .al-export-menu { background: #1a1a1a; border-color: #2a2a2a; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
 [data-theme="dark"] .al-export-item { color: #ccc; }
 [data-theme="dark"] .al-export-item:hover { background: #222; }
