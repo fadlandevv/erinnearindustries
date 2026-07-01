@@ -43,22 +43,12 @@ export default function ServicePageClient({ services }: { services: ServiceItem[
                 <h2>{sp.processTitle}</h2>
               </div>
               <div className="process-steps">
-                {sp.steps.map((step, i) => (
-                  <>
-                    <div key={step.num} className="process-step">
-                      <span className="process-step-num">{step.num}</span>
-                      <h4>{step.title}</h4>
-                      <p>{step.desc}</p>
-                    </div>
-                    {i < sp.steps.length - 1 && (
-                      <div key={`conn-${i}`} className="process-connector" aria-hidden="true">
-                        <svg width="32" height="2" viewBox="0 0 32 2" fill="none">
-                          <line x1="0" y1="1" x2="26" y2="1" stroke="#ccc" strokeWidth="1.5" strokeDasharray="4 3"/>
-                          <path d="M24 -3 L32 1 L24 5" stroke="#ccc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                        </svg>
-                      </div>
-                    )}
-                  </>
+                {sp.steps.map((step) => (
+                  <div key={step.num} className="process-step">
+                    <span className="process-step-num">{step.num}</span>
+                    <h4>{step.title}</h4>
+                    <p>{step.desc}</p>
+                  </div>
                 ))}
               </div>
             </div>
