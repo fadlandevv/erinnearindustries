@@ -158,6 +158,67 @@ function DatePicker({ value, onChange, placeholder }: {
   )
 }
 
+// ── Custom Select ──────────────────────────────────────────────
+function CustomSelect<T extends string>({ value, onChange, options }: {
+  value: T
+  onChange: (v: T) => void
+  options: { value: T; label: string }[]
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const selected = options.find(o => o.value === value)
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  return (
+    <div ref={ref} className="al-datepicker">
+      <button
+        type="button"
+        className={`al-datepicker-trigger admin-form-input${open ? ' focused' : ''}`}
+        onClick={() => setOpen(o => !o)}
+      >
+        <span style={{ flex: 1, fontSize: 14, color: '#0d0d0d', textAlign: 'left' }}>
+          {selected?.label}
+        </span>
+        <svg
+          width="12" height="12" viewBox="0 0 12 12" fill="none"
+          className="al-datepicker-icon"
+          style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
+        >
+          <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+
+      {open && (
+        <div className="al-datepicker-panel" style={{ width: '100%', padding: '6px' }}>
+          {options.map(opt => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`al-select-item${opt.value === value ? ' selected' : ''}`}
+              onClick={() => { onChange(opt.value); setOpen(false) }}
+            >
+              {opt.label}
+              {opt.value === value && (
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                  <path d="M2 6.5l3 3 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Export helpers ─────────────────────────────────────────────
 const HEADERS = ['Waktu', 'Admin', 'Action', 'IP Address']
 function rowValues(r: AccessLogEntry) {
@@ -281,12 +342,16 @@ export default function AccessLogClient({ logs }: { logs: AccessLogEntry[] }) {
 
           <div className="admin-form-group" style={{ marginBottom: 0 }}>
             <label>Action</label>
-            <select className="admin-form-select" value={filterAction} onChange={e => setFilterAction(e.target.value as typeof filterAction)}>
-              <option value="all">Semua</option>
-              <option value="login">Login</option>
-              <option value="logout">Logout</option>
-              <option value="login_failed">Login Failed</option>
-            </select>
+            <CustomSelect
+              value={filterAction}
+              onChange={setFilterAction}
+              options={[
+                { value: 'all', label: 'Semua' },
+                { value: 'login', label: 'Login' },
+                { value: 'logout', label: 'Logout' },
+                { value: 'login_failed', label: 'Login Failed' },
+              ]}
+            />
           </div>
 
           <div className="admin-form-group" style={{ marginBottom: 0 }}>

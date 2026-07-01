@@ -737,6 +737,20 @@
 }
 .al-cal-today-btn:hover { background: #fff5ee; }
 
+.al-select-item {
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 12px;
+  border: none; background: none;
+  border-radius: 8px;
+  font-size: 13.5px; font-family: inherit;
+  color: #333; cursor: pointer; text-align: left;
+  transition: background 0.1s;
+  gap: 8px;
+}
+.al-select-item:hover { background: #f4f4f4; }
+.al-select-item.selected { color: #f47c2f; font-weight: 600; background: #fff5ee; }
+
 .al-export-menu {
   position: absolute;
   top: calc(100% + 6px);
@@ -1441,6 +1455,9 @@
 [data-theme="dark"] .al-cal-day:hover { background: #222; }
 [data-theme="dark"] .al-cal-footer { border-top-color: #2a2a2a; }
 [data-theme="dark"] .al-cal-today-btn:hover { background: #2a1a0a; }
+[data-theme="dark"] .al-select-item { color: #ccc; }
+[data-theme="dark"] .al-select-item:hover { background: #222; }
+[data-theme="dark"] .al-select-item.selected { background: #2a1a0a; }
 [data-theme="dark"] .al-export-menu { background: #1a1a1a; border-color: #2a2a2a; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
 [data-theme="dark"] .al-export-item { color: #ccc; }
 [data-theme="dark"] .al-export-item:hover { background: #222; }
