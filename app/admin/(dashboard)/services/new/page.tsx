@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { createService } from '@/lib/actions'
-import ServiceIconPicker from '@/components/ServiceIconPicker'
 
 export default function NewServicePage() {
   return (
@@ -14,7 +13,7 @@ export default function NewServicePage() {
       </div>
 
       <div className="admin-form-card">
-        <form action={createService}>
+        <form action={createService} encType="multipart/form-data">
           <div className="admin-form-grid">
             <div className="admin-form-group">
               <label htmlFor="title">Service Name *</label>
@@ -22,8 +21,9 @@ export default function NewServicePage() {
                 placeholder="cth. Brand Identity" required />
             </div>
             <div className="admin-form-group">
-              <label>Icon *</label>
-              <ServiceIconPicker />
+              <label>Icon</label>
+              <input type="file" name="icon" accept="image/svg+xml,image/png,image/webp" className="admin-gallery-file-input" />
+              <p className="admin-form-hint">SVG, PNG, atau WebP — disarankan ukuran 48×48px</p>
             </div>
           </div>
 

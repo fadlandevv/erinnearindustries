@@ -248,14 +248,27 @@ export async function deleteProduct(id: string) {
   redirect('/admin/products?toast=Product+successfully+deleted&toastType=success')
 }
 
+async function uploadServiceIcon(id: string, file: File): Promise<string> {
+  const ext = file.name.split('.').pop()?.toLowerCase() || 'svg'
+  const path = `service-icons/${id}.${ext}`
+  await db.storage.from('images').upload(path, Buffer.from(await file.arrayBuffer()), {
+    upsert: true, contentType: file.type || `image/${ext}`,
+  })
+  const { data: { publicUrl } } = db.storage.from('images').getPublicUrl(path)
+  return publicUrl
+}
+
 export async function createService(formData: FormData) {
   const services = await getServices()
   const tag = (formData.get('tag') as string).trim()
   const featuresRaw = (formData.get('features') as string).trim()
   const features = featuresRaw ? featuresRaw.split('\n').map((l) => l.trim()).filter(Boolean) : undefined
+  const id = Date.now().toString()
+  const iconFile = formData.get('icon') as File | null
+  const icon = iconFile && iconFile.size > 0 ? await uploadServiceIcon(id, iconFile) : ''
   services.push({
-    id: Date.now().toString(),
-    icon: formData.get('icon') as string,
+    id,
+    icon,
     title: formData.get('title') as string,
     desc: formData.get('desc') as string,
     tag: tag || null,
@@ -273,10 +286,15 @@ export async function updateService(id: string, formData: FormData) {
   const featuresRaw = (formData.get('features') as string).trim()
   const features = featuresRaw ? featuresRaw.split('\n').map((l) => l.trim()).filter(Boolean) : undefined
   const services = await getServices()
+  const existing = services.find(s => s.id === id)
+  const iconFile = formData.get('icon') as File | null
+  const icon = iconFile && iconFile.size > 0
+    ? await uploadServiceIcon(id, iconFile)
+    : (existing?.icon ?? '')
   const updated = services.map((s) =>
     s.id === id ? {
       ...s,
-      icon: formData.get('icon') as string,
+      icon,
       title: formData.get('title') as string,
       desc: formData.get('desc') as string,
       tag: tag || null,

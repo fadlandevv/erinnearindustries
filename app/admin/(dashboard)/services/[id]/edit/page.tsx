@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getServiceById } from '@/lib/data'
 import { updateService } from '@/lib/actions'
-import ServiceIconPicker from '@/components/ServiceIconPicker'
 
 export default async function EditServicePage({
   params,
@@ -26,7 +25,7 @@ export default async function EditServicePage({
       </div>
 
       <div className="admin-form-card">
-        <form action={updateAction}>
+        <form action={updateAction} encType="multipart/form-data">
           <div className="admin-form-grid">
             <div className="admin-form-group">
               <label htmlFor="title">Service Name *</label>
@@ -34,8 +33,17 @@ export default async function EditServicePage({
                 defaultValue={service.title} required />
             </div>
             <div className="admin-form-group">
-              <label>Icon *</label>
-              <ServiceIconPicker defaultValue={service.icon} />
+              <label>Icon</label>
+              {service.icon && (
+                <div style={{ width: 40, height: 40, marginBottom: 8 }}>
+                  {service.icon.startsWith('http')
+                    ? <img src={service.icon} alt="icon" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    : <span dangerouslySetInnerHTML={{ __html: service.icon }} />
+                  }
+                </div>
+              )}
+              <input type="file" name="icon" accept="image/svg+xml,image/png,image/webp" className="admin-gallery-file-input" />
+              <p className="admin-form-hint">SVG, PNG, atau WebP — kosongkan jika tidak ingin mengubah icon</p>
             </div>
           </div>
 

@@ -50,7 +50,11 @@ export default async function ServiceDetailPage({
       {/* Hero */}
       <div className="svc-detail-hero">
         <div className="svc-detail-hero-inner">
-          <div className="svc-detail-icon" dangerouslySetInnerHTML={{ __html: service.icon }} />
+          <div className="svc-detail-icon">
+            {service.icon?.startsWith('http')
+              ? <img src={service.icon} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              : <span dangerouslySetInnerHTML={{ __html: service.icon }} />}
+          </div>
           <h1 className="svc-detail-title">{service.title}</h1>
           <p className="svc-detail-sub">{service.desc}</p>
         </div>
@@ -121,7 +125,11 @@ export default async function ServiceDetailPage({
             <div className="svc-detail-others-grid">
               {allServices.slice(0, 3).map((s) => (
                 <Link key={s.id} href={`/service/${s.id}`} className="svc-detail-other-card">
-                  <div className="svc-detail-other-icon" dangerouslySetInnerHTML={{ __html: s.icon }} />
+                  <div className="svc-detail-other-icon">
+                    {s.icon?.startsWith('http')
+                      ? <img src={s.icon} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      : <span dangerouslySetInnerHTML={{ __html: s.icon }} />}
+                  </div>
                   <div>
                     <div className="svc-detail-other-title">{s.title}</div>
                     <div className="svc-detail-other-desc">{s.desc}</div>
