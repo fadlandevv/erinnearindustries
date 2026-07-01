@@ -586,7 +586,8 @@
   background: #fff;
   border-radius: 16px;
   border: 1px solid #ebebeb;
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .admin-table { width: 100%; border-collapse: collapse; }
 .admin-table th {
@@ -936,9 +937,9 @@
   .admin-page-title { font-size: 20px; }
 
   /* ── Tables ── */
-  .admin-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+  .admin-table-wrap { border-radius: 12px; }
   .admin-table { min-width: 560px; }
-  .wh-table { min-width: 640px; }
+  .wh-table { min-width: 700px; }
 
   /* ── Sizechart ── */
   .admin-sizechart-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -1398,10 +1399,9 @@
   font-size: 12.48px; font-weight: 600; color: #555;
 }
 
-.wh-table th, .wh-table td { padding-left: 16px; padding-right: 16px; }
-.wh-table th:not(:first-child), .wh-table td:not(:first-child) { padding-left: 32px; padding-right: 32px; }
-.wh-table th:last-child, .wh-table td:last-child { padding-left: 8px; padding-right: 50px; }
-.wh-table .wh-product-cell { font-weight: 600; vertical-align: top; width: 800px; min-width: 800px; }
+.wh-table th, .wh-table td { padding-left: 14px; padding-right: 14px; }
+.wh-table th:last-child, .wh-table td:last-child { padding-left: 8px; padding-right: 14px; }
+.wh-table .wh-product-cell { font-weight: 600; vertical-align: top; min-width: 180px; }
 .wh-row-group-start td { border-top: 1.5px solid #e8e8e8 !important; }
 
 .wh-edit-btn {
