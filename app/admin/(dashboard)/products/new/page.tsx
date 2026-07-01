@@ -17,7 +17,7 @@ export default function NewProductPage() {
       </div>
 
       <div className="admin-form-card">
-        <form action={createProduct} encType="multipart/form-data">
+        <form action={createProduct}>
           <div className="admin-product-layout">
 
             {/* ── Left ── */}

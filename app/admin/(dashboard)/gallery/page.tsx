@@ -33,7 +33,7 @@ export default async function GalleryAdminPage() {
                 Slot {idx + 1} — {slotNames[idx]}
               </div>
 
-              <form action={action} encType="multipart/form-data" className="admin-gallery-form">
+              <form action={action} className="admin-gallery-form">
                 <div className="admin-form-group" style={{ marginBottom: '0.75rem' }}>
                   <label>Photo</label>
                   <input

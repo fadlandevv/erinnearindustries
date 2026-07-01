@@ -31,7 +31,7 @@ export default function PhotosForm({ productId, image, images }: Props) {
 
   return (
     <div className="admin-form-card" style={{ marginTop: '1.25rem' }}>
-      <form action={action} encType="multipart/form-data">
+      <form action={action}>
         <p className="admin-form-section-title">Product Photos</p>
         <p className="admin-form-hint" style={{ marginBottom: '0.75rem' }}>The first photo becomes the main product photo</p>
         <div className="admin-photos-5col">

@@ -27,7 +27,7 @@ export default async function ShowcaseAdminPage() {
                 )}
               </div>
 
-              <form action={action} encType="multipart/form-data">
+              <form action={action}>
                 <div className="admin-form-group">
                   <label>Photo</label>
                   <input type="file" name="image" accept="image/*" className="admin-gallery-file-input" />
