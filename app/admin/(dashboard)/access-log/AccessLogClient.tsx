@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import type { AccessLogEntry, AccessAction } from '@/lib/access-log'
 
 const ACTION_LABEL: Record<AccessAction, string> = {
@@ -21,25 +21,108 @@ function formatDate(iso: string) {
   })
 }
 
-function toCSV(rows: AccessLogEntry[]): string {
-  const header = ['Time', 'Admin', 'Action', 'IP Address']
-  const lines = rows.map(r => [
-    formatDate(r.createdAt),
-    r.username,
-    ACTION_LABEL[r.action],
-    r.ip,
-  ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
-  return [header.join(','), ...lines].join('\r\n')
+const HEADERS = ['Waktu', 'Admin', 'Action', 'IP Address']
+
+function rowValues(r: AccessLogEntry) {
+  return [formatDate(r.createdAt), r.username, ACTION_LABEL[r.action], r.ip]
 }
 
-function downloadCSV(content: string, filename: string) {
-  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' })
+function triggerDownload(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  a.click()
+  a.href = url; a.download = filename; a.click()
   URL.revokeObjectURL(url)
+}
+
+function exportCSV(rows: AccessLogEntry[], filename: string) {
+  const lines = rows.map(r => rowValues(r).map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+  const content = [HEADERS.join(','), ...lines].join('\r\n')
+  triggerDownload(new Blob([content], { type: 'text/csv;charset=utf-8;' }), filename)
+}
+
+function exportExcel(rows: AccessLogEntry[], filename: string) {
+  const ths = HEADERS.map(h => `<th>${h}</th>`).join('')
+  const trs = rows.map(r => `<tr>${rowValues(r).map(v => `<td>${v}</td>`).join('')}</tr>`).join('')
+  const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"/></head><body><table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table></body></html>`
+  triggerDownload(new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8;' }), filename)
+}
+
+function exportPDF(rows: AccessLogEntry[], title: string) {
+  const ths = HEADERS.map(h => `<th>${h}</th>`).join('')
+  const trs = rows.map(r => `<tr>${rowValues(r).map(v => `<td>${v}</td>`).join('')}</tr>`).join('')
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${title}</title><style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,sans-serif;font-size:11px;padding:24px;color:#111}
+    h1{font-size:15px;font-weight:700;margin-bottom:4px}
+    p{color:#888;font-size:10px;margin-bottom:16px}
+    table{width:100%;border-collapse:collapse}
+    th{background:#f5f5f5;text-align:left;padding:7px 10px;border:1px solid #ddd;font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:#666;font-weight:700}
+    td{padding:7px 10px;border:1px solid #eee;vertical-align:top}
+    tr:nth-child(even) td{background:#fafafa}
+  </style></head><body>
+    <h1>Access Log</h1>
+    <p>Diekspor pada ${new Date().toLocaleString('id-ID')} · ${rows.length} entri</p>
+    <table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>
+  </body></html>`
+  const win = window.open('', '_blank')
+  if (!win) return
+  win.document.write(html)
+  win.document.close()
+  win.focus()
+  setTimeout(() => { win.print(); win.close() }, 400)
+}
+
+function ExportDropdown({ onExport, disabled }: { onExport: (fmt: 'csv' | 'excel' | 'pdf') => void; disabled: boolean }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  const formats = [
+    { key: 'csv'   as const, label: 'CSV',   ext: '.csv',  icon: '⊞' },
+    { key: 'excel' as const, label: 'Excel',  ext: '.xls',  icon: '⊞' },
+    { key: 'pdf'   as const, label: 'PDF',    ext: '.pdf',  icon: '⊟' },
+  ]
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button
+        type="button"
+        className="btn-admin-secondary"
+        onClick={() => setOpen(o => !o)}
+        disabled={disabled}
+        style={{ gap: 6 }}
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1v8M4 6l3 3 3-3M2 10v1a1 1 0 001 1h8a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        Export
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ marginLeft: 2 }}>
+          <path d="M2 4l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>
+      {open && (
+        <div className="al-export-menu">
+          {formats.map(f => (
+            <button
+              key={f.key}
+              type="button"
+              className="al-export-item"
+              onClick={() => { onExport(f.key); setOpen(false) }}
+            >
+              <span className="al-export-label">{f.label}</span>
+              <span className="al-export-ext">{f.ext}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default function AccessLogClient({ logs }: { logs: AccessLogEntry[] }) {
@@ -71,9 +154,12 @@ export default function AccessLogClient({ logs }: { logs: AccessLogEntry[] }) {
     })
   }, [logs, search, filterAction, dateFrom, dateTo])
 
-  function handleExport() {
+  function handleExport(fmt: 'csv' | 'excel' | 'pdf') {
     const date = new Date().toISOString().slice(0, 10)
-    downloadCSV(toCSV(filtered), `access-log-${date}.csv`)
+    const base = `access-log-${date}`
+    if (fmt === 'csv')   exportCSV(filtered, `${base}.csv`)
+    if (fmt === 'excel') exportExcel(filtered, `${base}.xls`)
+    if (fmt === 'pdf')   exportPDF(filtered, `Access Log ${date}`)
   }
 
   function clearFilters() {
@@ -94,18 +180,7 @@ export default function AccessLogClient({ logs }: { logs: AccessLogEntry[] }) {
             {filtered.length} dari {logs.length} aktivitas login &amp; logout admin
           </p>
         </div>
-        <button
-          type="button"
-          className="btn-admin-secondary"
-          onClick={handleExport}
-          disabled={filtered.length === 0}
-          style={{ gap: 6 }}
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M7 1v8M4 6l3 3 3-3M2 10v1a1 1 0 001 1h8a1 1 0 001-1v-1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          Export CSV
-        </button>
+        <ExportDropdown onExport={handleExport} disabled={filtered.length === 0} />
       </div>
 
       {/* Filter bar */}
