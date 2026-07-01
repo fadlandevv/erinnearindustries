@@ -682,7 +682,7 @@
   background: #fff;
   border-radius: 20px;
   border: 1px solid #ebebeb;
-  padding: 32px 40px;
+  padding: 28px;
 }
 .admin-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .admin-form-group { display: flex; flex-direction: column; gap: 6.4px; margin-bottom: 16px; }
