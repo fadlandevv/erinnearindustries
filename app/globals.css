@@ -847,10 +847,8 @@ p:last-child { margin-bottom: 0; }
   border-bottom-right-radius: 12px;
   box-shadow: 0 12px 32px rgba(0,0,0,0.1);
   z-index: 100;
-  overflow: hidden;
+  overflow: visible;
   animation: cfDropDown 0.15s cubic-bezier(0.4,0,0.2,1);
-  max-height: 280px;
-  overflow-y: auto;
 }
 @keyframes cfDropDown {
   from { opacity: 0; transform: translateY(-6px); }
