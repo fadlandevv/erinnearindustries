@@ -263,7 +263,7 @@ export default function ContentEditor({
         {/* ── Products Page ── */}
         {tab === 'products' && (
           <div className="admin-form-card">
-            <p className="admin-form-section-title">Products Page — Banner</p>
+            <p className="admin-form-section-title">Banner</p>
             <BiField content={content} setField={setField} section="productPage" field="title" label="Title (Enter = new line)" multiline />
             <BiField content={content} setField={setField} section="productPage" field="sub" label="Subtitle" multiline />
           </div>
