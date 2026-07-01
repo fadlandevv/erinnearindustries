@@ -13,7 +13,7 @@ export default function NewServicePage() {
       </div>
 
       <div className="admin-form-card">
-        <form action={createService} encType="multipart/form-data">
+        <form action={createService}>
           <div className="admin-form-grid">
             <div className="admin-form-group">
               <label htmlFor="title">Service Name *</label>

@@ -260,8 +260,7 @@ async function uploadServiceIcon(id: string, file: File): Promise<string> {
 
 export async function createService(formData: FormData) {
   const services = await getServices()
-  const tag = (formData.get('tag') as string).trim()
-  const featuresRaw = (formData.get('features') as string).trim()
+  const featuresRaw = ((formData.get('features') as string) ?? '').trim()
   const features = featuresRaw ? featuresRaw.split('\n').map((l) => l.trim()).filter(Boolean) : undefined
   const id = Date.now().toString()
   const iconFile = formData.get('icon') as File | null
@@ -271,8 +270,7 @@ export async function createService(formData: FormData) {
     icon,
     title: formData.get('title') as string,
     desc: formData.get('desc') as string,
-    tag: tag || null,
-    longDesc: (formData.get('longDesc') as string).trim() || undefined,
+    longDesc: ((formData.get('longDesc') as string) ?? '').trim() || undefined,
     ...(features?.length ? { features } : {}),
   })
   await saveServices(services)
@@ -282,8 +280,7 @@ export async function createService(formData: FormData) {
 }
 
 export async function updateService(id: string, formData: FormData) {
-  const tag = (formData.get('tag') as string).trim()
-  const featuresRaw = (formData.get('features') as string).trim()
+  const featuresRaw = ((formData.get('features') as string) ?? '').trim()
   const features = featuresRaw ? featuresRaw.split('\n').map((l) => l.trim()).filter(Boolean) : undefined
   const services = await getServices()
   const existing = services.find(s => s.id === id)
@@ -297,8 +294,7 @@ export async function updateService(id: string, formData: FormData) {
       icon,
       title: formData.get('title') as string,
       desc: formData.get('desc') as string,
-      tag: tag || null,
-      longDesc: (formData.get('longDesc') as string).trim() || undefined,
+      longDesc: ((formData.get('longDesc') as string) ?? '').trim() || undefined,
       features: features?.length ? features : undefined,
     } : s
   )

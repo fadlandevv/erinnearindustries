@@ -25,7 +25,7 @@ export default async function EditServicePage({
       </div>
 
       <div className="admin-form-card">
-        <form action={updateAction} encType="multipart/form-data">
+        <form action={updateAction}>
           <div className="admin-form-grid">
             <div className="admin-form-group">
               <label htmlFor="title">Service Name *</label>
