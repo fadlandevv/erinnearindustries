@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import type { AccessLogEntry, AccessAction } from '@/lib/access-log'
 
 const ACTION_LABEL: Record<AccessAction, string> = {
@@ -292,8 +292,6 @@ export default function AccessLogClient({ logs }: { logs: AccessLogEntry[] }) {
   const [dateFrom, setDateFrom]         = useState('')
   const [dateTo, setDateTo]             = useState('')
 
-  const admins = useMemo(() => Array.from(new Set(logs.map(l => l.username))).sort(), [logs])
-
   const filtered = useMemo(() => logs.filter(entry => {
     if (search && !entry.username.toLowerCase().includes(search.toLowerCase())) return false
     if (filterAction !== 'all' && entry.action !== filterAction) return false
@@ -335,9 +333,7 @@ export default function AccessLogClient({ logs }: { logs: AccessLogEntry[] }) {
               type="text" className="admin-form-input"
               placeholder="Cari username..." value={search}
               onChange={e => setSearch(e.target.value)}
-              list="al-admin-list"
             />
-            <datalist id="al-admin-list">{admins.map(a => <option key={a} value={a} />)}</datalist>
           </div>
 
           <div className="admin-form-group" style={{ marginBottom: 0 }}>
