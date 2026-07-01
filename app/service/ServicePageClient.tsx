@@ -25,7 +25,11 @@ export default function ServicePageClient({ services }: { services: ServiceItem[
           <div className="service-page-grid">
             {services.map((s) => (
               <Link key={s.id} href={`/service/${s.id}`} className="service-card service-card-link">
-                <div className="service-card-icon">{s.icon}</div>
+                <div className="service-card-icon">
+                  {s.icon?.startsWith('http')
+                    ? <img src={s.icon} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    : <span dangerouslySetInnerHTML={{ __html: s.icon ?? '' }} />}
+                </div>
                 <h4>{s.title}</h4>
                 <p>{s.desc}</p>
                 <span className="service-card-arrow">→</span>
