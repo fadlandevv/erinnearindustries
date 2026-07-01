@@ -8,10 +8,12 @@ export default function ContentPageClient({ content, showcase }: { content: Cont
   const [preview, setPreview] = useState(false)
   const [previewContent, setPreviewContent] = useState<ContentData>(content)
   const [previewShowcase, setPreviewShowcase] = useState<ShowcaseItem[]>(showcase)
+  const [activeTab, setActiveTab] = useState('home-hero')
 
-  const handleContentChange = useCallback((c: ContentData, s: ShowcaseItem[]) => {
+  const handleContentChange = useCallback((c: ContentData, s: ShowcaseItem[], tab: string) => {
     setPreviewContent(c)
     setPreviewShowcase(s)
+    setActiveTab(tab)
   }, [])
 
   return (
@@ -81,10 +83,12 @@ export default function ContentPageClient({ content, showcase }: { content: Cont
               <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ffbd2e' }} />
               <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#28ca41' }} />
             </div>
-            <span style={{ flex: 1, textAlign: 'center' }}>Live Preview — Homepage</span>
+            <span style={{ flex: 1, textAlign: 'center' }}>
+              Live Preview — {activeTab === 'home-hero' ? 'Homepage' : activeTab === 'products' ? 'Products' : activeTab === 'services' ? 'Services' : 'Contact'}
+            </span>
           </div>
 
-          <ContentPreview content={previewContent} showcase={previewShowcase} />
+          <ContentPreview content={previewContent} showcase={previewShowcase} tab={activeTab} />
         </div>
 
       </div>
