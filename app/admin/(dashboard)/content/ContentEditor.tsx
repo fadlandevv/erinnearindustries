@@ -12,6 +12,42 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'contact', label: 'Page Contacts' },
 ]
 
+const inp = 'admin-form-input'
+const ta = 'admin-form-textarea'
+
+function BiField({
+  content, setField, section, field, label, multiline = false,
+}: {
+  content: ContentData
+  setField: (lang: 'id' | 'en', section: keyof ContentData['id'], field: string, value: string) => void
+  section: keyof ContentData['id']
+  field: string
+  label: string
+  multiline?: boolean
+}) {
+  const idVal = ((content.id[section] as any)?.[field] ?? '') as string
+  const enVal = ((content.en[section] as any)?.[field] ?? '') as string
+  return (
+    <div className="admin-form-group" style={{ marginBottom: '1.25rem' }}>
+      <label style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>{label}</label>
+      <div className="admin-2col-grid">
+        <div>
+          <span className="admin-form-hint" style={{ marginBottom: '0.25rem', display: 'block' }}>🇮🇩 Indonesia</span>
+          {multiline
+            ? <textarea className={ta} rows={3} value={idVal} onChange={e => setField('id', section, field, e.target.value)} />
+            : <input className={inp} type="text" value={idVal} onChange={e => setField('id', section, field, e.target.value)} />}
+        </div>
+        <div>
+          <span className="admin-form-hint" style={{ marginBottom: '0.25rem', display: 'block' }}>🇬🇧 English</span>
+          {multiline
+            ? <textarea className={ta} rows={3} value={enVal} onChange={e => setField('en', section, field, e.target.value)} />
+            : <input className={inp} type="text" value={enVal} onChange={e => setField('en', section, field, e.target.value)} />}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function CollapsibleCard({ title, defaultOpen = true, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
   const [open, setOpen] = useState(defaultOpen)
   return (
@@ -110,40 +146,7 @@ export default function ContentEditor({
     }))
   }
 
-  const inp = 'admin-form-input'
-  const ta = 'admin-form-textarea'
   const grp = 'admin-form-group'
-
-  function BiField({
-    section, field, label, multiline = false,
-  }: {
-    section: keyof ContentData['id']
-    field: string
-    label: string
-    multiline?: boolean
-  }) {
-    const idVal = ((content.id[section] as any)?.[field] ?? '') as string
-    const enVal = ((content.en[section] as any)?.[field] ?? '') as string
-    return (
-      <div className="admin-form-group" style={{ marginBottom: '1.25rem' }}>
-        <label style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>{label}</label>
-        <div className="admin-2col-grid">
-          <div>
-            <span className="admin-form-hint" style={{ marginBottom: '0.25rem', display: 'block' }}>🇮🇩 Indonesia</span>
-            {multiline
-              ? <textarea className={ta} rows={3} value={idVal} onChange={e => setField('id', section, field, e.target.value)} />
-              : <input className={inp} type="text" value={idVal} onChange={e => setField('id', section, field, e.target.value)} />}
-          </div>
-          <div>
-            <span className="admin-form-hint" style={{ marginBottom: '0.25rem', display: 'block' }}>🇬🇧 English</span>
-            {multiline
-              ? <textarea className={ta} rows={3} value={enVal} onChange={e => setField('en', section, field, e.target.value)} />
-              : <input className={inp} type="text" value={enVal} onChange={e => setField('en', section, field, e.target.value)} />}
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   const divider = <div style={{ borderTop: '1px solid var(--border,#e8e4de)', margin: '1.5rem 0' }} />
 
@@ -174,8 +177,8 @@ export default function ContentEditor({
             <p className="admin-form-hint" style={{ marginBottom: '1rem' }}>
               Use <code>*word*</code> for italic. Use a new line for line breaks in the title.
             </p>
-            <BiField section="hero" field="title" label="Title (use *word* for italic, Enter = new line)" multiline />
-            <BiField section="hero" field="sub" label="Subtitle" multiline />
+            <BiField content={content} setField={setField} section="hero" field="title" label="Title (use *word* for italic, Enter = new line)" multiline />
+            <BiField content={content} setField={setField} section="hero" field="sub" label="Subtitle" multiline />
 
           </CollapsibleCard>
 
@@ -207,8 +210,8 @@ export default function ContentEditor({
           </CollapsibleCard>
 
           <CollapsibleCard title="Stats Section" defaultOpen={false}>
-            <BiField section="stats" field="heading" label="Heading (Enter = new line)" multiline />
-            <BiField section="stats" field="desc" label="Description" multiline />
+            <BiField content={content} setField={setField} section="stats" field="heading" label="Heading (Enter = new line)" multiline />
+            <BiField content={content} setField={setField} section="stats" field="desc" label="Description" multiline />
             <div className="admin-form-section-title" style={{ marginTop: '1.5rem', fontSize: '0.8rem' }}>Stat Items</div>
             {(content.id.stats?.items ?? []).map((_, idx) => (
               <div key={idx} className="admin-card" style={{ padding: '1rem', marginBottom: '0.75rem' }}>
@@ -247,13 +250,13 @@ export default function ContentEditor({
 
           <CollapsibleCard title="Featured Products & Services" defaultOpen={false}>
             <p className="admin-form-section-title">Featured Products Section</p>
-            <BiField section="featuredProducts" field="title" label="Title (Enter = new line)" multiline />
+            <BiField content={content} setField={setField} section="featuredProducts" field="title" label="Title (Enter = new line)" multiline />
 
             {divider}
 
             <p className="admin-form-section-title">Services Section</p>
-            <BiField section="servicesSection" field="title" label="Title (Enter = new line)" multiline />
-            <BiField section="servicesSection" field="sub" label="Subtitle" multiline />
+            <BiField content={content} setField={setField} section="servicesSection" field="title" label="Title (Enter = new line)" multiline />
+            <BiField content={content} setField={setField} section="servicesSection" field="sub" label="Subtitle" multiline />
           </CollapsibleCard>
         </>)}
 
@@ -261,8 +264,8 @@ export default function ContentEditor({
         {tab === 'products' && (
           <div className="admin-form-card">
             <p className="admin-form-section-title">Products Page — Banner</p>
-            <BiField section="productPage" field="title" label="Title (Enter = new line)" multiline />
-            <BiField section="productPage" field="sub" label="Subtitle" multiline />
+            <BiField content={content} setField={setField} section="productPage" field="title" label="Title (Enter = new line)" multiline />
+            <BiField content={content} setField={setField} section="productPage" field="sub" label="Subtitle" multiline />
           </div>
         )}
 
@@ -270,13 +273,13 @@ export default function ContentEditor({
         {tab === 'services' && (
           <div className="admin-form-card">
             <p className="admin-form-section-title">Services Page — Banner</p>
-            <BiField section="servicePage" field="title" label="Title (Enter = new line)" multiline />
-            <BiField section="servicePage" field="sub" label="Subtitle" multiline />
+            <BiField content={content} setField={setField} section="servicePage" field="title" label="Title (Enter = new line)" multiline />
+            <BiField content={content} setField={setField} section="servicePage" field="sub" label="Subtitle" multiline />
 
             {divider}
 
             <p className="admin-form-section-title">How We Work / Process Steps</p>
-            <BiField section="servicePage" field="processTitle" label="Section Title" />
+            <BiField content={content} setField={setField} section="servicePage" field="processTitle" label="Section Title" />
 
             {(content.id.servicePage?.steps ?? []).map((_, idx) => (
               <div key={idx} className="admin-card" style={{ padding: '1rem', marginBottom: '0.75rem' }}>
@@ -312,8 +315,8 @@ export default function ContentEditor({
         {tab === 'contact' && (
           <div className="admin-form-card">
             <p className="admin-form-section-title">Contact Page — Banner</p>
-            <BiField section="contact" field="title" label="Title (Enter = new line)" multiline />
-            <BiField section="contact" field="sub" label="Subtitle" multiline />
+            <BiField content={content} setField={setField} section="contact" field="title" label="Title (Enter = new line)" multiline />
+            <BiField content={content} setField={setField} section="contact" field="sub" label="Subtitle" multiline />
           </div>
         )}
 
