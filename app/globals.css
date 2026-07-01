@@ -468,13 +468,10 @@ p:last-child { margin-bottom: 0; }
 .service-card-icon {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
-  background: #0d0d0d;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
   font-size: 17.6px;
 }
 .service-card h4 {
@@ -3736,12 +3733,9 @@ p:last-child { margin-bottom: 0; }
 .svc-detail-icon {
   width: 64px;
   height: 64px;
-  border-radius: 18px;
-  background: #0d0d0d;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
   font-size: 24px;
   margin: 0 auto 20px;
 }
@@ -3861,9 +3855,6 @@ p:last-child { margin-bottom: 0; }
 .svc-detail-other-icon {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
-  background: #0d0d0d;
-  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4138,7 +4129,6 @@ p:last-child { margin-bottom: 0; }
 [data-theme="dark"] .stats-about-avatar { background: #e06820; border-color: #e06820; }
 [data-theme="dark"] .stats-about-avatar::after { background: #d9641a; }
 
-[data-theme="dark"] .service-card-icon { background: #f47c2f; }
 
 [data-theme="dark"] .process-step-num { background: #f47c2f; }
 
@@ -4238,7 +4228,6 @@ p:last-child { margin-bottom: 0; }
 [data-theme="dark"] .svc-detail-back:hover { color: #f0ede8; }
 
 [data-theme="dark"] .svc-detail-hero { background: #111; border-bottom-color: #1e1e1e; }
-[data-theme="dark"] .svc-detail-icon { background: #f47c2f; }
 [data-theme="dark"] .svc-detail-title { color: #f0ede8; }
 [data-theme="dark"] .svc-detail-sub { color: #888; }
 
@@ -4251,7 +4240,6 @@ p:last-child { margin-bottom: 0; }
 [data-theme="dark"] .svc-detail-others-title { color: #666; }
 [data-theme="dark"] .svc-detail-other-card { background: #141414; border-color: #1e1e1e; color: #f0ede8; }
 [data-theme="dark"] .svc-detail-other-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.3); border-color: #2a2a2a; }
-[data-theme="dark"] .svc-detail-other-icon { background: #f47c2f; }
 [data-theme="dark"] .svc-detail-other-title { color: #f0ede8; }
 [data-theme="dark"] .svc-detail-other-desc { color: #888; }
 
