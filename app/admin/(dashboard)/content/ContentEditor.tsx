@@ -282,8 +282,9 @@ export default function ContentEditor({
             <BiField content={content} setField={setField} section="servicePage" field="processTitle" label="Section Title" />
 
             {(content.id.servicePage?.steps ?? []).map((_, idx) => (
-              <div key={idx} className="admin-card" style={{ padding: '1rem', marginBottom: '0.75rem' }}>
-                <p className="admin-form-hint" style={{ fontWeight: 600, marginBottom: '0.75rem' }}>
+              <div key={idx}>
+                {divider}
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
                   Step {content.id.servicePage?.steps?.[idx]?.num ?? idx + 1}
                 </p>
                 <div className="admin-2col-grid" style={{ marginBottom: '0.75rem' }}>
