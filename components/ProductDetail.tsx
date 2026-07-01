@@ -226,7 +226,7 @@ export default function ProductDetail({
             >
               {pd.addToCart}
             </button>
-            <Link href="/contact" className="btn-outline product-detail-contact-btn">
+            <Link href={`/contact?product=${product.id}`} className="btn-outline product-detail-contact-btn">
               {pd.contact}
             </Link>
           </div>

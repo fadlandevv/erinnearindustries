@@ -70,7 +70,7 @@ export default async function ServiceDetailPage({
               <div className="svc-detail-desc-col">
                 <h2 className="svc-detail-section-title">Tentang Layanan Ini</h2>
                 <p className="svc-detail-desc">{service.longDesc}</p>
-                <Link href="/contact" className="btn-dark svc-detail-cta">
+                <Link href={`/contact?service=${service.id}`} className="btn-dark svc-detail-cta">
                   Diskusikan Proyek →
                 </Link>
               </div>
@@ -97,7 +97,7 @@ export default async function ServiceDetailPage({
                 <p className="svc-detail-desc" style={{ color: '#777' }}>
                   Hubungi kami untuk mendapatkan detail lengkap tentang layanan ini.
                 </p>
-                <Link href="/contact" className="btn-dark svc-detail-cta">
+                <Link href={`/contact?service=${service.id}`} className="btn-dark svc-detail-cta">
                   Hubungi Kami →
                 </Link>
               </div>
@@ -111,7 +111,7 @@ export default async function ServiceDetailPage({
         <div className="cta-banner-inner">
           <h2>Siap memulai proyek {service.title}?</h2>
           <p>Ceritakan kebutuhan brand Anda — kami siapkan proposal dalam 48 jam.</p>
-          <Link href="/contact" className="btn-dark" style={{ display: 'inline-flex', marginTop: '1.5rem' }}>
+          <Link href={`/contact?service=${service.id}`} className="btn-dark" style={{ display: 'inline-flex', marginTop: '1.5rem' }}>
             Hubungi Kami →
           </Link>
         </div>

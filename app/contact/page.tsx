@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { getServices, getProducts } from '@/lib/data'
 import ContactForm from '@/components/ContactForm'
 import ContactHero from '@/components/ContactHero'
 
@@ -14,7 +15,17 @@ const details = [
   { icon: '◷', label: 'Working Hours', value: 'Mon – Fri, 09.00 – 18.00 WIB' },
 ]
 
-export default function ContactPage() {
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ service?: string; product?: string }>
+}) {
+  const [services, products, params] = await Promise.all([
+    getServices(),
+    getProducts(),
+    searchParams,
+  ])
+
   return (
     <>
       <ContactHero />
@@ -41,7 +52,12 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <ContactForm />
+            <ContactForm
+              services={services}
+              products={products}
+              defaultService={params.service}
+              defaultProduct={params.product}
+            />
           </div>
         </div>
       </div>
