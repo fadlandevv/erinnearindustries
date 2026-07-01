@@ -57,7 +57,7 @@ function CollapsibleCard({ title, defaultOpen = true, children }: { title: strin
         onClick={() => setOpen(o => !o)}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '1rem 2.5rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
+          padding: '1rem 28px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
         }}
       >
         <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{title}</span>
@@ -69,8 +69,8 @@ function CollapsibleCard({ title, defaultOpen = true, children }: { title: strin
         </svg>
       </button>
       {open && (
-        <div style={{ padding: '0 2.5rem 2rem', borderTop: '1px solid var(--border,#e8e4de)' }}>
-          <div style={{ paddingTop: '2rem' }}>{children}</div>
+        <div style={{ padding: '0 28px 28px', borderTop: '1px solid var(--border,#e8e4de)' }}>
+          <div style={{ paddingTop: '28px' }}>{children}</div>
         </div>
       )}
     </div>
