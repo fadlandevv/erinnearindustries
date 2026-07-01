@@ -86,7 +86,7 @@ function InterestDropdown({
             className={`cf-dropdown-item cf-dropdown-clear${!selected ? ' selected' : ''}`}
             onClick={() => { onSelect(null); setOpen(false) }}
           >
-            — No preference —
+            No preference
           </button>
 
           {services.length > 0 && (
