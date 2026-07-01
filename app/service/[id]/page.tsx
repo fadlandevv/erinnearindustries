@@ -50,7 +50,7 @@ export default async function ServiceDetailPage({
       {/* Hero */}
       <div className="svc-detail-hero">
         <div className="svc-detail-hero-inner">
-          <div className="svc-detail-icon">{service.icon}</div>
+          <div className="svc-detail-icon" dangerouslySetInnerHTML={{ __html: service.icon }} />
           <h1 className="svc-detail-title">{service.title}</h1>
           <p className="svc-detail-sub">{service.desc}</p>
         </div>
@@ -121,7 +121,7 @@ export default async function ServiceDetailPage({
             <div className="svc-detail-others-grid">
               {allServices.slice(0, 3).map((s) => (
                 <Link key={s.id} href={`/service/${s.id}`} className="svc-detail-other-card">
-                  <div className="svc-detail-other-icon">{s.icon}</div>
+                  <div className="svc-detail-other-icon" dangerouslySetInnerHTML={{ __html: s.icon }} />
                   <div>
                     <div className="svc-detail-other-title">{s.title}</div>
                     <div className="svc-detail-other-desc">{s.desc}</div>

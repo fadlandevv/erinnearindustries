@@ -2,8 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getServiceById } from '@/lib/data'
 import { updateService } from '@/lib/actions'
-
-const iconOptions = ['✦', '◈', '◎', '⊕', '◐', '⊞', '◇', '○', '△', '□']
+import ServiceIconPicker from '@/components/ServiceIconPicker'
 
 export default async function EditServicePage({
   params,
@@ -35,12 +34,8 @@ export default async function EditServicePage({
                 defaultValue={service.title} required />
             </div>
             <div className="admin-form-group">
-              <label htmlFor="icon">Icon *</label>
-              <select id="icon" name="icon" className="admin-form-select" defaultValue={service.icon} required>
-                {iconOptions.map((i) => (
-                  <option key={i} value={i}>{i} — {i}</option>
-                ))}
-              </select>
+              <label>Icon *</label>
+              <ServiceIconPicker defaultValue={service.icon} />
             </div>
           </div>
 

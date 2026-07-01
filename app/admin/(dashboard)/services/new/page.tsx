@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { createService } from '@/lib/actions'
-
-const iconOptions = ['✦', '◈', '◎', '⊕', '◐', '⊞', '◇', '○', '△', '□']
+import ServiceIconPicker from '@/components/ServiceIconPicker'
 
 export default function NewServicePage() {
   return (
@@ -23,12 +22,8 @@ export default function NewServicePage() {
                 placeholder="cth. Brand Identity" required />
             </div>
             <div className="admin-form-group">
-              <label htmlFor="icon">Icon *</label>
-              <select id="icon" name="icon" className="admin-form-select" required>
-                {iconOptions.map((i) => (
-                  <option key={i} value={i}>{i} — {i}</option>
-                ))}
-              </select>
+              <label>Icon *</label>
+              <ServiceIconPicker />
             </div>
           </div>
 
