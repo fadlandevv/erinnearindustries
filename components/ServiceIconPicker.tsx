@@ -9,7 +9,7 @@ export default function ServiceIconPicker({ defaultValue }: { defaultValue?: str
   return (
     <div>
       <input type="hidden" name="icon" value={SERVICE_ICONS.find(i => i.key === selected)?.svg ?? ''} />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
         {SERVICE_ICONS.map(icon => (
           <button
             key={icon.key}
@@ -17,21 +17,15 @@ export default function ServiceIconPicker({ defaultValue }: { defaultValue?: str
             title={icon.label}
             onClick={() => setSelected(icon.key)}
             style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-              gap: 4, padding: '10px 6px', borderRadius: 10, cursor: 'pointer',
-              border: selected === icon.key ? '2px solid #0d0d0d' : '2px solid #e8e4de',
-              background: selected === icon.key ? '#f0ede8' : '#fafaf9',
-              transition: 'all 0.15s',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 28, height: 28, padding: 0,
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: selected === icon.key ? '#0d0d0d' : '#bbb',
+              transform: selected === icon.key ? 'scale(1.2)' : 'scale(1)',
+              transition: 'color 0.15s, transform 0.15s',
             }}
-          >
-            <span
-              style={{ width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', color: selected === icon.key ? '#0d0d0d' : '#888' }}
-              dangerouslySetInnerHTML={{ __html: icon.svg }}
-            />
-            <span style={{ fontSize: 9, color: selected === icon.key ? '#0d0d0d' : '#aaa', fontWeight: 500, lineHeight: 1 }}>
-              {icon.label}
-            </span>
-          </button>
+            dangerouslySetInnerHTML={{ __html: icon.svg }}
+          />
         ))}
       </div>
     </div>
