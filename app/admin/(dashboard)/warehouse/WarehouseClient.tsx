@@ -1,7 +1,7 @@
 'use client'
 import { useState, useTransition, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { adjustStockAction, updateProductPriceAction, upsertSizeEntryAction, copyPricingToSizes } from '@/lib/actions'
+import { adjustStockAction, upsertSizeEntryAction, copyPricingToSizes } from '@/lib/actions'
 import type { Product } from '@/lib/data'
 import type { StockLogEntry } from '@/lib/warehouse'
 
@@ -115,51 +115,6 @@ function InlineStockCell({ qty, onSave, pending }: {
   )
 }
 
-function InlineDisplayPriceCell({ productId, currentPrice }: { productId: string; currentPrice: string }) {
-  const router = useRouter()
-  const [editing, setEditing] = useState(false)
-  const [input, setInput] = useState('')
-  const [pending, startTransition] = useTransition()
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  function startEdit() {
-    setInput(currentPrice === '—' ? '' : currentPrice)
-    setEditing(true)
-    setTimeout(() => inputRef.current?.select(), 0)
-  }
-
-  function commit() {
-    const val = input.trim()
-    setEditing(false)
-    if (val && val !== currentPrice) {
-      startTransition(async () => {
-        await updateProductPriceAction(productId, val)
-        router.refresh()
-      })
-    }
-  }
-
-  function onKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter') commit()
-    if (e.key === 'Escape') setEditing(false)
-  }
-
-  if (editing) {
-    return (
-      <input ref={inputRef} type="text" className="admin-form-input"
-        style={{ width: '100%', padding: '0.25rem 0.4rem', fontSize: '0.82rem', marginTop: 4 }}
-        value={input} onChange={e => setInput(e.target.value)}
-        onBlur={commit} onKeyDown={onKeyDown} autoFocus placeholder="e.g. Rp 150.000" />
-    )
-  }
-
-  return (
-    <button className={`wh-price-edit-btn${pending ? ' active' : ''}`}
-      onClick={startEdit} title="Edit website display price" style={{ opacity: pending ? 0.5 : 1 }}>
-      {pending ? '…' : '✎'}
-    </button>
-  )
-}
 
 export default function WarehouseClient({ products, stockMap, priceMap, logs }: Props) {
   const router = useRouter()
@@ -247,7 +202,6 @@ export default function WarehouseClient({ products, stockMap, priceMap, logs }: 
                   </svg>
                 </button>
                 <span>{product.title}</span>
-                <InlineDisplayPriceCell productId={product.id} currentPrice={product.price} />
               </div>
             ) : null}
           </td>
