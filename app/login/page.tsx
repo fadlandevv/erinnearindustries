@@ -1,9 +1,9 @@
-import { Suspense } from 'react'
 import LoginForm from '@/components/LoginForm'
 
 export const metadata = { title: 'Masuk — Erinnear Industries' }
 
-export default function LoginPage() {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ callbackUrl?: string }> }) {
+  const { callbackUrl } = await searchParams
   return (
     <section className="auth-section">
       <div className="auth-card">
@@ -13,9 +13,7 @@ export default function LoginPage() {
         </div>
         <h1 className="auth-title">Masuk</h1>
         <p className="auth-sub">Masuk untuk melihat riwayat pesananmu</p>
-        <Suspense fallback={null}>
-          <LoginForm />
-        </Suspense>
+        <LoginForm callbackUrl={callbackUrl ?? '/orders'} />
       </div>
     </section>
   )

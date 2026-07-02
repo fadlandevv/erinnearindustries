@@ -1,14 +1,11 @@
 'use client'
 import { useActionState } from 'react'
-import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { loginUser } from '@/lib/actions'
 import PasswordInput from '@/components/PasswordInput'
 
-export default function LoginForm() {
+export default function LoginForm({ callbackUrl = '/orders' }: { callbackUrl?: string }) {
   const [state, action, pending] = useActionState(loginUser, {})
-  const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') ?? '/orders'
 
   return (
     <form action={action} className="auth-form">
