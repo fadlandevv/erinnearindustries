@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import LoginForm from '@/components/LoginForm'
 
 export const metadata = { title: 'Masuk — Erinnear Industries' }
@@ -12,7 +13,9 @@ export default function LoginPage() {
         </div>
         <h1 className="auth-title">Masuk</h1>
         <p className="auth-sub">Masuk untuk melihat riwayat pesananmu</p>
-        <LoginForm />
+        <Suspense fallback={null}>
+          <LoginForm />
+        </Suspense>
       </div>
     </section>
   )

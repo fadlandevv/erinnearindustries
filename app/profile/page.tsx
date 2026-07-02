@@ -12,9 +12,9 @@ export const dynamic = 'force-dynamic'
 export default async function ProfilePage() {
   const jar = await cookies()
   const email = jar.get('user-session')?.value
-  if (!email) redirect('/login')
+  if (!email) redirect('/login?callbackUrl=/profile')
   const user = await getUserByEmail(email)
-  if (!user) redirect('/login')
+  if (!user) redirect('/login?callbackUrl=/profile')
   const orders = await getOrdersByEmail(email)
   const paidOrders = orders.filter((o) => o.status === 'paid').length
 
