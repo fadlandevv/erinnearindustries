@@ -13,7 +13,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </div>
         <h1 className="auth-title">Masuk</h1>
         <p className="auth-sub">Masuk untuk melihat riwayat pesananmu</p>
-        <LoginForm callbackUrl={callbackUrl ?? '/orders'} />
+        <LoginForm callbackUrl={callbackUrl ?? '/profile'} />
       </div>
     </section>
   )

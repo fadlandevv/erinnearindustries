@@ -572,7 +572,7 @@ export async function loginUser(
   const jar = await cookies()
   jar.set('user-session', email, { httpOnly: true, sameSite: 'lax', maxAge: 60 * 60 * 24 * 30 })
   const callbackUrl = formData.get('callbackUrl') as string
-  redirect(callbackUrl || '/orders')
+  redirect(callbackUrl || '/profile')
 }
 
 export async function logoutUser() {

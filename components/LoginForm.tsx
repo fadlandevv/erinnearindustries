@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { loginUser } from '@/lib/actions'
 import PasswordInput from '@/components/PasswordInput'
 
-export default function LoginForm({ callbackUrl = '/orders' }: { callbackUrl?: string }) {
+export default function LoginForm({ callbackUrl = '/profile' }: { callbackUrl?: string }) {
   const [state, action, pending] = useActionState(loginUser, {})
 
   return (
