@@ -1,6 +1,7 @@
 'use client'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useActionState } from 'react'
 import type { ServiceItem, Product } from '@/lib/data'
+import { submitContactMessage } from '@/lib/actions'
 
 type Props = {
   services: ServiceItem[]
@@ -168,7 +169,7 @@ function InterestDropdown({
 }
 
 export default function ContactForm({ services, products, defaultService, defaultProduct, defaultName, defaultEmail, defaultPhone }: Props) {
-  const [sent, setSent] = useState(false)
+  const [state, action, pending] = useActionState(submitContactMessage, {})
   const [interest, setInterest] = useState<{ value: string; label: string; group: string } | null>(null)
   const [form, setForm] = useState({
     name: defaultName ?? '',
@@ -187,12 +188,7 @@ export default function ContactForm({ services, products, defaultService, defaul
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setSent(true)
-  }
-
-  if (sent) {
+  if (state.ok) {
     return (
       <div className="contact-form-card">
         <div className="form-success">
@@ -207,7 +203,7 @@ export default function ContactForm({ services, products, defaultService, defaul
   return (
     <div className="contact-form-card">
       <h3>Send us a message</h3>
-      <form onSubmit={handleSubmit}>
+      <form action={action}>
         <input type="hidden" name="interest" value={interest?.value ?? ''} />
 
         <div className="form-row">
@@ -255,7 +251,10 @@ export default function ContactForm({ services, products, defaultService, defaul
             value={form.message} onChange={handleChange} required
           />
         </div>
-        <button type="submit" className="form-submit">Send Message →</button>
+        {state.error && <p className="cf-error">{state.error}</p>}
+        <button type="submit" className="form-submit" disabled={pending}>
+          {pending ? 'Sending...' : 'Send Message →'}
+        </button>
       </form>
     </div>
   )

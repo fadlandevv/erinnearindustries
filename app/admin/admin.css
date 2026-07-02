@@ -1769,3 +1769,122 @@
 .admin-form-input[type="number"]::-webkit-inner-spin-button,
 .admin-form-input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .admin-form-input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+
+/* ===== MESSAGES & CLAIMS ===== */
+.msg-filter-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.msg-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #e0e0e0;
+  background: transparent;
+  font-size: 13px;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.15s;
+}
+.msg-tab:hover { border-color: #f47c2f; color: #f47c2f; }
+.msg-tab.active { background: #f47c2f; border-color: #f47c2f; color: #fff; font-weight: 600; }
+.msg-tab-count {
+  background: rgba(0,0,0,0.08);
+  border-radius: 99px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.msg-tab.active .msg-tab-count { background: rgba(255,255,255,0.25); }
+
+.msg-row { transition: background 0.1s; }
+.msg-row:hover { background: #fafafa; }
+.msg-row--new td:first-child { border-left: 3px solid #f47c2f; }
+.msg-row--open { background: #fff8f4 !important; }
+
+.msg-sender { display: flex; flex-direction: column; gap: 2px; }
+.msg-name { font-weight: 600; font-size: 13.5px; }
+.msg-email { font-size: 11.5px; color: #888; }
+.msg-phone { font-size: 11px; color: #aaa; }
+
+.msg-interest-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.msg-interest-tag[data-type="service"] { background: #ede9ff; color: #7c3aed; }
+.msg-interest-tag[data-type="product"] { background: #fef3c7; color: #d97706; }
+
+.msg-preview { font-size: 13px; color: #444; line-height: 1.5; }
+
+.msg-status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.msg-actions { display: flex; gap: 4px; flex-wrap: wrap; }
+.msg-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1.5px solid #e0e0e0;
+  background: transparent;
+  font-size: 11.5px;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.15s;
+}
+.msg-btn:hover { border-color: #999; color: #333; }
+.msg-btn--reply { border-color: #22c55e33; color: #16a34a; }
+.msg-btn--reply:hover { background: #22c55e11; }
+.msg-btn--close { border-color: #9ca3af44; color: #6b7280; }
+.msg-btn--close:hover { background: #9ca3af11; }
+.msg-btn--delete { border-color: #ef444433; color: #dc2626; }
+.msg-btn--delete:hover { background: #ef444411; }
+.msg-btn--active { font-weight: 700; opacity: 0.5; }
+.msg-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.msg-detail-row td { padding: 0 !important; }
+.msg-detail {
+  padding: 16px 20px;
+  background: #fafafa;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.msg-detail-interest { font-size: 12.5px; color: #666; margin-bottom: 8px; }
+.msg-detail-body {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #222;
+  white-space: pre-wrap;
+  background: #fff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  margin-bottom: 10px;
+}
+.msg-detail-meta { font-size: 12px; color: #888; margin-bottom: 10px; }
+.msg-detail-meta a { color: #f47c2f; text-decoration: none; }
+.msg-detail-status-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+.cf-error { color: #dc2626; font-size: 13px; margin-top: 8px; }
+
+/* Dark mode */
+[data-theme="dark"] .msg-tab { border-color: #2a2a2a; color: #aaa; }
+[data-theme="dark"] .msg-tab:hover { border-color: #f47c2f; color: #f47c2f; }
+[data-theme="dark"] .msg-row:hover { background: #1a1a1a; }
+[data-theme="dark"] .msg-row--open { background: #1f1400 !important; }
+[data-theme="dark"] .msg-detail { background: #141414; border-color: #2a2a2a; }
+[data-theme="dark"] .msg-detail-body { background: #0d0d0d; border-color: #2a2a2a; color: #e0e0e0; }
+[data-theme="dark"] .msg-name { color: #f0ede8; }
+[data-theme="dark"] .msg-preview { color: #bbb; }
+[data-theme="dark"] .msg-btn { border-color: #2a2a2a; color: #aaa; }
+[data-theme="dark"] .msg-btn:hover { border-color: #555; color: #eee; }

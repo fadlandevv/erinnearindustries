@@ -25,6 +25,7 @@ import { fetchShippingCost, fetchShippingCostByName, type ShippingOption } from 
 import { generateId } from './utils'
 import { db } from './db'
 import { getOrderMessages, getMessagesByOrderIds, sendOrderMessage, markMessagesRead, type OrderMessage } from './order-messages'
+import { saveContactMessage, updateMessageStatus, deleteContactMessage, type MessageStatus } from './contact-messages'
 
 function parseSizechart(formData: FormData): string | undefined {
   const chart: Record<string, { panjang: number; lebar: number }> = {}
@@ -1375,6 +1376,46 @@ export async function updateCustomProductImageAction(
   return { url: publicUrl }
 }
 
+
+export async function submitContactMessage(
+  _prev: { error?: string; ok?: boolean },
+  formData: FormData
+): Promise<{ error?: string; ok?: boolean }> {
+  const name    = (formData.get('name') as string ?? '').trim()
+  const email   = (formData.get('email') as string ?? '').trim()
+  const phone   = (formData.get('phone') as string ?? '').trim() || undefined
+  const interest = (formData.get('interest') as string ?? '').trim() || undefined
+  const message = (formData.get('message') as string ?? '').trim()
+
+  if (!name || !email || !message) return { error: 'Nama, email, dan pesan wajib diisi.' }
+
+  try {
+    await saveContactMessage({
+      id: generateId(10),
+      name, email, phone, interest, message,
+      status: 'new',
+      createdAt: new Date().toISOString(),
+    })
+    revalidatePath('/admin/messages')
+    return { ok: true }
+  } catch (e) {
+    return { error: 'Gagal mengirim pesan. Coba lagi.' }
+  }
+}
+
+export async function adminUpdateMessageStatus(id: string, status: MessageStatus): Promise<void> {
+  const jar = await cookies()
+  if (!jar.get('admin-token')) return
+  await updateMessageStatus(id, status)
+  revalidatePath('/admin/messages')
+}
+
+export async function adminDeleteMessage(id: string): Promise<void> {
+  const jar = await cookies()
+  if (!jar.get('admin-token')) return
+  await deleteContactMessage(id)
+  revalidatePath('/admin/messages')
+}
 
 export async function updateProductConfigAction(
   _prev: Record<string, unknown>,

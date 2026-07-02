@@ -37,7 +37,7 @@ export function middleware(request: NextRequest) {
   const isUserAuth = !!userSession?.value
 
   if (pathname === '/login' || pathname === '/register') {
-    if (isUserAuth) return NextResponse.redirect(new URL('/orders', request.url))
+    if (isUserAuth) return NextResponse.redirect(new URL('/profile', request.url))
     return NextResponse.next()
   }
 
@@ -53,5 +53,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/reseller/:path*', '/orders/:path*', '/profile/:path*', '/login', '/register'],
+  matcher: ['/admin/:path*', '/reseller/:path*', '/orders', '/orders/:path*', '/profile', '/profile/:path*', '/login', '/register'],
 }

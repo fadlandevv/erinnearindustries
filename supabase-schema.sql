@@ -268,3 +268,15 @@ create table if not exists custom_product_config (
   updated_at   timestamptz default now(),
   primary key (product_type, key)
 );
+
+-- Contact messages (from Contact Us form)
+create table if not exists contact_messages (
+  id          text primary key,
+  name        text not null,
+  email       text not null,
+  phone       text,
+  interest    text,
+  message     text not null,
+  status      text not null default 'new',
+  created_at  timestamptz not null default now()
+);

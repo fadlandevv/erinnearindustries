@@ -65,6 +65,13 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    group: 'Communications',
+    icon: '✉',
+    items: [
+      { label: 'Messages', href: '/admin/messages', icon: '✉', permission: 'messages' },
+    ],
+  },
+  {
     group: 'System',
     icon: '⊞',
     items: [
