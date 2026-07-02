@@ -4,14 +4,17 @@ import { getOrdersByEmail } from '@/lib/orders'
 import { logoutUser } from '@/lib/actions'
 import ProfileForm from '@/components/ProfileForm'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 
 export const metadata = { title: 'Profil — Erinnear Industries' }
 export const dynamic = 'force-dynamic'
 
 export default async function ProfilePage() {
   const jar = await cookies()
-  const email = jar.get('user-session')?.value ?? ''
-  const user = (await getUserByEmail(email))!
+  const email = jar.get('user-session')?.value
+  if (!email) redirect('/login')
+  const user = await getUserByEmail(email)
+  if (!user) redirect('/login')
   const orders = await getOrdersByEmail(email)
   const paidOrders = orders.filter((o) => o.status === 'paid').length
 
