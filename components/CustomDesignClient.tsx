@@ -148,7 +148,7 @@ const DESIGN_SIZES: Record<DesignSize, { x: number; y: number; w: number; h: num
 const AMPLOP_DESIGN_SIZES: Record<AmplopDesignSize, { x: number; y: number; w: number; h: number }> = {
   kecil:  { x: 110, y: 155, w: 80,  h: 100 },
   sedang: { x:  75, y: 115, w: 150, h: 185 },
-  besar:  { x:  27, y:  37, w: 247, h: 301 },
+  besar:  { x:   2, y:   8, w: 296, h: 360 },
 }
 
 function sablonToDesignSize(label?: string): DesignSize | undefined {
