@@ -4,17 +4,22 @@ import { useState, useRef, useEffect } from 'react'
 type Option = { value: string; label: string }
 
 type Props = {
-  value: string
-  onChange: (value: string) => void
+  value?: string
+  defaultValue?: string
+  onChange?: (value: string) => void
   options: Option[]
   name?: string
   placeholder?: string
 }
 
-export default function AdminSelect({ value, onChange, options, name, placeholder }: Props) {
+export default function AdminSelect({ value, defaultValue, onChange, options, name, placeholder }: Props) {
+  const isControlled = value !== undefined
+  const [internal, setInternal] = useState(defaultValue ?? '')
+  const current = isControlled ? (value as string) : internal
+
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
-  const selected = options.find(o => o.value === value)
+  const selected = options.find(o => o.value === current)
 
   useEffect(() => {
     function onDown(e: MouseEvent) {
@@ -31,90 +36,51 @@ export default function AdminSelect({ value, onChange, options, name, placeholde
     }
   }, [])
 
+  function pick(v: string) {
+    if (!isControlled) setInternal(v)
+    onChange?.(v)
+    setOpen(false)
+  }
+
   return (
-    <div ref={ref} style={{ position: 'relative', width: '100%' }}>
-      {name && <input type="hidden" name={name} value={value} />}
+    <div ref={ref} className="admin-cselect" >
+      {name && <input type="hidden" name={name} value={current} />}
 
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        style={{
-          width: '100%',
-          padding: '0.7rem 0.9rem',
-          border: `1.5px solid ${open ? '#f47c2f' : '#e5e5e5'}`,
-          borderRadius: 10,
-          fontSize: '0.875rem',
-          color: selected ? '#0d0d0d' : '#aaa',
-          background: '#fff',
-          boxShadow: open ? '0 0 0 3px rgba(244,124,47,0.08)' : 'none',
-          transition: 'border-color 0.15s, box-shadow 0.15s',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '0.5rem',
-          cursor: 'pointer',
-          fontFamily: 'inherit',
-          textAlign: 'left',
-        }}
+        className={`admin-cselect-trigger${open ? ' open' : ''}${!selected ? ' placeholder' : ''}`}
       >
-        <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span className="admin-cselect-value">
           {selected?.label ?? placeholder ?? 'Pilih...'}
         </span>
         <svg
+          className={`admin-cselect-chevron${open ? ' open' : ''}`}
           width="10" height="10" viewBox="0 0 10 10" fill="none"
-          style={{ flexShrink: 0, transition: 'transform 0.15s', transform: open ? 'rotate(180deg)' : 'none', opacity: 0.5 }}
         >
           <path d="M2 3.5l3 3 3-3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </button>
 
       {open && (
-        <div style={{
-          position: 'absolute',
-          top: 'calc(100% + 5px)',
-          left: 0,
-          right: 0,
-          background: '#fff',
-          border: '1.5px solid #e5e5e5',
-          borderRadius: 12,
-          boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
-          zIndex: 400,
-          overflow: 'hidden',
-          maxHeight: 240,
-          overflowY: 'auto',
-        }}>
+        <div className="admin-cselect-panel">
           {options.map(opt => {
-            const isActive = opt.value === value
+            const isActive = opt.value === current
             return (
               <button
                 key={opt.value}
                 type="button"
-                onClick={() => { onChange(opt.value); setOpen(false) }}
-                style={{
-                  width: '100%',
-                  padding: '0.65rem 0.9rem',
-                  background: isActive ? 'rgba(244,124,47,0.07)' : 'transparent',
-                  color: isActive ? '#f47c2f' : '#0d0d0d',
-                  fontWeight: isActive ? 600 : 400,
-                  fontSize: '0.875rem',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'background 0.1s',
-                  fontFamily: 'inherit',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                }}
-                onMouseOver={e => { if (!isActive) e.currentTarget.style.background = '#fafaf9' }}
-                onMouseOut={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}
+                onClick={() => pick(opt.value)}
+                className={`admin-cselect-item${isActive ? ' active' : ''}`}
               >
-                {isActive && (
+                {isActive ? (
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0 }}>
-                    <path d="M2 6l3 3 5-5" stroke="#f47c2f" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
+                ) : (
+                  <span style={{ width: 12, flexShrink: 0 }} />
                 )}
-                <span style={{ marginLeft: isActive ? 0 : 20 }}>{opt.label}</span>
+                <span>{opt.label}</span>
               </button>
             )
           })}

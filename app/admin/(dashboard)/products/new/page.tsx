@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createProduct } from '@/lib/actions'
 import ImageUploadField from '@/components/ImageUploadField'
+import AdminSelect from '@/components/AdminSelect'
 import { getContent } from '@/lib/data'
 
 const tagOptions = ['New Arrival', 'Best Seller', 'Limited', 'Sale', 'Coming Soon']
@@ -35,19 +36,25 @@ export default async function NewProductPage() {
                   placeholder="cth. Classic Oxford Shirt" required />
               </div>
 
-              <div className="admin-form-group">
-                <label htmlFor="tag">Tag *</label>
-                <select id="tag" name="tag" className="admin-form-select" required>
-                  {tagOptions.map((t) => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
+              <div className="admin-2col-grid">
+                <div className="admin-form-group">
+                  <label>Tag *</label>
+                  <AdminSelect
+                    name="tag"
+                    defaultValue={tagOptions[0]}
+                    options={tagOptions.map((t) => ({ value: t, label: t }))}
+                  />
+                </div>
 
-              <div className="admin-form-group">
-                <label htmlFor="category">Category</label>
-                <select id="category" name="category" className="admin-form-select" defaultValue="">
-                  <option value="">— Tanpa kategori —</option>
-                  {categories.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
+                <div className="admin-form-group">
+                  <label>Category</label>
+                  <AdminSelect
+                    name="category"
+                    defaultValue=""
+                    placeholder="— Tanpa kategori —"
+                    options={[{ value: '', label: '— Tanpa kategori —' }, ...categories.map((c) => ({ value: c, label: c }))]}
+                  />
+                </div>
               </div>
 
               <div className="admin-form-group">
