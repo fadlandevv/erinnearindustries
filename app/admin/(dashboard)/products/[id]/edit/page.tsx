@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getProductById } from '@/lib/data'
+import { getProductById, getContent } from '@/lib/data'
 import InfoForm from './InfoForm'
 import PhotosForm from './PhotosForm'
 
@@ -10,8 +10,10 @@ export default async function EditProductPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const product = await getProductById(id)
+  const [product, content] = await Promise.all([getProductById(id), getContent()])
   if (!product) notFound()
+
+  const categories = (content.id.productPage?.categories ?? ['Semua', 'Apparel', 'Accessories', 'B2B']).slice(1)
 
   let sizechartData: Record<string, { panjang?: number; lebar?: number }> = {}
   try {
@@ -28,7 +30,7 @@ export default async function EditProductPage({
         <Link href="/admin/products" className="btn-admin-secondary">← Back</Link>
       </div>
 
-      <InfoForm product={product} sizechartData={sizechartData} />
+      <InfoForm product={product} sizechartData={sizechartData} categories={categories} />
 
       <PhotosForm
         productId={product.id}

@@ -1,11 +1,14 @@
 import Link from 'next/link'
 import { createProduct } from '@/lib/actions'
 import ImageUploadField from '@/components/ImageUploadField'
+import { getContent } from '@/lib/data'
 
 const tagOptions = ['New Arrival', 'Best Seller', 'Limited', 'Sale', 'Coming Soon']
 const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size']
 
-export default function NewProductPage() {
+export default async function NewProductPage() {
+  const content = await getContent()
+  const categories = (content.id.productPage?.categories ?? ['Semua', 'Apparel', 'Accessories', 'B2B']).slice(1)
   return (
     <>
       <div className="admin-page-header">
@@ -36,6 +39,14 @@ export default function NewProductPage() {
                 <label htmlFor="tag">Tag *</label>
                 <select id="tag" name="tag" className="admin-form-select" required>
                   {tagOptions.map((t) => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+
+              <div className="admin-form-group">
+                <label htmlFor="category">Category</label>
+                <select id="category" name="category" className="admin-form-select" defaultValue="">
+                  <option value="">— Tanpa kategori —</option>
+                  {categories.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
 

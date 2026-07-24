@@ -202,6 +202,10 @@ create index if not exists reseller_orders_created_at_idx on reseller_orders (cr
 
 alter table products add column if not exists price_reseller integer;
 
+-- ── Add category to products ─────────────────────────────────
+
+alter table products add column if not exists category text;
+
 -- ── Order discussion messages ─────────────────────────────────
 
 create table if not exists order_messages (

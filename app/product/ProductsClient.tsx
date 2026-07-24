@@ -1,11 +1,17 @@
 'use client'
+import { useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import type { Product } from '@/lib/data'
 import ProductCard from '@/components/ProductCard'
 
-export default function ProductsClient({ products }: { products: Product[] }) {
+export default function ProductsClient({ products, idCategories }: { products: Product[]; idCategories: string[] }) {
   const { t } = useLanguage()
   const pp = t.productPage
+  const [activeIdx, setActiveIdx] = useState(0)
+
+  const filtered = activeIdx === 0
+    ? products
+    : products.filter((p) => p.category === idCategories[activeIdx])
 
   return (
     <>
@@ -24,21 +30,27 @@ export default function ProductsClient({ products }: { products: Product[] }) {
         <div className="products-page-inner">
           <div className="category-tabs">
             {pp.categories.map((c, i) => (
-              <button key={c} className={`category-tab${i === 0 ? ' active' : ''}`}>
+              <button
+                key={c}
+                className={`category-tab${i === activeIdx ? ' active' : ''}`}
+                onClick={() => setActiveIdx(i)}
+              >
                 {c}
               </button>
             ))}
           </div>
 
-          <div className="products-page-grid">
-            {products.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-
-          <div className="products-page-cta">
-            <button className="btn-outline">{pp.loadMore}</button>
-          </div>
+          {filtered.length === 0 ? (
+            <p style={{ textAlign: 'center', color: '#999', padding: '3rem 0' }}>
+              Belum ada produk di kategori ini.
+            </p>
+          ) : (
+            <div className="products-page-grid">
+              {filtered.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </>

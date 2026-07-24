@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { getProducts } from '@/lib/data'
+import { getProducts, getContent } from '@/lib/data'
 import ProductsClient from './ProductsClient'
 import GalleryMarquee from '@/components/GalleryMarquee'
 
@@ -9,10 +9,11 @@ export const metadata: Metadata = {
 }
 
 export default async function ProductPage() {
-  const products = await getProducts()
+  const [products, content] = await Promise.all([getProducts(), getContent()])
+  const idCategories = content.id.productPage?.categories ?? ['Semua', 'Apparel', 'Accessories', 'B2B']
   return (
     <>
-      <ProductsClient products={products} />
+      <ProductsClient products={products} idCategories={idCategories} />
       <GalleryMarquee />
     </>
   )

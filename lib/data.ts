@@ -18,6 +18,7 @@ export type Product = {
   images?: string[]
   updatedAt?: string
   sortOrder?: number
+  category?: string
 }
 
 export type ServiceItem = {
@@ -85,6 +86,7 @@ function toProduct(row: Record<string, unknown>): Product {
     images: (row.images as string[]) ?? undefined,
     updatedAt: (row.updated_at as string) ?? undefined,
     sortOrder: (row.sort_order as number) ?? 0,
+    category: (row.category as string) ?? undefined,
   }
 }
 
@@ -117,6 +119,7 @@ export async function saveProducts(products: Product[]): Promise<void> {
       price_reseller: p.priceReseller ?? null,
       updated_at: new Date().toISOString(),
       sort_order: p.sortOrder ?? 0,
+      category: p.category ?? null,
     })
     if (error) throw new Error(error.message)
   }

@@ -12,9 +12,10 @@ const sizeOptions = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL']
 type Props = {
   product: Product
   sizechartData: Record<string, { panjang?: number; lebar?: number }>
+  categories: string[]
 }
 
-export default function InfoForm({ product, sizechartData }: Props) {
+export default function InfoForm({ product, sizechartData, categories }: Props) {
   const { toast } = useAdminToast()
   const router = useRouter()
   const [state, action, isPending] = useActionState(
@@ -47,6 +48,14 @@ export default function InfoForm({ product, sizechartData }: Props) {
           <label htmlFor="tag">Tag *</label>
           <select id="tag" name="tag" className="admin-form-select" defaultValue={product.tag} required>
             {tagOptions.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </div>
+
+        <div className="admin-form-group">
+          <label htmlFor="category">Category</label>
+          <select id="category" name="category" className="admin-form-select" defaultValue={product.category ?? ''}>
+            <option value="">— Tanpa kategori —</option>
+            {categories.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
 
