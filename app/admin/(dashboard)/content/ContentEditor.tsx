@@ -261,13 +261,74 @@ export default function ContentEditor({
         </>)}
 
         {/* ── Products Page ── */}
-        {tab === 'products' && (
+        {tab === 'products' && (<>
           <div className="admin-form-card">
             <p className="admin-form-section-title">Banner Product</p>
             <BiField content={content} setField={setField} section="productPage" field="title" label="Title (Enter = new line)" multiline />
             <BiField content={content} setField={setField} section="productPage" field="sub" label="Subtitle" multiline />
           </div>
-        )}
+
+          <div className="admin-form-card" style={{ marginTop: '1rem' }}>
+            <p className="admin-form-section-title">Category Tabs</p>
+            <p className="admin-form-hint" style={{ marginBottom: '1rem' }}>Kelola tab kategori di halaman produk. Kategori pertama otomatis jadi "Semua".</p>
+            {(['id', 'en'] as const).map(lang => {
+              const cats: string[] = (content[lang].productPage?.categories as string[] | undefined) ?? (lang === 'id' ? ['Semua', 'Apparel', 'Accessories', 'B2B'] : ['All', 'Apparel', 'Accessories', 'B2B'])
+              return (
+                <div key={lang} className="admin-form-group" style={{ marginBottom: '1.25rem' }}>
+                  <label style={{ fontWeight: 600, marginBottom: '0.5rem', display: 'block' }}>
+                    {lang === 'id' ? '🇮🇩 Indonesia' : '🇬🇧 English'}
+                  </label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+                    {cats.map((cat, idx) => (
+                      <span key={idx} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#f5f5f5', border: '1.5px solid #e0e0e0', borderRadius: 8, padding: '4px 10px', fontSize: 13 }}>
+                        {cat}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next = cats.filter((_, i) => i !== idx)
+                            setContent(prev => ({ ...prev, [lang]: { ...prev[lang], productPage: { ...prev[lang].productPage, categories: next } } }))
+                          }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#999', fontSize: 14, lineHeight: 1, padding: 0 }}
+                        >✕</button>
+                      </span>
+                    ))}
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input
+                      className="admin-form-input"
+                      type="text"
+                      placeholder="Tambah kategori..."
+                      style={{ margin: 0 }}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          const val = (e.target as HTMLInputElement).value.trim()
+                          if (!val) return
+                          const next = [...cats, val];
+                          (e.target as HTMLInputElement).value = ''
+                          setContent(prev => ({ ...prev, [lang]: { ...prev[lang], productPage: { ...prev[lang].productPage, categories: next } } }))
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="btn-admin-secondary"
+                      style={{ whiteSpace: 'nowrap' }}
+                      onClick={e => {
+                        const input = (e.currentTarget.previousElementSibling as HTMLInputElement)
+                        const val = input.value.trim()
+                        if (!val) return
+                        const next = [...cats, val]
+                        input.value = ''
+                        setContent(prev => ({ ...prev, [lang]: { ...prev[lang], productPage: { ...prev[lang].productPage, categories: next } } }))
+                      }}
+                    >+ Tambah</button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </>)}
 
         {/* ── Services Page ── */}
         {tab === 'services' && (

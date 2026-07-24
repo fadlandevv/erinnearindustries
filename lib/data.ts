@@ -55,7 +55,7 @@ export type ContentLang = {
   }
   featuredProducts?: { badge?: string; title?: string }
   servicesSection?: { badge?: string; title?: string; sub?: string }
-  productPage?: { badge?: string; title?: string; sub?: string }
+  productPage?: { badge?: string; title?: string; sub?: string; categories?: string[] }
   servicePage?: {
     badge?: string; title?: string; sub?: string; processTitle?: string
     steps?: Array<{ num: string; title: string; desc: string }>
