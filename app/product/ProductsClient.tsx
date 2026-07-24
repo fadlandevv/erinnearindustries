@@ -11,7 +11,7 @@ export default function ProductsClient({ products, idCategories }: { products: P
 
   const filtered = activeIdx === 0
     ? products
-    : products.filter((p) => p.category === idCategories[activeIdx])
+    : products.filter((p) => p.categories?.includes(idCategories[activeIdx]))
 
   return (
     <>

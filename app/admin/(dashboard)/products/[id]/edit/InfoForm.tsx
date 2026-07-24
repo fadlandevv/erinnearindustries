@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { updateProductInfo } from '@/lib/actions'
 import { useAdminToast } from '@/context/AdminToastContext'
 import AdminSelect from '@/components/AdminSelect'
+import AdminMultiSelect from '@/components/AdminMultiSelect'
 import type { Product } from '@/lib/data'
 
 const tagOptions = ['New Arrival', 'Best Seller', 'Limited', 'Sale', 'Coming Soon']
@@ -57,11 +58,11 @@ export default function InfoForm({ product, sizechartData, categories }: Props) 
 
           <div className="admin-form-group">
             <label>Category</label>
-            <AdminSelect
-              name="category"
-              defaultValue={product.category ?? ''}
-              placeholder="— Tanpa kategori —"
-              options={[{ value: '', label: '— Tanpa kategori —' }, ...categories.map(c => ({ value: c, label: c }))]}
+            <AdminMultiSelect
+              name="categories"
+              defaultValues={product.categories ?? []}
+              placeholder="— Pilih kategori —"
+              options={categories.map(c => ({ value: c, label: c }))}
             />
           </div>
         </div>

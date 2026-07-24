@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createProduct } from '@/lib/actions'
 import ImageUploadField from '@/components/ImageUploadField'
 import AdminSelect from '@/components/AdminSelect'
+import AdminMultiSelect from '@/components/AdminMultiSelect'
 import { getContent } from '@/lib/data'
 
 const tagOptions = ['New Arrival', 'Best Seller', 'Limited', 'Sale', 'Coming Soon']
@@ -48,11 +49,10 @@ export default async function NewProductPage() {
 
                 <div className="admin-form-group">
                   <label>Category</label>
-                  <AdminSelect
-                    name="category"
-                    defaultValue=""
-                    placeholder="— Tanpa kategori —"
-                    options={[{ value: '', label: '— Tanpa kategori —' }, ...categories.map((c) => ({ value: c, label: c }))]}
+                  <AdminMultiSelect
+                    name="categories"
+                    placeholder="— Pilih kategori —"
+                    options={categories.map((c) => ({ value: c, label: c }))}
                   />
                 </div>
               </div>

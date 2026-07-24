@@ -122,7 +122,7 @@ export async function createProduct(formData: FormData) {
     material: ((formData.get('material') as string | null) ?? '').split('\n').map((s) => s.trim()).filter(Boolean),
     sizechart: parseSizechart(formData),
     sizes: formData.getAll('sizes') as string[],
-    category: (formData.get('category') as string | null)?.trim() || undefined,
+    categories: (formData.getAll('categories') as string[]).filter(Boolean),
     ...(image ? { image } : {}),
     ...(images.some(Boolean) ? { images } : {}),
     updatedAt: new Date().toISOString(),
@@ -957,7 +957,7 @@ export async function updateProductInfo(
         material: ((formData.get('material') as string | null) ?? '').split('\n').map(s => s.trim()).filter(Boolean),
         sizechart: parseSizechart(formData),
         sizes: formData.getAll('sizes') as string[],
-        category: (formData.get('category') as string | null)?.trim() || p.category,
+        categories: (formData.getAll('categories') as string[]).filter(Boolean),
         priceReseller,
         updatedAt: new Date().toISOString(),
       } : p
