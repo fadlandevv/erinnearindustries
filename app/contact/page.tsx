@@ -1,13 +1,15 @@
-import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
-import { getServices, getProducts } from '@/lib/data'
+import { getServices, getProducts, buildPageMetadata } from '@/lib/data'
 import { getUserByEmail } from '@/lib/users'
 import ContactForm from '@/components/ContactForm'
 import ContactHero from '@/components/ContactHero'
 
-export const metadata: Metadata = {
-  title: 'Contact Us — Erinnear Industries',
-  description: 'Get in touch with Erinnear Industries.',
+export async function generateMetadata() {
+  return buildPageMetadata('contact', {
+    title: 'Contact Us — Erinnear Industries',
+    description: 'Get in touch with Erinnear Industries.',
+    path: '/contact',
+  })
 }
 
 const details = [

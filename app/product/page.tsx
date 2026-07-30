@@ -1,11 +1,13 @@
-import type { Metadata } from 'next'
-import { getProducts, getContent } from '@/lib/data'
+import { getProducts, getContent, buildPageMetadata } from '@/lib/data'
 import ProductsClient from './ProductsClient'
 import GalleryMarquee from '@/components/GalleryMarquee'
 
-export const metadata: Metadata = {
-  title: 'Products — Erinnear Industries',
-  description: 'Explore our premium clothing collections.',
+export async function generateMetadata() {
+  return buildPageMetadata('products', {
+    title: 'Products — Erinnear Industries',
+    description: 'Explore our premium clothing collections.',
+    path: '/product',
+  })
 }
 
 export default async function ProductPage() {

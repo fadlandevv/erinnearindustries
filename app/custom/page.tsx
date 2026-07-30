@@ -1,10 +1,12 @@
-import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getCustomProductImages } from '@/lib/data'
+import { getCustomProductImages, buildPageMetadata } from '@/lib/data'
 
-export const metadata: Metadata = {
-  title: 'Custom Design — Erinnear Industries',
-  description: 'Buat produk custom sesuai keinginanmu — kaos, totebag, hoodie, jersey, dan lainnya.',
+export async function generateMetadata() {
+  return buildPageMetadata('custom', {
+    title: 'Custom Design — Erinnear Industries',
+    description: 'Buat produk custom sesuai keinginanmu — kaos, totebag, hoodie, jersey, dan lainnya.',
+    path: '/custom',
+  })
 }
 
 // desc: max 29 karakter (1 baris pada card, font 12px, lebar ~190px)

@@ -1,10 +1,12 @@
-import type { Metadata } from 'next'
-import { getServices } from '@/lib/data'
+import { getServices, buildPageMetadata } from '@/lib/data'
 import ServicePageClient from './ServicePageClient'
 
-export const metadata: Metadata = {
-  title: 'Services — Erinnear Industries',
-  description: 'Full-service clothing and brand presentation.',
+export async function generateMetadata() {
+  return buildPageMetadata('services', {
+    title: 'Services — Erinnear Industries',
+    description: 'Full-service clothing and brand presentation.',
+    path: '/service',
+  })
 }
 
 export default async function ServicePage() {

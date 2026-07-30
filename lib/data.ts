@@ -47,6 +47,8 @@ export type ShowcaseItem = {
   buttonHref: string
 }
 
+export type SeoFields = { title?: string; description?: string; keywords?: string }
+
 export type ContentLang = {
   hero?: { badge?: string; title?: string; sub?: string }
   stats?: {
@@ -62,6 +64,41 @@ export type ContentLang = {
     steps?: Array<{ num: string; title: string; desc: string }>
   }
   contact?: { badge?: string; title?: string; sub?: string }
+  seo?: {
+    googleVerification?: string
+    home?: SeoFields
+    products?: SeoFields
+    services?: SeoFields
+    contact?: SeoFields
+    berita?: SeoFields
+    custom?: SeoFields
+  }
+}
+
+// Convenience helper — pulls SEO for a page from the (Indonesian) content, with fallbacks.
+export type SeoPage = 'home' | 'products' | 'services' | 'contact' | 'berita' | 'custom'
+export async function getSeo(page: SeoPage): Promise<SeoFields & { googleVerification?: string }> {
+  const content = await getContent()
+  const seo = content.id.seo ?? {}
+  return { ...(seo[page] ?? {}), googleVerification: seo.googleVerification }
+}
+
+// Builds a Next.js Metadata object from CMS SEO for a page, with sensible fallbacks.
+export async function buildPageMetadata(
+  page: SeoPage,
+  fallback: { title: string; description: string; path: string },
+) {
+  const seo = await getSeo(page)
+  const title = seo.title || fallback.title
+  const description = seo.description || fallback.description
+  return {
+    title,
+    description,
+    keywords: seo.keywords || undefined,
+    alternates: { canonical: fallback.path },
+    openGraph: { title, description, url: `https://erinnear.com${fallback.path}` },
+    twitter: { title, description },
+  }
 }
 
 export type ContentData = { id: ContentLang; en: ContentLang }

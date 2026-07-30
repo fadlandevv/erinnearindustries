@@ -7,30 +7,39 @@ import Footer from '@/components/Footer'
 import Providers from '@/components/Providers'
 import ChatBot from '@/components/ChatBotWrapper'
 import { getUserByEmail } from '@/lib/users'
-import { getContent } from '@/lib/data'
+import { getContent, getSeo } from '@/lib/data'
 
-export const metadata: Metadata = {
-  title: {
-    default: 'Erinnear Industries',
-    template: '%s — Erinnear Industries',
-  },
-  description: 'Erinnear Industries — brand fashion custom berkualitas. Kaos, totebag, dan solusi custom printing terbaik. Percayakan kebutuhan brand Anda kepada kami.',
-  metadataBase: new URL('https://erinnear.com'),
-  openGraph: {
-    type: 'website',
-    locale: 'id_ID',
-    url: 'https://erinnear.com',
-    siteName: 'Erinnear Industries',
-    title: 'Erinnear Industries',
-    description: 'Erinnear Industries — brand fashion custom berkualitas. Kaos, totebag, dan solusi custom printing terbaik.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Erinnear Industries' }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Erinnear Industries',
-    description: 'Brand fashion custom berkualitas — kaos, totebag, dan custom printing.',
-    images: ['/og-image.png'],
-  },
+const DEFAULT_TITLE = 'Erinnear Industries'
+const DEFAULT_DESC = 'Erinnear Industries — brand fashion custom berkualitas. Kaos, totebag, dan solusi custom printing terbaik. Percayakan kebutuhan brand Anda kepada kami.'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSeo('home')
+  const title = seo.title || DEFAULT_TITLE
+  const description = seo.description || DEFAULT_DESC
+  return {
+    title: {
+      default: title,
+      template: '%s — Erinnear Industries',
+    },
+    description,
+    keywords: seo.keywords || undefined,
+    metadataBase: new URL('https://erinnear.com'),
+    alternates: { canonical: '/' },
+    ...(seo.googleVerification ? { verification: { google: seo.googleVerification } } : {}),
+    openGraph: {
+      type: 'website',
+      locale: 'id_ID',
+      url: 'https://erinnear.com',
+      siteName: 'Erinnear Industries',
+      title,
+      description,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  }
 }
 
 export default async function RootLayout({ children }: { children: ReactNode }) {

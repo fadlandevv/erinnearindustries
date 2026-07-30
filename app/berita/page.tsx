@@ -1,10 +1,13 @@
-import type { Metadata } from 'next'
 import Link from 'next/link'
 import { POSTS } from './dummyPosts'
+import { buildPageMetadata } from '@/lib/data'
 
-export const metadata: Metadata = {
-  title: 'Berita & Artikel — Erinnear Industries',
-  description: 'Kabar terbaru, tips, dan artikel seputar produk custom dari Erinnear Industries.',
+export async function generateMetadata() {
+  return buildPageMetadata('berita', {
+    title: 'Berita & Artikel — Erinnear Industries',
+    description: 'Kabar terbaru, tips, dan artikel seputar produk custom dari Erinnear Industries.',
+    path: '/berita',
+  })
 }
 
 export default function BeritaPage() {

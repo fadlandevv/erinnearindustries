@@ -3,13 +3,23 @@ import { useState, useActionState, useRef, useEffect } from 'react'
 import { saveContentAction } from '@/lib/actions'
 import type { ContentData, ShowcaseItem } from '@/lib/data'
 
-type Tab = 'home-hero' | 'products' | 'services' | 'contact'
+type Tab = 'home-hero' | 'products' | 'services' | 'contact' | 'seo'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'home-hero', label: 'Homepage' },
   { id: 'products', label: 'Page Products' },
   { id: 'services', label: 'Page Services' },
   { id: 'contact', label: 'Page Contacts' },
+  { id: 'seo', label: 'SEO' },
+]
+
+const SEO_PAGES: { key: 'home' | 'products' | 'services' | 'contact' | 'berita' | 'custom'; label: string; path: string }[] = [
+  { key: 'home', label: 'Homepage', path: '/' },
+  { key: 'products', label: 'Products', path: '/product' },
+  { key: 'services', label: 'Services', path: '/service' },
+  { key: 'contact', label: 'Contact', path: '/contact' },
+  { key: 'berita', label: 'Berita / Blog', path: '/berita' },
+  { key: 'custom', label: 'Custom Order', path: '/custom' },
 ]
 
 const inp = 'admin-form-input'
@@ -143,6 +153,26 @@ export default function ContentEditor({
         ...prev[lang],
         stats: { ...prev[lang].stats, items },
       },
+    }))
+  }
+
+  function setSeoField(page: string, field: 'title' | 'description' | 'keywords', value: string) {
+    setContent(prev => ({
+      ...prev,
+      id: {
+        ...prev.id,
+        seo: {
+          ...prev.id.seo,
+          [page]: { ...(prev.id.seo?.[page as keyof typeof prev.id.seo] as object ?? {}), [field]: value },
+        },
+      },
+    }))
+  }
+
+  function setSeoVerification(value: string) {
+    setContent(prev => ({
+      ...prev,
+      id: { ...prev.id, seo: { ...prev.id.seo, googleVerification: value } },
     }))
   }
 
@@ -381,6 +411,82 @@ export default function ContentEditor({
             <BiField content={content} setField={setField} section="contact" field="sub" label="Subtitle" multiline />
           </div>
         )}
+
+        {/* ── SEO ── */}
+        {tab === 'seo' && (<>
+          <div className="admin-form-card">
+            <p className="admin-form-section-title">Google Search Console</p>
+            <div className="admin-form-group">
+              <label>Verification Code</label>
+              <input
+                className={inp}
+                type="text"
+                placeholder="cth. AbCdEf123... (isi content dari meta tag verifikasi)"
+                value={content.id.seo?.googleVerification ?? ''}
+                onChange={e => setSeoVerification(e.target.value)}
+              />
+              <p className="admin-form-hint">Ambil dari Google Search Console → Verifikasi via &quot;HTML tag&quot;. Cukup isi nilai <code>content=&quot;...&quot;</code> saja.</p>
+            </div>
+          </div>
+
+          {SEO_PAGES.map(pg => {
+            const seo = (content.id.seo?.[pg.key] ?? {}) as { title?: string; description?: string; keywords?: string }
+            const titleLen = (seo.title ?? '').length
+            const descLen = (seo.description ?? '').length
+            return (
+              <CollapsibleCard key={pg.key} title={`${pg.label}  ·  ${pg.path}`} defaultOpen={pg.key === 'home'}>
+                <div className="admin-form-group">
+                  <label>Meta Title</label>
+                  <input
+                    className={inp}
+                    type="text"
+                    placeholder="Judul di tab browser & hasil Google"
+                    value={seo.title ?? ''}
+                    onChange={e => setSeoField(pg.key, 'title', e.target.value)}
+                  />
+                  <p className="admin-form-hint" style={{ color: titleLen > 60 ? '#dc2626' : undefined }}>
+                    {titleLen}/60 karakter {titleLen > 60 ? '— terlalu panjang, bisa terpotong' : '(ideal 50–60)'}
+                  </p>
+                </div>
+
+                <div className="admin-form-group">
+                  <label>Meta Description</label>
+                  <textarea
+                    className={ta}
+                    rows={2}
+                    placeholder="Ringkasan halaman yang muncul di hasil pencarian Google"
+                    value={seo.description ?? ''}
+                    onChange={e => setSeoField(pg.key, 'description', e.target.value)}
+                  />
+                  <p className="admin-form-hint" style={{ color: descLen > 160 ? '#dc2626' : undefined }}>
+                    {descLen}/160 karakter {descLen > 160 ? '— terlalu panjang, bisa terpotong' : '(ideal 120–160)'}
+                  </p>
+                </div>
+
+                <div className="admin-form-group">
+                  <label>Keywords</label>
+                  <input
+                    className={inp}
+                    type="text"
+                    placeholder="kaos custom, sablon, konveksi, ... (pisahkan koma)"
+                    value={seo.keywords ?? ''}
+                    onChange={e => setSeoField(pg.key, 'keywords', e.target.value)}
+                  />
+                  <p className="admin-form-hint">Opsional. Pisahkan dengan koma.</p>
+                </div>
+
+                {/* Google preview */}
+                {(seo.title || seo.description) && (
+                  <div className="seo-preview">
+                    <div className="seo-preview-url">erinnear.com{pg.path}</div>
+                    <div className="seo-preview-title">{seo.title || 'Judul halaman akan muncul di sini'}</div>
+                    <div className="seo-preview-desc">{seo.description || 'Deskripsi halaman akan muncul di sini...'}</div>
+                  </div>
+                )}
+              </CollapsibleCard>
+            )
+          })}
+        </>)}
 
       </div>{/* end scrollable */}
 

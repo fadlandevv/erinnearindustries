@@ -1,7 +1,10 @@
 import type { MetadataRoute } from 'next'
 import { getProducts, getServices } from '@/lib/data'
+import { POSTS } from '@/app/berita/dummyPosts'
 
 const BASE_URL = 'https://erinnear.com'
+
+const CUSTOM_TYPES = ['tshirt', 'totebag', 'hoodie', 'jersey', 'coach-jacket', 'amplop-packaging']
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const products = await getProducts()
@@ -14,14 +17,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/contact`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.6 },
     { url: `${BASE_URL}/berita`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE_URL}/custom`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${BASE_URL}/custom/tshirt`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${BASE_URL}/custom/totebag`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE_URL}/reseller`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
   ]
 
+  const customRoutes: MetadataRoute.Sitemap = CUSTOM_TYPES.map((t) => ({
+    url: `${BASE_URL}/custom/${t}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly',
+    priority: 0.6,
+  }))
+
   const productRoutes: MetadataRoute.Sitemap = products.map((p) => ({
     url: `${BASE_URL}/product/${p.id}`,
-    lastModified: new Date(),
+    lastModified: p.updatedAt ? new Date(p.updatedAt) : new Date(),
     changeFrequency: 'weekly',
     priority: 0.8,
   }))
@@ -33,5 +41,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  return [...staticRoutes, ...productRoutes, ...serviceRoutes]
+  const beritaRoutes: MetadataRoute.Sitemap = POSTS.map((p) => {
+    const d = p.date ? new Date(p.date) : new Date()
+    return {
+      url: `${BASE_URL}/berita/${p.slug}`,
+      lastModified: isNaN(d.getTime()) ? new Date() : d,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }
+  })
+
+  return [...staticRoutes, ...customRoutes, ...productRoutes, ...serviceRoutes, ...beritaRoutes]
 }
