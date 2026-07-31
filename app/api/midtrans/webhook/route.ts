@@ -1,5 +1,6 @@
 import { createHash } from 'crypto'
 import { updateOrderStatus } from '@/lib/orders'
+import { consumeStockForOrder } from '@/lib/warehouse'
 import { NextRequest, NextResponse } from 'next/server'
 
 const SERVER_KEY = process.env.MIDTRANS_SERVER_KEY ?? ''
@@ -53,7 +54,8 @@ export async function POST(req: NextRequest) {
 
     // Strip retry suffix (e.g. "EI-123-r1700000000000" → "EI-123")
     const internalId = order_id.replace(/-r\d+$/, '')
-    updateOrderStatus(internalId, status)
+    await updateOrderStatus(internalId, status)
+    if (status === 'paid') await consumeStockForOrder(internalId)
     return NextResponse.json({ ok: true })
   } catch (e) {
     console.error('Midtrans webhook error:', e)

@@ -284,3 +284,42 @@ create table if not exists contact_messages (
   status      text not null default 'new',
   created_at  timestamptz not null default now()
 );
+
+-- ── Pengurangan stok atomik saat penjualan ──────────────────────────────
+-- WAJIB dijalankan manual di Supabase SQL Editor.
+-- Dipanggil dari lib/warehouse.ts (consumeStockForOrder) lewat db.rpc('consume_stock').
+--
+-- Mengembalikan sisa stok setelah dikurangi, atau NULL bila kombinasi
+-- product_id+size tidak dilacak di warehouse_stock.
+-- Kuncian baris (FOR UPDATE) mencegah dua pembeli mengambil item terakhir bersamaan.
+create or replace function consume_stock(
+  p_product_id text,
+  p_size       text,
+  p_qty        integer
+) returns integer
+language plpgsql
+as $$
+declare
+  v_remaining integer;
+begin
+  select quantity into v_remaining
+  from warehouse_stock
+  where product_id = p_product_id and size = p_size
+  for update;
+
+  if not found then
+    return null;  -- tidak dilacak, jangan blokir penjualan
+  end if;
+
+  v_remaining := greatest(v_remaining - p_qty, 0);
+
+  update warehouse_stock
+  set quantity = v_remaining, updated_at = now()
+  where product_id = p_product_id and size = p_size;
+
+  return v_remaining;
+end;
+$$;
+
+-- Mempercepat cek idempotensi webhook (lookup warehouse_log by note)
+create index if not exists warehouse_log_note_idx on warehouse_log (note);

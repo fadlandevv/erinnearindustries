@@ -18,9 +18,11 @@ export async function generateMetadata({
   return {
     title: service.title,
     description: service.desc,
+    alternates: { canonical: `/service/${id}` },
     openGraph: {
       title: service.title,
       description: service.desc,
+      url: `https://erinnear.com/service/${id}`,
     },
   }
 }

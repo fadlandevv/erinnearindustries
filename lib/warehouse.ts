@@ -89,6 +89,99 @@ export async function upsertSizeEntry(
   return {}
 }
 
+// ── Stok saat penjualan ───────────────────────────────────────
+// Catatan: stok hanya ditegakkan untuk kombinasi product+size yang SUDAH punya
+// baris di warehouse_stock. Produk yang belum didata gudang dianggap "tidak
+// dilacak" dan tetap bisa dibeli — supaya toko tidak berhenti menjual hanya
+// karena admin belum mengisi data gudang. Item custom (id `custom-*`) dilewati.
+
+type StockLine = { productId: string; title: string; size: string; quantity: number }
+
+function isTracked(productId: string): boolean {
+  return !productId.startsWith('custom-')
+}
+
+/** Cek ketersediaan sebelum order dibuat. Mengembalikan daftar item yang kurang stok. */
+export async function checkStockAvailability(
+  lines: StockLine[],
+): Promise<{ title: string; size: string; available: number }[]> {
+  const tracked = lines.filter(l => isTracked(l.productId))
+  if (tracked.length === 0) return []
+
+  const stockMap = await getStockMap()
+  const shortages: { title: string; size: string; available: number }[] = []
+
+  // Gabungkan baris duplikat (produk+size sama) sebelum membandingkan.
+  const needed = new Map<string, StockLine>()
+  for (const l of tracked) {
+    const key = `${l.productId}:${l.size}`
+    const prev = needed.get(key)
+    needed.set(key, prev ? { ...prev, quantity: prev.quantity + l.quantity } : { ...l })
+  }
+
+  for (const [key, line] of needed) {
+    if (!(key in stockMap)) continue // tidak dilacak
+    const available = stockMap[key]
+    if (available < line.quantity) {
+      shortages.push({ title: line.title, size: line.size, available })
+    }
+  }
+  return shortages
+}
+
+/**
+ * Kurangi stok setelah pembayaran sukses. Idempoten: bila order sudah pernah
+ * diproses (ada di warehouse_log dengan note order yang sama), tidak dikurangi lagi
+ * — penting karena Midtrans dapat mengirim webhook berkali-kali.
+ */
+export async function consumeStockForOrder(orderId: string): Promise<void> {
+  const { data: order } = await db.from('orders').select('items').eq('id', orderId).maybeSingle()
+  if (!order?.items) return
+
+  const note = `Order ${orderId}`
+
+  const { data: already } = await db
+    .from('warehouse_log')
+    .select('id')
+    .eq('note', note)
+    .limit(1)
+  if (already && already.length > 0) return // sudah diproses
+
+  const items = order.items as Array<{ productId: string; title: string; size: string; quantity: number }>
+
+  for (const item of items) {
+    if (!isTracked(item.productId)) continue
+
+    // Update atomik lewat RPC — mencegah race condition saat dua pembeli
+    // mengambil item terakhir bersamaan. Lihat supabase-schema.sql.
+    const { data, error } = await db.rpc('consume_stock', {
+      p_product_id: item.productId,
+      p_size: item.size,
+      p_qty: item.quantity,
+    })
+
+    if (error) {
+      // RPC belum dibuat di Supabase → jangan gagalkan webhook, cukup catat.
+      console.error(`[warehouse] consume_stock gagal untuk ${item.productId}:${item.size}:`, error.message)
+      continue
+    }
+
+    const remaining = data as number | null
+    if (remaining === null) continue // produk/size tidak dilacak
+
+    await db.from('warehouse_log').insert({
+      product_id: item.productId,
+      product_title: item.title,
+      size: item.size,
+      quantity_change: -item.quantity,
+      quantity_after: remaining,
+      type: 'keluar',
+      note,
+      admin_username: 'system',
+    })
+  }
+}
+
 export async function getPriceMap(): Promise<Record<string, { harga: number | null; hpp: number | null }>> {
   try {
     const { data } = await db.from('warehouse_stock').select('product_id,size,harga,hpp')

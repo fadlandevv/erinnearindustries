@@ -7,7 +7,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const post = POSTS.find(p => p.slug === slug)
   if (!post) return {}
-  return { title: `${post.title} — Erinnear Industries` }
+  return {
+    title: `${post.title} — Erinnear Industries`,
+    alternates: { canonical: `/berita/${slug}` },
+    openGraph: {
+      title: post.title,
+      url: `https://erinnear.com/berita/${slug}`,
+    },
+  }
 }
 
 export async function generateStaticParams() {
