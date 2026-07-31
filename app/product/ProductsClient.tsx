@@ -13,6 +13,14 @@ export default function ProductsClient({ products, idCategories }: { products: P
     ? products
     : products.filter((p) => p.categories?.includes(idCategories[activeIdx]))
 
+  // Labels follow the active language, but filtering always matches the ID category values.
+  // Categories with no products are dropped so no tab ever leads to an empty grid.
+  const tabs = pp.categories
+    .map((label: string, i: number) => ({ label, i }))
+    .filter(({ i }: { i: number }) =>
+      i === 0 || products.some((p) => p.categories?.includes(idCategories[i]))
+    )
+
   return (
     <>
       <div className="page-hero">
@@ -29,13 +37,13 @@ export default function ProductsClient({ products, idCategories }: { products: P
       <div className="products-page-section">
         <div className="products-page-inner">
           <div className="category-tabs">
-            {pp.categories.map((c, i) => (
+            {tabs.map(({ label, i }: { label: string; i: number }) => (
               <button
-                key={c}
+                key={label}
                 className={`category-tab${i === activeIdx ? ' active' : ''}`}
                 onClick={() => setActiveIdx(i)}
               >
-                {c}
+                {label}
               </button>
             ))}
           </div>
