@@ -272,6 +272,7 @@ export async function createService(formData: FormData) {
     icon,
     title: formData.get('title') as string,
     desc: formData.get('desc') as string,
+    tag: null,
     longDesc: ((formData.get('longDesc') as string) ?? '').trim() || undefined,
     ...(features?.length ? { features } : {}),
   })
