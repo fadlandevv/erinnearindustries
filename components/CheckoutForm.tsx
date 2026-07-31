@@ -10,6 +10,7 @@ import {
   getProvincesAction, getRegenciesAction, getDistrictsAction, getVillagesAction,
 } from '@/lib/actions'
 import type { ShippingOption } from '@/lib/rajaongkir'
+import { FALLBACK_COURIERS } from '@/lib/shipping-fallback'
 
 declare global {
   interface Window {
@@ -29,14 +30,6 @@ const IS_PROD    = process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === 'true'
 const SNAP_URL   = IS_PROD
   ? 'https://app.midtrans.com/snap/snap.js'
   : 'https://app.sandbox.midtrans.com/snap/snap.js'
-
-const FALLBACK_COURIERS = [
-  { id: 'jne-reg',  name: 'JNE',           service: 'REG',          etd: '2–3 hari kerja', price: 15000 },
-  { id: 'jnt-ez',   name: 'J&T Express',   service: 'Express',      etd: '1–2 hari kerja', price: 14000 },
-  { id: 'sicepat',  name: 'SiCepat',       service: 'REG',          etd: '2–3 hari kerja', price: 13000 },
-  { id: 'anteraja', name: 'AnterAja',      service: 'Reguler',      etd: '3–5 hari kerja', price: 10000 },
-  { id: 'pos',      name: 'Pos Indonesia', service: 'Kilat Khusus', etd: '3–5 hari kerja', price:  9000 },
-]
 
 function formatRupiah(n: number) { return 'Rp ' + n.toLocaleString('id-ID') }
 function titleCase(s: string)    { return s.toLowerCase().replace(/(?:^|[\s.])\S/g, c => c.toUpperCase()) }

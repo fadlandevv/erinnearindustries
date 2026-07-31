@@ -2,7 +2,7 @@
 import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { revalidatePath, revalidateTag } from 'next/cache'
-import { getProducts, saveProducts, deleteProduct as _deleteProductFromDB, getServices, saveServices, getGallery, saveGallery, getShowcase, saveShowcase, saveContent, type ContentData } from './data'
+import { getProducts, getProductById, saveProducts, deleteProduct as _deleteProductFromDB, getServices, saveServices, getGallery, saveGallery, getShowcase, saveShowcase, saveContent, type ContentData } from './data'
 import { saveOrder, getOrderById, getOrdersByEmail, deleteOrder, updateOrderStatus, type OrderItem, type Order } from './orders'
 import { createSnapToken } from './midtrans'
 import { getUserByEmail, saveUser, updateUser, deleteUser, hashPassword, verifyPassword, createResetToken, validateAndConsumeResetToken } from './users'
@@ -22,10 +22,17 @@ import { savePembukuanEntry, deletePembukuanEntry, type EntryType } from './pemb
 import { logAdminAccess } from './access-log'
 import { getPricingItems, upsertPricingItem, insertPricingItem, deletePricingItem } from './pricing'
 import { fetchShippingCost, fetchShippingCostByName, type ShippingOption } from './rajaongkir'
+import { FALLBACK_COURIERS } from './shipping-fallback'
 import { generateId } from './utils'
 import { db } from './db'
 import { getOrderMessages, getMessagesByOrderIds, sendOrderMessage, markMessagesRead, type OrderMessage } from './order-messages'
 import { saveContactMessage, updateMessageStatus, deleteContactMessage, type MessageStatus } from './contact-messages'
+import {
+  requireAdmin, guardAdmin, getCurrentAdmin, getCurrentUserEmail, getCurrentReseller,
+  signSession, sessionCookieOptions, WEEK, MONTH,
+} from './auth'
+import { checkStockAvailability } from './warehouse'
+import { rateLimit, resetRateLimit } from './rate-limit'
 
 function parseSizechart(formData: FormData): string | undefined {
   const chart: Record<string, { panjang: number; lebar: number }> = {}
@@ -66,35 +73,42 @@ export async function login(
 ): Promise<{ error?: string }> {
   const username = (formData.get('username') as string).trim()
   const password = formData.get('password') as string
-  const admin = await getAdminByUsername(username)
   const ip = await getClientIp()
+
+  // Batasi brute force: 5 percobaan per IP tiap 15 menit.
+  const limited = rateLimit(`admin-login:${ip}`, 5, 900)
+  if (!limited.ok) {
+    await logAdminAccess({ adminId: '', username: username || '?', action: 'login_failed', ip })
+    return { error: `Terlalu banyak percobaan login. Coba lagi dalam ${Math.ceil(limited.retryAfterSeconds / 60)} menit.` }
+  }
+
+  const admin = await getAdminByUsername(username)
 
   if (!admin || !verifyAdminPassword(password, admin.passwordHash)) {
     await logAdminAccess({ adminId: admin?.id ?? '', username: username || '?', action: 'login_failed', ip })
     return { error: 'Username atau password salah.' }
   }
 
+  resetRateLimit(`admin-login:${ip}`)
   const jar = await cookies()
-  jar.set('admin-token', admin.id, { httpOnly: true, sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 })
+  jar.set('admin-token', signSession(admin.id), sessionCookieOptions(WEEK))
   await logAdminAccess({ adminId: admin.id, username: admin.username, action: 'login', ip })
   redirect('/admin')
 }
 
 export async function logout() {
-  const jar = await cookies()
-  const adminId = jar.get('admin-token')?.value
-  if (adminId) {
-    const admin = await getAdminById(adminId)
-    if (admin) {
-      const ip = await getClientIp()
-      await logAdminAccess({ adminId: admin.id, username: admin.username, action: 'logout', ip })
-    }
+  const session = await getCurrentAdmin()
+  if (session) {
+    const ip = await getClientIp()
+    await logAdminAccess({ adminId: session.admin.id, username: session.admin.username, action: 'logout', ip })
   }
+  const jar = await cookies()
   jar.delete('admin-token')
   redirect('/admin/login')
 }
 
 export async function createProduct(formData: FormData) {
+  await requireAdmin('products')
   const id = Date.now().toString()
   let image: string | undefined
   const mainFile = formData.get('image') as File | null
@@ -135,6 +149,7 @@ export async function createProduct(formData: FormData) {
 }
 
 export async function updateProduct(id: string, formData: FormData) {
+  await requireAdmin('products')
   const products = await getProducts()
   const existing = products.find((p) => p.id === id)
 
@@ -175,6 +190,7 @@ export async function updateProduct(id: string, formData: FormData) {
 }
 
 export async function reorderProducts(orderedIds: string[]): Promise<void> {
+  await requireAdmin('products')
   for (let i = 0; i < orderedIds.length; i++) {
     await db.from('products').update({ sort_order: i }).eq('id', orderedIds[i])
   }
@@ -183,6 +199,7 @@ export async function reorderProducts(orderedIds: string[]): Promise<void> {
 }
 
 export async function duplicateProduct(id: string) {
+  await requireAdmin('products')
   const products = await getProducts()
   const source = products.find((p) => p.id === id)
   if (!source) return
@@ -213,6 +230,7 @@ export async function duplicateProduct(id: string) {
 }
 
 export async function copyPricingToSizes(productId: string, fromSize: string, targetSizes: string[]): Promise<{ ok: boolean; error?: string }> {
+  await requireAdmin('products')
   const { data: source } = await db
     .from('warehouse_stock')
     .select('harga,hpp,quantity')
@@ -244,6 +262,7 @@ export async function copyPricingToSizes(productId: string, fromSize: string, ta
 }
 
 export async function deleteProduct(id: string) {
+  await requireAdmin('products')
   await _deleteProductFromDB(id)
   revalidateTag('products', {})
   revalidatePath('/product')
@@ -261,6 +280,7 @@ async function uploadServiceIcon(id: string, file: File): Promise<string> {
 }
 
 export async function createService(formData: FormData) {
+  await requireAdmin('services')
   const services = await getServices()
   const featuresRaw = ((formData.get('features') as string) ?? '').trim()
   const features = featuresRaw ? featuresRaw.split('\n').map((l) => l.trim()).filter(Boolean) : undefined
@@ -283,6 +303,7 @@ export async function createService(formData: FormData) {
 }
 
 export async function updateService(id: string, formData: FormData) {
+  await requireAdmin('services')
   const featuresRaw = ((formData.get('features') as string) ?? '').trim()
   const features = featuresRaw ? featuresRaw.split('\n').map((l) => l.trim()).filter(Boolean) : undefined
   const services = await getServices()
@@ -309,8 +330,8 @@ export async function updateService(id: string, formData: FormData) {
 }
 
 export async function updateShowcaseItem(itemId: string, formData: FormData): Promise<void> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return
+  const _g = await guardAdmin('showcase')
+  if (_g.error) return
   const showcase = await getShowcase()
   const item = showcase.find((s) => s.id === itemId)
   if (!item) return
@@ -341,8 +362,8 @@ export async function updateShowcaseItem(itemId: string, formData: FormData): Pr
 }
 
 export async function updateGallerySlot(slotId: string, formData: FormData): Promise<void> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return
+  const _g = await guardAdmin('gallery')
+  if (_g.error) return
   const gallery = await getGallery()
   const slot = gallery.find((g) => g.id === slotId)
   if (!slot) return
@@ -373,6 +394,7 @@ export async function updateGallerySlot(slotId: string, formData: FormData): Pro
 }
 
 export async function deleteService(id: string) {
+  await requireAdmin('services')
   const services = await getServices()
   await saveServices(services.filter((s) => s.id !== id))
   revalidateTag('services', {})
@@ -390,6 +412,7 @@ export async function addCustomProductOptionAction(
   _: Record<string, unknown>,
   formData: FormData
 ): Promise<{ ok?: boolean; error?: string }> {
+  await requireAdmin('custom_products')
   const productType = (formData.get('product_type') as string)?.trim()
   const category    = (formData.get('category') as string)?.trim()
   const label       = (formData.get('label') as string)?.trim()
@@ -404,6 +427,7 @@ export async function addCustomProductOptionAction(
 }
 
 export async function deleteCustomProductOptionAction(id: string): Promise<void> {
+  await requireAdmin('custom_products')
   await db.from('custom_product_options').delete().eq('id', id)
 }
 
@@ -411,6 +435,7 @@ export async function seedDefaultBahansAction(
   productType: string,
   bahans: { label: string; price: number }[]
 ): Promise<void> {
+  await requireAdmin('custom_products')
   const rows = bahans.map((b, i) => ({
     product_type: productType,
     category: 'bahan',
@@ -426,6 +451,7 @@ export async function seedDefaultSizesAction(
   productType: string,
   sizes: { label: string; price: number }[]
 ): Promise<void> {
+  await requireAdmin('custom_products')
   const rows = sizes.map((s, i) => ({
     product_type: productType,
     category: 'size',
@@ -440,6 +466,7 @@ export async function seedDefaultSizesAction(
 export async function updateCustomProductOptionPriceAction(
   id: string, price: number
 ): Promise<{ ok?: boolean; error?: string }> {
+  await requireAdmin('custom_products')
   const { error } = await db.from('custom_product_options').update({ price }).eq('id', id)
   if (error) return { error: error.message }
   return { ok: true }
@@ -448,6 +475,7 @@ export async function updateCustomProductOptionPriceAction(
 export async function updateCustomProductOptionAction(
   id: string, label: string, price: number
 ): Promise<{ ok?: boolean; error?: string }> {
+  await requireAdmin('custom_products')
   const { error } = await db.from('custom_product_options').update({ label, price }).eq('id', id)
   if (error) return { error: error.message }
   return { ok: true }
@@ -458,6 +486,7 @@ export async function updateCustomProductOptionAction(
 export async function upsertCustomProductOptionPriceAction(
   productType: string, category: string, label: string, price: number, sortOrder: number
 ): Promise<{ ok?: boolean; error?: string }> {
+  await requireAdmin('custom_products')
   const { data } = await db.from('custom_product_options')
     .select('id').eq('product_type', productType).eq('category', category).eq('label', label).maybeSingle()
   if (data) {
@@ -472,15 +501,38 @@ export async function upsertCustomProductOptionPriceAction(
   return { ok: true }
 }
 
+/*
+  Endpoint upload ini terbuka tanpa login — memang harus, karena pembeli
+  merancang produk custom sebelum checkout dan tanpa akun. Karena itu batas
+  ukuran dan daftar ekstensi yang diizinkan jadi satu-satunya pengaman: tanpa
+  keduanya siapa pun bisa memenuhi Storage atau menaruh file HTML/SVG yang
+  dieksekusi browser dari domain Storage kita.
+*/
+const MAX_DESIGN_FILE_BYTES = 10 * 1024 * 1024 // 10 MB
+const ALLOWED_DESIGN_TYPES: Record<string, string> = {
+  jpg:  'image/jpeg',
+  jpeg: 'image/jpeg',
+  png:  'image/png',
+  webp: 'image/webp',
+  pdf:  'application/pdf',
+}
+
 export async function uploadDesignFileAction(
   formData: FormData
 ): Promise<{ url?: string; error?: string }> {
   try {
     const file = formData.get('file') as File | null
     if (!file || file.size === 0) return { error: 'File kosong.' }
-    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
-    const isPdf = ext === 'pdf'
-    const contentType = isPdf ? 'application/pdf' : (file.type || `image/${ext}`)
+    if (file.size > MAX_DESIGN_FILE_BYTES) {
+      return { error: 'Ukuran file maksimal 10 MB.' }
+    }
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? ''
+    // contentType ditentukan server dari ekstensi yang lolos daftar izin —
+    // file.type kiriman client tidak dipakai karena bisa dipalsukan.
+    const contentType = ALLOWED_DESIGN_TYPES[ext]
+    if (!contentType) {
+      return { error: 'Format file harus JPG, PNG, WEBP, atau PDF.' }
+    }
     const path = `custom-designs/${Date.now()}-${generateId(8)}.${ext}`
     const buf = Buffer.from(await file.arrayBuffer())
     const { error } = await db.storage.from('images').upload(path, buf, {
@@ -493,6 +545,46 @@ export async function uploadDesignFileAction(
     console.error(e)
     return { error: 'Gagal mengupload file desain.' }
   }
+}
+
+const MAX_QTY_PER_ITEM = 1000
+
+/*
+  Harga TIDAK BOLEH dipercaya dari keranjang milik browser.
+
+  Keranjang dikirim sebagai JSON dari localStorage, jadi pembeli bisa
+  menyuntingnya sesuka hati. Untuk produk katalog, semua field harga di sini
+  diambil ulang dari database berdasarkan `productId` — nilai kiriman client
+  hanya dipakai untuk memilih barang (id, ukuran, jumlah), bukan menentukan
+  nominalnya.
+
+  Catatan: item custom (`custom-*`) belum tercakup — lihat komentar di bawah.
+*/
+function isCustomItem(productId: string): boolean {
+  return productId.startsWith('custom-')
+}
+
+/** Ongkir diambil ulang dari sumber resmi, tidak dari kiriman client. */
+async function resolveShippingCost(
+  city: string,
+  kurir: { name: string; service: string } | undefined
+): Promise<{ kurir?: { name: string; service: string; price: number }; error?: string }> {
+  if (!kurir) return {}
+
+  const live = await fetchShippingCostByName(city)
+  const match =
+    live.find((o) => o.courier === kurir.name && o.service === kurir.service)
+    // Client menampilkan daftar estimasi saat RajaOngkir kosong (API mati /
+    // kota tak cocok). Daftar itu tetap diterima di sini — harganya diambil
+    // dari konstanta server, bukan dari kiriman client — supaya pesanan yang
+    // sah tidak ditolak hanya karena API keburu pulih setelah kurir dipilih.
+    ?? FALLBACK_COURIERS.find((c) => c.name === kurir.name && c.service === kurir.service)
+
+  if (!match) {
+    return { error: 'Pilihan kurir tidak valid. Silakan pilih ulang kurir pengiriman.' }
+  }
+  const name = 'courier' in match ? match.courier : match.name
+  return { kurir: { name, service: match.service, price: match.price } }
 }
 
 export async function createCheckoutOrder(
@@ -508,17 +600,64 @@ export async function createCheckoutOrder(
     }>
     if (!rawItems.length) return { error: 'Keranjang kosong' }
 
-    const items: OrderItem[] = rawItems.map((i) => ({
-      productId: i.product.id, title: i.product.title, price: i.product.price,
-      unitPrice: parsePrice(i.product.price), size: i.size, quantity: i.quantity, bg: i.product.bg,
-      ...(i.customSpec?.depanUrl    ? { customDesignDepan:    i.customSpec.depanUrl }    : {}),
-      ...(i.customSpec?.belakangUrl ? { customDesignBelakang: i.customSpec.belakangUrl } : {}),
-    }))
+    const items: OrderItem[] = []
+    for (const i of rawItems) {
+      const quantity = Math.floor(Number(i.quantity))
+      if (!Number.isFinite(quantity) || quantity < 1 || quantity > MAX_QTY_PER_ITEM) {
+        return { error: `Jumlah pesanan untuk "${i.product?.title ?? 'produk'}" tidak valid.` }
+      }
+      const design = {
+        ...(i.customSpec?.depanUrl    ? { customDesignDepan:    i.customSpec.depanUrl }    : {}),
+        ...(i.customSpec?.belakangUrl ? { customDesignBelakang: i.customSpec.belakangUrl } : {}),
+      }
+
+      if (isCustomItem(i.product.id)) {
+        /*
+          Item custom belum bisa diverifikasi di server: CustomSpec yang
+          tersimpan di keranjang tidak mencatat `productType` maupun pilihan
+          sablon (hanya boolean depan/belakang), sehingga harganya tidak dapat
+          dihitung ulang dari konfigurasi. Harga masih memakai kiriman client.
+          Lihat catatan di README/laporan audit sebelum mengandalkan alur ini
+          untuk pembayaran otomatis.
+        */
+        items.push({
+          productId: i.product.id, title: i.product.title, price: i.product.price,
+          unitPrice: parsePrice(i.product.price), size: i.size,
+          quantity, bg: i.product.bg, ...design,
+        })
+        continue
+      }
+
+      const product = await getProductById(i.product.id)
+      if (!product) {
+        return { error: `Produk "${i.product?.title ?? i.product?.id}" sudah tidak tersedia.` }
+      }
+      if (product.sizes.length > 0 && !product.sizes.includes(i.size)) {
+        return { error: `Ukuran ${i.size} tidak tersedia untuk ${product.title}.` }
+      }
+      items.push({
+        productId: product.id,
+        title: product.title,
+        price: product.price,
+        unitPrice: parsePrice(product.price),
+        size: i.size,
+        quantity,
+        bg: product.bg,
+        ...design,
+      })
+    }
 
     const kurirRaw = formData.get('kurir') as string | null
-    const kurir = kurirRaw ? JSON.parse(kurirRaw) as { name: string; service: string; price: number } : undefined
+    const requestedKurir = kurirRaw
+      ? JSON.parse(kurirRaw) as { name: string; service: string; price: number }
+      : undefined
+    const shipping = await resolveShippingCost(formData.get('city') as string, requestedKurir)
+    if (shipping.error) return { error: shipping.error }
+    const kurir = shipping.kurir
+
     const itemsTotal = items.reduce((s, i) => s + i.unitPrice * i.quantity, 0)
     const totalPrice = itemsTotal + (kurir?.price ?? 0)
+    if (totalPrice <= 0) return { error: 'Total pesanan tidak valid.' }
     const orderId = generateId(6)
     const customer = {
       name: formData.get('name') as string, email: formData.get('email') as string,
@@ -558,7 +697,7 @@ export async function registerUser(
   await saveUser({ id: generateId(8), name, email, passwordHash: hashPassword(password), createdAt: new Date().toISOString() })
 
   const jar = await cookies()
-  jar.set('user-session', email, { httpOnly: true, sameSite: 'lax', maxAge: 60 * 60 * 24 * 30 })
+  jar.set('user-session', signSession(email), sessionCookieOptions(MONTH))
   redirect('/orders')
 }
 
@@ -573,7 +712,7 @@ export async function loginUser(
     return { error: 'Email atau password salah.' }
   }
   const jar = await cookies()
-  jar.set('user-session', email, { httpOnly: true, sameSite: 'lax', maxAge: 60 * 60 * 24 * 30 })
+  jar.set('user-session', signSession(email), sessionCookieOptions(MONTH))
   const callbackUrl = formData.get('callbackUrl') as string
   redirect(callbackUrl || '/profile')
 }
@@ -585,8 +724,8 @@ export async function logoutUser() {
 }
 
 export async function adminUpdateOrderStatus(orderId: string, status: Order['status']): Promise<void> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return
+  const _g = await guardAdmin('orders')
+  if (_g.error) return
   await updateOrderStatus(orderId, status)
   revalidatePath('/admin/orders')
 }
@@ -608,8 +747,8 @@ function orderStatusToResellerStatus(s: Order['status']): ResellerOrderStatus {
 }
 
 export async function updateOrderStatusFormAction(formData: FormData) {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return
+  const _g = await guardAdmin('orders')
+  if (_g.error) return
   const orderId = formData.get('orderId') as string
   const status = formData.get('status') as Order['status']
   await updateOrderStatus(orderId, status)
@@ -625,7 +764,7 @@ export async function updateOrderStatusFormAction(formData: FormData) {
 export async function renewSnapToken(orderId: string): Promise<{ snapToken: string } | { error: string }> {
   try {
     const jar = await cookies()
-    const email = jar.get('user-session')?.value
+    const email = await getCurrentUserEmail()
     if (!email) return { error: 'Tidak terautentikasi.' }
     const orders = await getOrdersByEmail(email)
     const order = orders.find((o) => o.id === orderId)
@@ -643,7 +782,7 @@ export async function renewSnapToken(orderId: string): Promise<{ snapToken: stri
 
 export async function deleteUserOrder(orderId: string): Promise<{ error?: string }> {
   const jar = await cookies()
-  const email = jar.get('user-session')?.value
+  const email = await getCurrentUserEmail()
   if (!email) return { error: 'Tidak terautentikasi.' }
   const orders = await getOrdersByEmail(email)
   if (!orders.find((o) => o.id === orderId)) return { error: 'Order not found.' }
@@ -657,7 +796,7 @@ export async function updateProfile(
   formData: FormData
 ): Promise<{ error?: string; success?: boolean }> {
   const jar = await cookies()
-  const email = jar.get('user-session')?.value
+  const email = await getCurrentUserEmail()
   if (!email) return { error: 'Session expired, please log in again.' }
   const user = await getUserByEmail(email)
   if (!user) return { error: 'Account not found.' }
@@ -674,7 +813,7 @@ export async function changePassword(
   formData: FormData
 ): Promise<{ error?: string; success?: boolean }> {
   const jar = await cookies()
-  const email = jar.get('user-session')?.value
+  const email = await getCurrentUserEmail()
   if (!email) return { error: 'Session expired, please log in again.' }
   const user = await getUserByEmail(email)
   if (!user) return { error: 'Account not found.' }
@@ -687,6 +826,7 @@ export async function changePassword(
 }
 
 export async function saveContentAction(_prev: unknown, formData: FormData): Promise<{ ok: boolean }> {
+  await requireAdmin('content')
   const raw = formData.get('content') as string
   const data = JSON.parse(raw) as ContentData
   await saveContent(data)
@@ -702,6 +842,7 @@ export async function saveContentAction(_prev: unknown, formData: FormData): Pro
 }
 
 export async function deleteMemberAction(id: string) {
+  await requireAdmin('members')
   await deleteUser(id)
   revalidatePath('/admin/members')
 }
@@ -709,8 +850,8 @@ export async function deleteMemberAction(id: string) {
 export async function generateResetLinkAction(
   email: string
 ): Promise<{ link?: string; error?: string }> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+  const _g = await guardAdmin('members')
+  if (_g.error) return { error: _g.error }
   const user = await getUserByEmail(email)
   if (!user) return { error: 'User not found.' }
   const token = await createResetToken(email)
@@ -739,6 +880,7 @@ export async function createRoleAction(
   _prev: { error?: string },
   formData: FormData
 ): Promise<{ error?: string }> {
+  await requireAdmin('roles')
   const name = (formData.get('name') as string).trim()
   if (!name) return { error: 'Nama role wajib diisi.' }
   const permissions = formData.getAll('permissions') as Permission[]
@@ -751,6 +893,7 @@ export async function updateRoleAction(
   _prev: { error?: string },
   formData: FormData
 ): Promise<{ error?: string }> {
+  await requireAdmin('roles')
   const id = formData.get('id') as string
   const role = await getRoleById(id)
   if (!role) return { error: 'Role not found.' }
@@ -763,6 +906,7 @@ export async function updateRoleAction(
 }
 
 export async function deleteRoleAction(id: string) {
+  await requireAdmin('roles')
   const role = await getRoleById(id)
   if (role?.locked) return
   await _deleteRole(id)
@@ -773,6 +917,7 @@ export async function createAdminAction(
   _prev: { error?: string },
   formData: FormData
 ): Promise<{ error?: string }> {
+  await requireAdmin('roles')
   const username = (formData.get('username') as string).trim()
   const password = (formData.get('password') as string).trim()
   const roleId = formData.get('roleId') as string
@@ -786,6 +931,7 @@ export async function createAdminAction(
 }
 
 export async function deleteAdminAction(id: string) {
+  await requireAdmin('roles')
   if (id === 'default-superadmin') return
   await _deleteAdmin(id)
   revalidatePath('/admin/roles')
@@ -795,6 +941,7 @@ export async function addManualEntryAction(
   _prev: { error?: string },
   formData: FormData
 ): Promise<{ error?: string }> {
+  const { admin } = await requireAdmin('rekap')
   const date = (formData.get('date') as string).trim()
   const source = (formData.get('source') as string).trim() as RekapSource
   const platform = (formData.get('platform') as string).trim()
@@ -806,19 +953,16 @@ export async function addManualEntryAction(
   if (!['marketplace', 'offline'].includes(source))
     return { error: 'Invalid source.' }
 
-  const jar = await cookies()
-  const adminId = jar.get('admin-token')?.value
-  const admin = adminId ? await getAdminById(adminId) : null
-
   await saveManualEntry({
     id: Date.now().toString(), date, source, platform, amount, note,
-    filledBy: admin?.username, createdAt: new Date().toISOString(),
+    filledBy: admin.username, createdAt: new Date().toISOString(),
   })
   revalidatePath('/admin/rekap')
   return {}
 }
 
 export async function deleteManualEntryAction(id: string) {
+  await requireAdmin('rekap')
   await deleteManualEntry(id)
   revalidatePath('/admin/rekap')
 }
@@ -827,6 +971,7 @@ export async function addPembukuanAction(
   _prev: { error?: string },
   formData: FormData,
 ): Promise<{ error?: string }> {
+  const { admin } = await requireAdmin('pembukuan')
   const date = (formData.get('date') as string).trim()
   const type = (formData.get('type') as string).trim() as EntryType
   const category = (formData.get('category') as string).trim()
@@ -839,16 +984,13 @@ export async function addPembukuanAction(
   if (!['pemasukan', 'pengeluaran'].includes(type))
     return { error: 'Invalid type.' }
 
-  const jar = await cookies()
-  const adminId = jar.get('admin-token')?.value
-  const admin = adminId ? await getAdminById(adminId) : null
-
-  await savePembukuanEntry({ date, type, category, description, amount, note, filledBy: admin?.username })
+  await savePembukuanEntry({ date, type, category, description, amount, note, filledBy: admin.username })
   revalidatePath('/admin/pembukuan')
   return {}
 }
 
 export async function deletePembukuanAction(id: string) {
+  await requireAdmin('pembukuan')
   await deletePembukuanEntry(id)
   revalidatePath('/admin/pembukuan')
 }
@@ -857,8 +999,8 @@ export async function updatePricingAction(
   _prev: { ok?: boolean; error?: string },
   formData: FormData
 ): Promise<{ ok?: boolean; error?: string }> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+  const _g = await guardAdmin('pricing')
+  if (_g.error) return { error: _g.error }
   const items = await getPricingItems()
   await Promise.all(
     items.map(item => {
@@ -878,8 +1020,8 @@ export async function addPricingItemAction(
   _prev: { ok?: boolean; error?: string },
   formData: FormData
 ): Promise<{ ok?: boolean; error?: string }> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+  const _g = await guardAdmin('pricing')
+  if (_g.error) return { error: _g.error }
   const type  = formData.get('type') as 'bahan' | 'sablon'
   const label = (formData.get('label') as string).trim()
   const price = parseInt(formData.get('price') as string, 10)
@@ -892,8 +1034,8 @@ export async function addPricingItemAction(
 }
 
 export async function deletePricingItemAction(id: string): Promise<void> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return
+  const _g = await guardAdmin('pricing')
+  if (_g.error) return
   await deletePricingItem(id)
   revalidatePath('/admin/pricing')
   revalidatePath('/custom')
@@ -907,14 +1049,11 @@ export async function adjustStockAction(input: {
   amount: number
   note: string
 }): Promise<{ error?: string }> {
-  const jar = await cookies()
-  const adminId = jar.get('admin-token')?.value
-  if (!adminId) return { error: 'Unauthorized' }
-  const admin = await getAdminById(adminId)
-  if (!admin) return { error: 'Unauthorized' }
+  const _g = await guardAdmin('warehouse')
+  if (!_g.session) return { error: _g.error }
   return adjustStock(
     input.productId, input.productTitle, input.size,
-    input.type, input.amount, input.note, admin.username,
+    input.type, input.amount, input.note, _g.session.admin.username,
   )
 }
 
@@ -922,8 +1061,8 @@ export async function updateProductPriceAction(
   productId: string,
   price: string,
 ): Promise<{ error?: string }> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+  const _g = await guardAdmin('products')
+  if (_g.error) return { error: _g.error }
   const products = await getProducts()
   const normalPrice = parseInt(price.replace(/[^\d]/g, '')) || 0
   const priceReseller = normalPrice > 0 ? Math.round(normalPrice * 0.85) : undefined
@@ -939,6 +1078,7 @@ export async function updateProductInfo(
   _prev: unknown,
   formData: FormData
 ): Promise<{ ok?: boolean; error?: string }> {
+  await requireAdmin('products')
   try {
     const products = await getProducts()
     const existing = products.find(p => p.id === id)
@@ -980,6 +1120,7 @@ export async function updateProductPhotos(
   _prev: unknown,
   formData: FormData
 ): Promise<{ ok?: boolean; error?: string }> {
+  await requireAdmin('products')
   try {
     const products = await getProducts()
     const existing = products.find(p => p.id === id)
@@ -1013,14 +1154,11 @@ export async function upsertSizeEntryAction(input: {
   harga: number | null
   hpp: number | null
 }): Promise<{ error?: string }> {
-  const jar = await cookies()
-  const adminId = jar.get('admin-token')?.value
-  if (!adminId) return { error: 'Unauthorized' }
-  const admin = await getAdminById(adminId)
-  if (!admin) return { error: 'Unauthorized' }
+  const _g = await guardAdmin('warehouse')
+  if (!_g.session) return { error: _g.error }
   const result = await upsertSizeEntry(
     input.productId, input.productTitle, input.size,
-    input.quantity, input.harga, input.hpp, admin.username,
+    input.quantity, input.harga, input.hpp, _g.session.admin.username,
   )
   if (!result.error) {
     revalidatePath(`/admin/products/${input.productId}/edit`)
@@ -1044,7 +1182,7 @@ export async function resellerLogin(
     return { error: 'Akun reseller ini tidak aktif. Hubungi admin.' }
   }
   const jar = await cookies()
-  jar.set('reseller-token', reseller.id, { httpOnly: true, sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 })
+  jar.set('reseller-token', signSession(reseller.id), sessionCookieOptions(WEEK))
   redirect('/reseller/dashboard')
 }
 
@@ -1062,7 +1200,7 @@ export async function createResellerOrderAction(
 ): Promise<{ ok?: boolean; error?: string }> {
   try {
     const jar = await cookies()
-    const resellerId = jar.get('reseller-token')?.value
+    const resellerId = (await getCurrentReseller())?.id
     if (!resellerId) return { error: 'Sesi habis, silakan login ulang.' }
     const reseller = await getResellerById(resellerId)
     if (!reseller) return { error: 'Akun reseller tidak ditemukan.' }
@@ -1144,8 +1282,8 @@ export async function createResellerAction(
   _prev: { error?: string; ok?: boolean },
   formData: FormData
 ): Promise<{ error?: string; ok?: boolean }> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+  const _g = await guardAdmin('reseller')
+  if (_g.error) return { error: _g.error }
 
   const username = (formData.get('username') as string).trim()
   const password = (formData.get('password') as string).trim()
@@ -1175,8 +1313,8 @@ export async function createResellerAction(
 }
 
 export async function deleteResellerAction(id: string): Promise<void> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return
+  const _g = await guardAdmin('reseller')
+  if (_g.error) return
   await _deleteReseller(id)
   revalidatePath('/admin/reseller')
 }
@@ -1185,8 +1323,8 @@ export async function updateResellerOrderStatusAction(
   _prev: { error?: string } | null,
   formData: FormData
 ): Promise<{ error?: string }> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+  const _g = await guardAdmin('reseller')
+  if (_g.error) return { error: _g.error }
 
   const id = formData.get('id') as string
   const status = formData.get('status') as ResellerOrderStatus
@@ -1205,8 +1343,8 @@ export async function updateProductResellerPriceAction(
   productId: string,
   priceReseller: number | null,
 ): Promise<{ error?: string }> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+  const _g = await guardAdmin('reseller')
+  if (_g.error) return { error: _g.error }
   const products = await getProducts()
   const updated = products.map(p =>
     p.id === productId
@@ -1227,7 +1365,7 @@ export async function sendOrderMessageAction(
   formData: FormData
 ): Promise<{ error?: string }> {
   const jar = await cookies()
-  const email = jar.get('user-session')?.value
+  const email = await getCurrentUserEmail()
   if (!email) return { error: 'Sesi habis, silakan login ulang.' }
   const user = await getUserByEmail(email)
   if (!user) return { error: 'User not found.' }
@@ -1248,11 +1386,7 @@ export async function adminSendOrderMessageAction(
   _prev: { error?: string } | null,
   formData: FormData
 ): Promise<{ error?: string }> {
-  const jar = await cookies()
-  const adminId = jar.get('admin-token')?.value
-  if (!adminId) return { error: 'Unauthorized' }
-  const admin = await getAdminById(adminId)
-  if (!admin) return { error: 'Admin tidak ditemukan.' }
+  const { admin } = await requireAdmin('orders')
 
   const orderId = formData.get('orderId') as string
   const message = (formData.get('message') as string ?? '').trim()
@@ -1264,14 +1398,14 @@ export async function adminSendOrderMessageAction(
 }
 
 export async function getOrderMessagesAction(orderId: string): Promise<OrderMessage[]> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return []
+  const _g = await guardAdmin('orders')
+  if (_g.error) return []
   return getOrderMessages(orderId)
 }
 
 export async function markOrderMessagesReadAction(orderId: string): Promise<void> {
   const jar = await cookies()
-  const email = jar.get('user-session')?.value
+  const email = await getCurrentUserEmail()
   if (!email) return
   const orders = await getOrdersByEmail(email)
   if (!orders.find(o => o.id === orderId)) return
@@ -1280,8 +1414,8 @@ export async function markOrderMessagesReadAction(orderId: string): Promise<void
 }
 
 export async function adminMarkOrderMessagesReadAction(orderId: string): Promise<void> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return
+  const _g = await guardAdmin('orders')
+  if (_g.error) return
   await markMessagesRead(orderId, 'customer')
 }
 
@@ -1290,7 +1424,7 @@ export async function resellerSendOrderMessageAction(
   formData: FormData
 ): Promise<{ error?: string }> {
   const jar = await cookies()
-  const resellerId = jar.get('reseller-token')?.value
+  const resellerId = (await getCurrentReseller())?.id
   if (!resellerId) return { error: 'Sesi habis, silakan login ulang.' }
   const reseller = await getResellerById(resellerId)
   if (!reseller) return { error: 'Reseller tidak ditemukan.' }
@@ -1309,13 +1443,13 @@ export async function resellerSendOrderMessageAction(
 
 export async function resellerGetOrderMessagesAction(orderId: string): Promise<OrderMessage[]> {
   const jar = await cookies()
-  if (!jar.get('reseller-token')) return []
+  if (!(await getCurrentReseller())) return []
   return getOrderMessages(orderId)
 }
 
 export async function resellerMarkOrderMessagesReadAction(orderId: string): Promise<void> {
   const jar = await cookies()
-  if (!jar.get('reseller-token')) return
+  if (!(await getCurrentReseller())) return
   await markMessagesRead(orderId, 'admin')
   revalidatePath('/reseller/dashboard/orders')
 }
@@ -1354,8 +1488,8 @@ export async function updateCustomProductImageAction(
   id: string,
   formData: FormData,
 ): Promise<{ url: string } | { error: string }> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return { error: 'Unauthorized' }
+  const _g = await guardAdmin('custom_products')
+  if (_g.error) return { error: _g.error }
 
   const imageFile = formData.get('image') as File | null
   if (!imageFile || imageFile.size === 0) return { error: 'File tidak ditemukan' }
@@ -1409,15 +1543,15 @@ export async function submitContactMessage(
 }
 
 export async function adminUpdateMessageStatus(id: string, status: MessageStatus): Promise<void> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return
+  const _g = await guardAdmin('messages')
+  if (_g.error) return
   await updateMessageStatus(id, status)
   revalidatePath('/admin/messages')
 }
 
 export async function adminDeleteMessage(id: string): Promise<void> {
-  const jar = await cookies()
-  if (!jar.get('admin-token')) return
+  const _g = await guardAdmin('messages')
+  if (_g.error) return
   await deleteContactMessage(id)
   revalidatePath('/admin/messages')
 }
@@ -1426,6 +1560,7 @@ export async function updateProductConfigAction(
   _prev: Record<string, unknown>,
   formData: FormData
 ): Promise<{ ok?: boolean; error?: string }> {
+  await requireAdmin('custom_products')
   try {
     const { upsertProductConfig } = await import('./product-config')
     const productType = formData.get('product_type') as string

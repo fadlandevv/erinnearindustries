@@ -18,3 +18,8 @@ next-env.d.ts
 .DS_Store
 *.pem
 .vercel
+
+# Laporan audit keamanan — berisi peta kerentanan beserta lokasi baris kodenya.
+# Repo ini publik, jadi laporan semacam ini tidak boleh ikut ter-commit.
+AUDIT_REPORT.md
+*-audit-report.md
