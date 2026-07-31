@@ -942,6 +942,8 @@ export async function updateProductInfo(
     const products = await getProducts()
     const existing = products.find(p => p.id === id)
     if (!existing) return { error: 'Product not found' }
+    const categories = (formData.getAll('categories') as string[]).filter(Boolean)
+    if (categories.length === 0) return { error: 'Pilih minimal 1 kategori produk' }
     const colorsRaw = (formData.get('colors') as string | null) ?? ''
     const colors = colorsRaw.split(',').map(c => c.trim()).filter(Boolean)
     const normalPrice = parsePrice(existing.price)

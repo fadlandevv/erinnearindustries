@@ -1879,6 +1879,18 @@
 
 /* ===== CUSTOM ADMIN SELECT ===== */
 .admin-cselect { position: relative; width: 100%; }
+/* Invisible but still focusable, so the browser can anchor its validation bubble here */
+.admin-cselect-validity {
+  position: absolute;
+  left: 14px;
+  bottom: 4px;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
 .admin-cselect-trigger {
   width: 100%;
   padding: 11.2px 14.4px;

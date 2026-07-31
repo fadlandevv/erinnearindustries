@@ -48,11 +48,12 @@ export default async function NewProductPage() {
                 </div>
 
                 <div className="admin-form-group">
-                  <label>Category</label>
+                  <label>Category *</label>
                   <AdminMultiSelect
                     name="categories"
                     placeholder="— Pilih kategori —"
                     options={categories.map((c) => ({ value: c, label: c }))}
+                    required
                   />
                 </div>
               </div>

@@ -57,12 +57,13 @@ export default function InfoForm({ product, sizechartData, categories }: Props) 
           </div>
 
           <div className="admin-form-group">
-            <label>Category</label>
+            <label>Category *</label>
             <AdminMultiSelect
               name="categories"
               defaultValues={product.categories ?? []}
               placeholder="— Pilih kategori —"
               options={categories.map(c => ({ value: c, label: c }))}
+              required
             />
           </div>
         </div>

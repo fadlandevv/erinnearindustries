@@ -8,9 +8,10 @@ type Props = {
   defaultValues?: string[]
   options: Option[]
   placeholder?: string
+  required?: boolean
 }
 
-export default function AdminMultiSelect({ name, defaultValues = [], options, placeholder }: Props) {
+export default function AdminMultiSelect({ name, defaultValues = [], options, placeholder, required }: Props) {
   const [selected, setSelected] = useState<string[]>(defaultValues)
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -39,6 +40,18 @@ export default function AdminMultiSelect({ name, defaultValues = [], options, pl
   return (
     <div ref={ref} className="admin-cselect">
       {selected.map(v => <input key={v} type="hidden" name={name} value={v} />)}
+
+      {/* Hidden inputs skip native validation — this stand-in blocks submit while nothing is picked */}
+      {required && selected.length === 0 && (
+        <input
+          className="admin-cselect-validity"
+          tabIndex={-1}
+          required
+          value=""
+          onChange={() => {}}
+          onFocus={() => setOpen(true)}
+        />
+      )}
 
       <button
         type="button"
