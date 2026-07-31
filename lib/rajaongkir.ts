@@ -1,7 +1,11 @@
 const API_KEY      = process.env.RAJAONGKIR_API_KEY        ?? ''
 const ORIGIN_CITY  = process.env.RAJAONGKIR_ORIGIN_CITY_ID ?? ''
 const BASE         = 'https://api.rajaongkir.com/starter'
-const WEIGHT_GRAMS = 500
+// Perkiraan berat satu potong pakaian. Ongkir dihitung dari berat total
+// (per_item × jumlah item), bukan nilai tetap — sebelumnya order 20 pcs tetap
+// dihitung 500 gram sehingga selisih ongkirnya ditanggung penjual.
+const WEIGHT_PER_ITEM_GRAMS = 500
+const MIN_WEIGHT_GRAMS = 500
 
 const COURIERS = ['jne', 'pos', 'tiki']
 
@@ -42,15 +46,16 @@ export async function fetchCities(): Promise<RajaCity[]> {
   }
 }
 
-export async function fetchShippingCost(destCityId: string): Promise<ShippingOption[]> {
+export async function fetchShippingCost(destCityId: string, totalItems = 1): Promise<ShippingOption[]> {
   if (!API_KEY || !ORIGIN_CITY) return []
+  const weight = Math.max(MIN_WEIGHT_GRAMS, WEIGHT_PER_ITEM_GRAMS * Math.max(1, totalItems))
   try {
     const allResults = await Promise.all(
       COURIERS.map(async (courier) => {
         const body = new URLSearchParams({
           origin:      ORIGIN_CITY,
           destination: destCityId,
-          weight:      String(WEIGHT_GRAMS),
+          weight:      String(weight),
           courier,
         })
         const res = await fetchTimeout(`${BASE}/cost`, {
@@ -84,7 +89,7 @@ export async function fetchShippingCost(destCityId: string): Promise<ShippingOpt
 }
 
 // Single server-side call: city list + name matching + cost fetch combined
-export async function fetchShippingCostByName(regencyName: string): Promise<ShippingOption[]> {
+export async function fetchShippingCostByName(regencyName: string, totalItems = 1): Promise<ShippingOption[]> {
   if (!API_KEY || !ORIGIN_CITY) {
     console.warn('[RajaOngkir] RAJAONGKIR_API_KEY or RAJAONGKIR_ORIGIN_CITY_ID not set')
     return []
@@ -107,7 +112,7 @@ export async function fetchShippingCostByName(regencyName: string): Promise<Ship
       return []
     }
     console.log(`[RajaOngkir] matched: ${match.city_name} id=${match.city_id}`)
-    return await fetchShippingCost(match.city_id)
+    return await fetchShippingCost(match.city_id, totalItems)
   } catch (err) {
     console.error('[RajaOngkir] fetchShippingCostByName error:', err)
     return []

@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+import { getCurrentUserEmail } from '@/lib/auth'
 import { getUserByEmail } from '@/lib/users'
 import { getOrdersByEmail } from '@/lib/orders'
 import { logoutUser } from '@/lib/actions'
@@ -10,8 +10,7 @@ export const metadata = { title: 'Profil — Erinnear Industries' }
 export const dynamic = 'force-dynamic'
 
 export default async function ProfilePage() {
-  const jar = await cookies()
-  const email = jar.get('user-session')?.value
+  const email = await getCurrentUserEmail()
   if (!email) redirect('/login?callbackUrl=/profile')
   const user = await getUserByEmail(email)
   if (!user) redirect('/login?callbackUrl=/profile')

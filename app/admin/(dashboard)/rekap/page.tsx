@@ -1,5 +1,6 @@
-import { cookies } from 'next/headers'
-import { getAdminById, getRoleById } from '@/lib/rbac'
+import { redirect } from 'next/navigation'
+import { getCurrentAdmin } from '@/lib/auth'
+import { hasPermission } from '@/lib/rbac'
 import { computeRekap, getManualEntries } from '@/lib/rekap'
 import RekapClient from './RekapClient'
 
@@ -11,9 +12,10 @@ export default async function RekapPage({
   const { tab } = await searchParams
   const initialTab: 'weekly' | 'monthly' | 'yearly' = tab === 'weekly' || tab === 'mingguan' ? 'weekly' : tab === 'yearly' || tab === 'tahunan' ? 'yearly' : 'monthly'
 
-  const jar = await cookies()
-  const adminId = jar.get('admin-token')?.value
-  const admin = adminId ? await getAdminById(adminId) : null
+  const session = await getCurrentAdmin()
+  if (!session) redirect('/admin/login')
+  if (!session.role?.locked && !hasPermission(session.role, 'rekap')) redirect('/admin')
+  const admin = session.admin
 
   const data = await computeRekap()
   const entries = await getManualEntries()

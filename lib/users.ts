@@ -48,10 +48,15 @@ export function hashPassword(password: string): string {
 }
 
 export function verifyPassword(password: string, stored: string): boolean {
-  const [salt, hash] = stored.split(':')
-  const hashBuffer = Buffer.from(hash, 'hex')
-  const derived = scryptSync(password, salt, 64)
-  return timingSafeEqual(hashBuffer, derived)
+  // Hash yang rusak/format lama membuat timingSafeEqual melempar (panjang buffer
+  // berbeda) dan berujung HTTP 500. Perlakukan sebagai password salah.
+  try {
+    const [salt, hash] = stored.split(':')
+    const hashBuffer = Buffer.from(hash, 'hex')
+    const derived = scryptSync(password, salt, 64)
+    if (hashBuffer.length !== derived.length) return false
+    return timingSafeEqual(hashBuffer, derived)
+  } catch { return false }
 }
 
 export async function createResetToken(email: string): Promise<string> {

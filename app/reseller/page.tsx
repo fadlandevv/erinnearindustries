@@ -1,6 +1,6 @@
+import { getCurrentReseller } from '@/lib/auth'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { cookies } from 'next/headers'
 import { getResellerById } from '@/lib/resellers'
 
 export const metadata: Metadata = {
@@ -57,8 +57,7 @@ const FAQS = [
 ]
 
 export default async function ResellerPage() {
-  const jar = await cookies()
-  const resellerId = jar.get('reseller-token')?.value
+  const resellerId = (await getCurrentReseller())?.id
   const isLoggedIn = resellerId ? !!(await getResellerById(resellerId)) : false
 
   return (

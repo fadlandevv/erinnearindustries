@@ -1,5 +1,6 @@
-import { cookies } from 'next/headers'
-import { getAdminById } from '@/lib/rbac'
+import { redirect } from 'next/navigation'
+import { getCurrentAdmin } from '@/lib/auth'
+import { hasPermission } from '@/lib/rbac'
 import { getPembukuanByMonth, getPembukuanByYear } from '@/lib/pembukuan'
 import PembukuanClient from './PembukuanClient'
 
@@ -14,9 +15,12 @@ export default async function PembukuanPage({
   const month = parseInt(monthParam ?? '') || now.getMonth() + 1
   const mode = modeParam === 'yearly' ? 'yearly' : 'monthly'
 
-  const jar = await cookies()
-  const adminId = jar.get('admin-token')?.value
-  const admin = adminId ? await getAdminById(adminId) : null
+  // Sidebar hanya menyembunyikan link — halaman wajib menegakkan permission sendiri,
+  // kalau tidak role terbatas bisa membuka data keuangan lewat URL langsung.
+  const session = await getCurrentAdmin()
+  if (!session) redirect('/admin/login')
+  if (!session.role?.locked && !hasPermission(session.role, 'pembukuan')) redirect('/admin')
+  const admin = session.admin
 
   const entries = mode === 'yearly'
     ? await getPembukuanByYear(year)

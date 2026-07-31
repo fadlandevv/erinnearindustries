@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { getProducts, getServices } from '@/lib/data'
+import { rateLimit } from '@/lib/rate-limit'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -40,7 +41,32 @@ Cara menjawab:
 
 export async function POST(req: Request) {
   try {
+    // Endpoint ini memakai kuota API berbayar, jadi harus dibatasi walau publik.
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim()
+      ?? req.headers.get('x-real-ip') ?? 'unknown'
+    const limited = rateLimit(`chat:${ip}`, 20, 300)
+    if (!limited.ok) {
+      return Response.json(
+        { error: 'Terlalu banyak pesan. Coba lagi sebentar lagi.' },
+        { status: 429, headers: { 'Retry-After': String(limited.retryAfterSeconds) } },
+      )
+    }
+
+    if (!process.env.ANTHROPIC_API_KEY) {
+      // Tanpa cek ini kegagalan muncul di tengah stream (setelah header terkirim),
+      // sehingga try/catch di bawah tidak menangkapnya dan chat menggantung.
+      console.error('[chat] ANTHROPIC_API_KEY belum diset')
+      return Response.json(
+        { error: 'Chatbot sedang tidak tersedia. Silakan hubungi kami lewat halaman /contact.' },
+        { status: 503 },
+      )
+    }
+
     const { messages } = await req.json()
+
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return Response.json({ error: 'Pesan kosong.' }, { status: 400 })
+    }
 
     const stream = await client.messages.stream({
       model: 'claude-haiku-4-5-20251001',
@@ -52,15 +78,24 @@ export async function POST(req: Request) {
     const encoder = new TextEncoder()
     const readable = new ReadableStream({
       async start(controller) {
-        for await (const chunk of stream) {
-          if (
-            chunk.type === 'content_block_delta' &&
-            chunk.delta.type === 'text_delta'
-          ) {
-            controller.enqueue(encoder.encode(chunk.delta.text))
+        // Error di sini terjadi setelah header terkirim, jadi tidak bisa lagi
+        // diubah jadi status HTTP. Kirim pesan yang terbaca pengguna lalu tutup
+        // stream dengan rapi — jangan biarkan koneksi putus tanpa penjelasan.
+        try {
+          for await (const chunk of stream) {
+            if (
+              chunk.type === 'content_block_delta' &&
+              chunk.delta.type === 'text_delta'
+            ) {
+              controller.enqueue(encoder.encode(chunk.delta.text))
+            }
           }
+        } catch (err) {
+          console.error('[chat] stream error:', err)
+          controller.enqueue(encoder.encode('\n\nMaaf, koneksi ke asisten terputus. Coba kirim ulang pesannya ya.'))
+        } finally {
+          controller.close()
         }
-        controller.close()
       },
     })
 

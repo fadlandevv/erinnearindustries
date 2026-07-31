@@ -1,7 +1,7 @@
+import { getCurrentUserEmail } from '@/lib/auth'
 import './globals.css'
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
-import { cookies } from 'next/headers'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import Providers from '@/components/Providers'
@@ -43,8 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const jar = await cookies()
-  const email = jar.get('user-session')?.value
+  const email = await getCurrentUserEmail()
   const user = email ? await getUserByEmail(email) : null
   const userInfo = user ? { name: user.name } : null
   const content = await getContent()

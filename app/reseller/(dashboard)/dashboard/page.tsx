@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+import { getCurrentReseller } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getResellerById } from '@/lib/resellers'
@@ -20,8 +20,7 @@ const STATUS_LABEL: Record<string, string> = {
 }
 
 export default async function ResellerDashboardPage() {
-  const jar = await cookies()
-  const resellerId = jar.get('reseller-token')?.value
+  const resellerId = (await getCurrentReseller())?.id
   const reseller = resellerId ? await getResellerById(resellerId) : null
   if (!reseller) redirect('/reseller/login')
 

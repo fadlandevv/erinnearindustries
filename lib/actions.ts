@@ -855,7 +855,7 @@ export async function generateResetLinkAction(
   const user = await getUserByEmail(email)
   if (!user) return { error: 'User not found.' }
   const token = await createResetToken(email)
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  const base = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
   return { link: `${base}/reset-password?token=${token}` }
 }
 

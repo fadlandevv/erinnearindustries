@@ -1,16 +1,18 @@
-import { cookies } from 'next/headers'
+import { getCurrentUserEmail } from '@/lib/auth'
 import { getUserByEmail } from '@/lib/users'
 import { getOrdersByEmail } from '@/lib/orders'
 import { getMessagesByOrderIds, type OrderMessage } from '@/lib/order-messages'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import OrderList from '@/components/OrderList'
 
 export const metadata = { title: 'Riwayat Pesanan — Erinnear Industries' }
 export const dynamic = 'force-dynamic'
 
 export default async function OrdersPage() {
-  const jar = await cookies()
-  const email = jar.get('user-session')?.value ?? ''
+  // Middleware hanya gerbang pertama — halaman tetap wajib memverifikasi sendiri.
+  const email = await getCurrentUserEmail()
+  if (!email) redirect('/login?callbackUrl=/orders')
   const user = await getUserByEmail(email)
   const orders = await getOrdersByEmail(email)
 

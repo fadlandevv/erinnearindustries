@@ -1,18 +1,15 @@
 import type { ReactNode } from 'react'
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { getAdminById, getRoleById } from '@/lib/rbac'
+import { getCurrentAdmin } from '@/lib/auth'
 import AdminSidebar from '@/components/AdminSidebar'
 import { AdminToastProvider } from '@/context/AdminToastContext'
 import AdminFlash from '@/components/AdminFlash'
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
-  const jar = await cookies()
-  const adminId = jar.get('admin-token')?.value
-  const admin = adminId ? await getAdminById(adminId) : null
-  if (!admin) redirect('/admin/login')
+  const session = await getCurrentAdmin()
+  if (!session) redirect('/admin/login')
 
-  const role = await getRoleById(admin.roleId)
+  const { admin, role } = session
   const permissions = role?.permissions ?? []
 
   return (

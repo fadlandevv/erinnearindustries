@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+import { getCurrentReseller } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getResellerById, getResellerOrders } from '@/lib/resellers'
@@ -6,8 +6,7 @@ import { getMessagesByOrderIds } from '@/lib/order-messages'
 import ResellerOrdersClient from './ResellerOrdersClient'
 
 export default async function ResellerOrdersPage() {
-  const jar = await cookies()
-  const resellerId = jar.get('reseller-token')?.value
+  const resellerId = (await getCurrentReseller())?.id
   const reseller = resellerId ? await getResellerById(resellerId) : null
   if (!reseller) redirect('/reseller/login')
 

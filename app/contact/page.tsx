@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+import { getCurrentUserEmail } from '@/lib/auth'
 import { getServices, getProducts, buildPageMetadata } from '@/lib/data'
 import { getUserByEmail } from '@/lib/users'
 import ContactForm from '@/components/ContactForm'
@@ -24,8 +24,7 @@ export default async function ContactPage({
 }: {
   searchParams: Promise<{ service?: string; product?: string }>
 }) {
-  const jar = await cookies()
-  const sessionEmail = jar.get('user-session')?.value
+  const sessionEmail = await getCurrentUserEmail()
 
   const [services, products, params, user] = await Promise.all([
     getServices(),

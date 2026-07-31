@@ -1,12 +1,11 @@
-import { cookies } from 'next/headers'
+import { getCurrentReseller } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { getResellerById, getResellerOrders } from '@/lib/resellers'
 import InsentifClient from './InsentifClient'
 import ExportPdfBtn from './ExportPdfBtn'
 
 export default async function EarningsInsentifPage() {
-  const jar = await cookies()
-  const resellerId = jar.get('reseller-token')?.value
+  const resellerId = (await getCurrentReseller())?.id
   const reseller = resellerId ? await getResellerById(resellerId) : null
   if (!reseller) redirect('/reseller/login')
 

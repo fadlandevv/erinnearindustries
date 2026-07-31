@@ -1,12 +1,11 @@
-import { cookies } from 'next/headers'
+import { getCurrentUserEmail } from '@/lib/auth'
 import { getUserByEmail } from '@/lib/users'
 import CheckoutForm from '@/components/CheckoutForm'
 
 export const metadata = { title: 'Checkout — Erinnear Industries' }
 
 export default async function CheckoutPage() {
-  const jar = await cookies()
-  const email = jar.get('user-session')?.value
+  const email = await getCurrentUserEmail()
   const user = email ? await getUserByEmail(email) : null
   const userInfo = user ? { name: user.name, email: user.email } : null
 
