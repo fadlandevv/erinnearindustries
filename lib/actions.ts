@@ -959,7 +959,7 @@ export async function updateProductInfo(
         material: ((formData.get('material') as string | null) ?? '').split('\n').map(s => s.trim()).filter(Boolean),
         sizechart: parseSizechart(formData),
         sizes: formData.getAll('sizes') as string[],
-        categories: (formData.getAll('categories') as string[]).filter(Boolean),
+        categories,
         priceReseller,
         updatedAt: new Date().toISOString(),
       } : p
