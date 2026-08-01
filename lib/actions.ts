@@ -521,6 +521,12 @@ export async function uploadDesignFileAction(
   formData: FormData
 ): Promise<{ url?: string; error?: string }> {
   try {
+    // Upload terbuka untuk pengunjung (belum tentu login), jadi dibatasi per IP
+    // supaya storage tidak bisa dibanjiri.
+    const ip = await getClientIp()
+    const limited = rateLimit(`upload:${ip}`, 15, 3600)
+    if (!limited.ok) return { error: 'Terlalu banyak upload. Coba lagi nanti.' }
+
     const file = formData.get('file') as File | null
     if (!file || file.size === 0) return { error: 'File kosong.' }
     if (file.size > MAX_DESIGN_FILE_BYTES) {
@@ -707,10 +713,18 @@ export async function loginUser(
 ): Promise<{ error?: string }> {
   const email    = (formData.get('email') as string).trim().toLowerCase()
   const password = formData.get('password') as string
+
+  const ip = await getClientIp()
+  const limited = rateLimit(`user-login:${ip}`, 8, 900)
+  if (!limited.ok) {
+    return { error: `Terlalu banyak percobaan login. Coba lagi dalam ${Math.ceil(limited.retryAfterSeconds / 60)} menit.` }
+  }
+
   const user = await getUserByEmail(email)
   if (!user || !verifyPassword(password, user.passwordHash)) {
     return { error: 'Email atau password salah.' }
   }
+  resetRateLimit(`user-login:${ip}`)
   const jar = await cookies()
   jar.set('user-session', signSession(email), sessionCookieOptions(MONTH))
   const callbackUrl = formData.get('callbackUrl') as string
@@ -1527,6 +1541,13 @@ export async function submitContactMessage(
   const message = (formData.get('message') as string ?? '').trim()
 
   if (!name || !email || !message) return { error: 'Nama, email, dan pesan wajib diisi.' }
+
+  // Form publik tanpa captcha — batasi agar tidak dibanjiri spam.
+  const ip = await getClientIp()
+  const limited = rateLimit(`contact:${ip}`, 5, 3600)
+  if (!limited.ok) {
+    return { error: 'Anda sudah mengirim beberapa pesan. Coba lagi nanti ya.' }
+  }
 
   try {
     await saveContactMessage({
