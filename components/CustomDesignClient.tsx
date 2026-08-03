@@ -187,6 +187,31 @@ function clientToSVG(svg: SVGSVGElement, clientX: number, clientY: number): Desi
   }
 }
 
+// The tintable mockups under /mockups/light are neutral greys whose fabric shading
+// sits around this value — it's the anchor where the tint lands on the chosen colour
+// exactly, with folds falling below it and highlights pushing above.
+const MOCKUP_BASE_TONE = 210
+
+function hexToRgb(hex: string): [number, number, number] {
+  const h = hex.replace('#', '')
+  const full = h.length === 3 ? h.split('').map(c => c + c).join('') : h
+  const n = parseInt(full, 16)
+  return Number.isNaN(n) || full.length !== 6
+    ? [255, 255, 255]
+    : [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+}
+
+// Recolour the grey mockup as C' = amplitude * C^exponent, per channel.
+// Linear scaling alone flattens dark colours (all the shading collapses into a few
+// levels), so the exponent climbs as the colour darkens to stretch the folds back out.
+function tintTransfer(color: string) {
+  const rgb = hexToRgb(color)
+  const lum = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255
+  const exponent = 1 + 1.6 * Math.pow(1 - lum, 2)
+  const baseAtTone = Math.pow(MOCKUP_BASE_TONE / 255, exponent)
+  return { exponent, amplitudes: rgb.map(c => (c / 255) / baseAtTone) as [number, number, number] }
+}
+
 function ProductMockupSVG({ color, design, side, productType, designPos, isDragging, onDesignPointerDown, onSVGPointerMove, onSVGPointerUp, svgRef, designSize, amplopDesignSize }: {
   color: string
   design: string | null
@@ -201,15 +226,19 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
   designSize?: DesignSize
   amplopDesignSize?: AmplopDesignSize
 }) {
-  const PHOTO_MOCKUPS: Record<string, { front: string; back: string; vb: string; da: { x: number; y: number; w: number; h: number } }> = {
-    tshirt:            { front: '/mockups/tshirt.png',               back: '/mockups/tshirt-back.png',           vb: '0 0 300 300', da: { x: 90, y: 90,  w: 120, h: 120 } },
-    totebag:           { front: '/mockups/totebag.png',              back: '/mockups/totebag.png',               vb: '0 0 300 300', da: { x: 85, y: 110, w: 130, h: 130 } },
-    'coach-jacket':    { front: '/mockups/coachjacket.png',          back: '/mockups/coachjacket-belakang.png',  vb: '0 0 300 300', da: { x: 90, y: 100, w: 120, h: 120 } },
-    hoodie:            { front: '/mockups/hoodiedepan.png',          back: '/mockups/hoodiebelakang.png',        vb: '0 0 300 300', da: { x: 90, y: 118, w: 120, h: 110 } },
-    jersey:            { front: '/mockups/jerseydepan.png',          back: '/mockups/jerseybelakang.png',        vb: '0 0 300 300', da: { x: 90, y: 90,  w: 120, h: 120 } },
-    'amplop-packaging':{ front: '/mockups/amplop-packaging.png',     back: '/mockups/amplop-packaging-back.png', vb: '0 0 300 375', da: { x: 75, y: 115, w: 150, h: 185 } },
+  // `tint` mockups live under /mockups/light — neutral grey renders of the same photo,
+  // recoloured at runtime to whatever the customer picks in "Warna Baju".
+  const PHOTO_MOCKUPS: Record<string, { front: string; back: string; vb: string; tint?: boolean; da: { x: number; y: number; w: number; h: number } }> = {
+    tshirt:            { front: '/mockups/light/tshirt.png',              back: '/mockups/light/tshirt-back.png',          vb: '0 0 300 300', tint: true, da: { x: 90, y: 90,  w: 120, h: 120 } },
+    totebag:           { front: '/mockups/light/totebag.png',             back: '/mockups/light/totebag.png',              vb: '0 0 300 300', tint: true, da: { x: 85, y: 110, w: 130, h: 130 } },
+    'coach-jacket':    { front: '/mockups/light/coachjacket.png',         back: '/mockups/light/coachjacket-belakang.png', vb: '0 0 300 300', tint: true, da: { x: 90, y: 100, w: 120, h: 120 } },
+    hoodie:            { front: '/mockups/light/hoodiedepan.png',         back: '/mockups/light/hoodiebelakang.png',       vb: '0 0 300 300', tint: true, da: { x: 90, y: 118, w: 120, h: 110 } },
+    jersey:            { front: '/mockups/light/jerseydepan.png',         back: '/mockups/light/jerseybelakang.png',       vb: '0 0 300 300', tint: true, da: { x: 90, y: 90,  w: 120, h: 120 } },
+    'amplop-packaging':{ front: '/mockups/amplop-packaging.png',          back: '/mockups/amplop-packaging-back.png',      vb: '0 0 300 375',             da: { x: 75, y: 115, w: 150, h: 185 } },
   }
   const photoCfg = PHOTO_MOCKUPS[productType] ?? PHOTO_MOCKUPS.tshirt
+  const tintId = React.useId().replace(/:/g, '')
+  const tint = photoCfg.tint ? tintTransfer(color) : null
   const da = productType === 'amplop-packaging' && amplopDesignSize
     ? AMPLOP_DESIGN_SIZES[amplopDesignSize]
     : designSize
@@ -228,10 +257,23 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
       onPointerUp={onSVGPointerUp}
       onPointerLeave={onSVGPointerUp}
     >
+      {tint && (
+        <defs>
+          <filter id={`tint-${tintId}`} colorInterpolationFilters="sRGB">
+            <feComponentTransfer>
+              <feFuncR type="gamma" amplitude={tint.amplitudes[0]} exponent={tint.exponent} offset="0" />
+              <feFuncG type="gamma" amplitude={tint.amplitudes[1]} exponent={tint.exponent} offset="0" />
+              <feFuncB type="gamma" amplitude={tint.amplitudes[2]} exponent={tint.exponent} offset="0" />
+            </feComponentTransfer>
+          </filter>
+        </defs>
+      )}
+
       <image
         href={side === 'front' ? photoCfg.front : photoCfg.back}
         x="0" y="0" width="300" height={photoCfg.vb.split(' ')[3]}
         preserveAspectRatio="xMidYMid meet"
+        filter={tint ? `url(#tint-${tintId})` : undefined}
       />
 
       {design

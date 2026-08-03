@@ -21,7 +21,7 @@ const NAV_GROUPS: NavGroup[] = [
     group: 'Content',
     icon: '✎',
     items: [
-      { label: 'Homepage', href: '/admin/content',  icon: '✎', permission: 'content'  },
+      { label: 'Page',     href: '/admin/content',  icon: '✎', permission: 'content'  },
       { label: 'Services', href: '/admin/services', icon: '✦', permission: 'services' },
       { label: 'Gallery',  href: '/admin/gallery',  icon: '◧', permission: 'gallery'  },
     ],
