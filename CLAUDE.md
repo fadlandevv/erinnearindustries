@@ -53,6 +53,21 @@ Folders:
 - `gallery/`, `showcase/` — CMS images  
 - `custom-designs/` — uploaded customer design files
 
+## Custom Order Mockups
+
+`public/mockups/` — source garment photos (transparent PNG).  
+`public/mockups/light/` — **generated**, never edit by hand. Neutral grey bases that
+`ProductMockupSVG` recolours at runtime to match the "Warna Baju" dropdown.
+
+After adding or replacing a source photo, regenerate:
+
+```bash
+node scripts/make-light-mockups.mjs
+```
+
+New products also need an entry in `MOCKUPS` in that script and in `PHOTO_MOCKUPS`
+(with `tint: true`) in `components/CustomDesignClient.tsx`.
+
 ## Key Conventions
 
 - Server Actions: `lib/actions.ts` (`'use server'`)
