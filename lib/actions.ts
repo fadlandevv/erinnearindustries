@@ -700,7 +700,14 @@ export async function registerUser(
   if (password.length < 6) return { error: 'Password minimal 6 karakter.' }
   if (await getUserByEmail(email)) return { error: 'Email already registered.' }
 
-  await saveUser({ id: generateId(8), name, email, passwordHash: hashPassword(password), createdAt: new Date().toISOString() })
+  try {
+    await saveUser({ id: generateId(8), name, email, passwordHash: hashPassword(password), createdAt: new Date().toISOString() })
+  } catch (e) {
+    // Jangan set cookie sesi kalau baris user gagal tersimpan — kalau tidak,
+    // user merasa sudah punya akun padahal tidak pernah bisa login.
+    console.error('registerUser: gagal menyimpan user', e)
+    return { error: 'Pendaftaran gagal disimpan. Coba lagi atau hubungi admin.' }
+  }
 
   const jar = await cookies()
   jar.set('user-session', signSession(email), sessionCookieOptions(MONTH))

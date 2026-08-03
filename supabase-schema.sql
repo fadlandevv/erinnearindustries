@@ -8,9 +8,14 @@ create table if not exists users (
   id text primary key,
   name text not null,
   email text unique not null,
+  phone text,
   password_hash text not null,
   created_at timestamptz default now()
 );
+
+-- Kolom `phone` sempat tertinggal di tabel yang sudah terlanjur dibuat.
+-- Tanpa ini setiap insert dari saveUser() ditolak PostgREST (PGRST204).
+alter table users add column if not exists phone text;
 
 create table if not exists admins (
   id text primary key,

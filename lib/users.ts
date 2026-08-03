@@ -29,16 +29,27 @@ export async function getUserByEmail(email: string): Promise<User | undefined> {
   return data ? toUser(data) : undefined
 }
 
+/*
+  Tulisan ke tabel `users` WAJIB melempar kalau gagal.
+
+  Sebelumnya error dari Supabase dibuang diam-diam, jadi saat kolom `phone`
+  belum ada di tabel, registrasi tetap "berhasil": cookie sesi diset dan user
+  di-redirect, padahal tidak ada baris yang tersimpan. Akibatnya semua login
+  pelanggan berakhir "Email atau password salah." tanpa jejak error.
+*/
 export async function saveUser(user: User): Promise<void> {
-  await db.from('users').upsert({ id: user.id, name: user.name, email: user.email, phone: user.phone ?? null, password_hash: user.passwordHash, created_at: user.createdAt })
+  const { error } = await db.from('users').upsert({ id: user.id, name: user.name, email: user.email, phone: user.phone ?? null, password_hash: user.passwordHash, created_at: user.createdAt })
+  if (error) throw new Error(`Gagal menyimpan user: ${error.message}`)
 }
 
 export async function updateUser(user: User): Promise<void> {
-  await db.from('users').update({ name: user.name, email: user.email, phone: user.phone ?? null, password_hash: user.passwordHash }).eq('id', user.id)
+  const { error } = await db.from('users').update({ name: user.name, email: user.email, phone: user.phone ?? null, password_hash: user.passwordHash }).eq('id', user.id)
+  if (error) throw new Error(`Gagal memperbarui user: ${error.message}`)
 }
 
 export async function deleteUser(id: string): Promise<void> {
-  await db.from('users').delete().eq('id', id)
+  const { error } = await db.from('users').delete().eq('id', id)
+  if (error) throw new Error(`Gagal menghapus user: ${error.message}`)
 }
 
 export function hashPassword(password: string): string {
