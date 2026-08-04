@@ -1406,6 +1406,17 @@ p:last-child { margin-bottom: 0; }
   .products-page-section { padding: 40px 0 64px; }
   .service-page-section { padding: 40px 0 16px; }
 
+  /* Section header → stack atas-bawah */
+  .products-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  .products-top .btn-dark { align-self: flex-start; }
+  .products-header { max-width: 100%; }
+  .products-header h2 { font-size: 30px; margin-top: 0; }
+
   /* Grids → 1 column */
   .products-grid { grid-template-columns: 1fr; }
   .products-page-grid { grid-template-columns: 1fr; }
