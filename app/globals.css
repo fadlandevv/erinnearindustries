@@ -4642,7 +4642,23 @@ button.custom-product-card { cursor: pointer; border: 1px solid #ede9e3; backgro
   .custom-pick-grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 600px) {
-  .custom-pick-grid { grid-template-columns: repeat(2, 1fr); }
+  .custom-pick-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .custom-pick-card {
+    aspect-ratio: 16/9;
+    padding: 16px;
+  }
+  .custom-pick-circle {
+    width: 38px;
+    height: 38px;
+  }
+  .custom-pick-circle svg {
+    width: 19px;
+    height: 19px;
+  }
+  .custom-pick-name { font-size: 18px; }
 }
 
 .custom-section {
