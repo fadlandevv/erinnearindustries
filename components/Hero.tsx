@@ -2,8 +2,9 @@
 import Image from 'next/image'
 import { useLanguage } from '@/context/LanguageContext'
 
-// Ganti path ini untuk mengubah gambar banner homepage.
-const BANNER_IMAGE = '/gallery/slot-4.webp'
+// Gambar banner homepage. Untuk menggantinya, timpa saja file
+// public/banner.jpg — tidak perlu mengubah kode ini.
+const BANNER_IMAGE = '/banner.jpg'
 
 function renderTitle(title: string) {
   return title.split('\n').map((line, li) => {
