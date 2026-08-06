@@ -51,6 +51,26 @@ p:last-child { margin-bottom: 0; }
   left: 0;
   right: 0;
 }
+/* Gradasi gelap di balik navbar transparan supaya logo & menu tetap tegas
+   di atas foto banner yang terang. Selalu ada di homepage, opacity-nya yang
+   di-fade mengikuti transisi navbar transparan → solid. */
+.navbar--overlay::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  /* melebihi tinggi navbar agar ujung gradasinya tidak terlihat memotong */
+  height: 200%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.28) 45%, rgba(0, 0, 0, 0) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.navbar--transparent::before { opacity: 1; }
+/* isi navbar harus di atas lapisan gradasi */
+.navbar--overlay .nav-inner { position: relative; z-index: 1; }
+
 .navbar--transparent {
   background: transparent;
   backdrop-filter: none;
