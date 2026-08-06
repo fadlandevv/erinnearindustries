@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import { getProducts } from '@/lib/data'
 
+export const metadata = { title: 'Produk' }
+
 const IDR = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
 

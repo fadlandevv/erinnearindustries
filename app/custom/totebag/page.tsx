@@ -7,7 +7,7 @@ import { getProductConfig } from '@/lib/product-config'
 import { DEFAULT_BAHANS } from '@/lib/custom-defaults'
 
 export const metadata: Metadata = {
-  title: 'Custom Totebag — Erinnear Industries',
+  title: 'Custom Totebag',
 }
 
 export default async function CustomTotebagPage() {

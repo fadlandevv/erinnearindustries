@@ -6,7 +6,7 @@ import ProfileForm from '@/components/ProfileForm'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-export const metadata = { title: 'Profil — Erinnear Industries' }
+export const metadata = { title: 'Profil' }
 export const dynamic = 'force-dynamic'
 
 export default async function ProfilePage() {

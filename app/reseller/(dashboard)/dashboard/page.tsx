@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { getResellerById } from '@/lib/resellers'
 import { getResellerOrders } from '@/lib/resellers'
 
+export const metadata = { title: 'Dashboard' }
+
 const IDR = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
 

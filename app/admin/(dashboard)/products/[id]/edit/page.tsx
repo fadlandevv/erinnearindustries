@@ -4,6 +4,8 @@ import { getProductById, getContent } from '@/lib/data'
 import InfoForm from './InfoForm'
 import PhotosForm from './PhotosForm'
 
+export const metadata = { title: 'Edit Produk' }
+
 export default async function EditProductPage({
   params,
 }: {

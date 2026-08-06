@@ -1,6 +1,8 @@
 import { getPricingItems } from '@/lib/pricing'
 import PricingClient from './PricingClient'
 
+export const metadata = { title: 'Pricing' }
+
 export default async function PricingPage() {
   const items = await getPricingItems()
 

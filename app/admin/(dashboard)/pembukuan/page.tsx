@@ -4,6 +4,8 @@ import { hasPermission } from '@/lib/rbac'
 import { getPembukuanByMonth, getPembukuanByYear } from '@/lib/pembukuan'
 import PembukuanClient from './PembukuanClient'
 
+export const metadata = { title: 'Pembukuan' }
+
 export default async function PembukuanPage({
   searchParams,
 }: {

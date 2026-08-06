@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import { getProducts } from '@/lib/data'
 
+export const metadata = { title: 'Materi Promo' }
+
 export default async function ResellerPromoPage() {
   const products = await getProducts()
   const withImages = products.filter(p => p.image)

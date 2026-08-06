@@ -5,6 +5,8 @@ import { getResellerById, getResellerOrders } from '@/lib/resellers'
 import { getMessagesByOrderIds } from '@/lib/order-messages'
 import ResellerOrdersClient from './ResellerOrdersClient'
 
+export const metadata = { title: 'Pesanan' }
+
 export default async function ResellerOrdersPage() {
   const resellerId = (await getCurrentReseller())?.id
   const reseller = resellerId ? await getResellerById(resellerId) : null

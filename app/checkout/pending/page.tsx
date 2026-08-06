@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { getOrderById } from '@/lib/orders'
 
-export const metadata = { title: 'Menunggu Pembayaran — Erinnear Industries' }
+export const metadata = { title: 'Menunggu Pembayaran' }
 
 export default async function PendingPage({
   searchParams,

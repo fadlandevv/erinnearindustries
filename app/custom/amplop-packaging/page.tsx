@@ -5,7 +5,7 @@ import { getPricingItems } from '@/lib/pricing'
 import { getProductConfig } from '@/lib/product-config'
 
 export const metadata: Metadata = {
-  title: 'Custom Amplop Packaging — Erinnear Industries',
+  title: 'Custom Amplop Packaging',
 }
 
 export default async function CustomAmplopPage() {

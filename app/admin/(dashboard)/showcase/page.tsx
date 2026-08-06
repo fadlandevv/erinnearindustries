@@ -1,5 +1,7 @@
 import { getShowcase } from '@/lib/data'
 import { updateShowcaseItem } from '@/lib/actions'
+
+export const metadata = { title: 'Showcase' }
 export default async function ShowcaseAdminPage() {
   const items = await getShowcase()
 

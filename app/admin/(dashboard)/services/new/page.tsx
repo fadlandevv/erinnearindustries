@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { createService } from '@/lib/actions'
 
+export const metadata = { title: 'Service Baru' }
+
 export default function NewServicePage() {
   return (
     <>

@@ -4,6 +4,8 @@ import { getResellerById, getResellerOrders } from '@/lib/resellers'
 import GrafikClient from './GrafikClient'
 import type { MonthStat } from './GrafikClient'
 
+export const metadata = { title: 'Grafik Penghasilan' }
+
 export default async function EarningsGrafikPage() {
   const resellerId = (await getCurrentReseller())?.id
   const reseller = resellerId ? await getResellerById(resellerId) : null

@@ -3,7 +3,7 @@ import ServicePageClient from './ServicePageClient'
 
 export async function generateMetadata() {
   return buildPageMetadata('services', {
-    title: 'Services — Erinnear Industries',
+    title: 'Services',
     description: 'Full-service clothing and brand presentation.',
     path: '/service',
   })

@@ -17,14 +17,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = seo.title || DEFAULT_TITLE
   const description = seo.description || DEFAULT_DESC
   return {
-    // Judul tab dikunci ke nama brand di semua halaman publik. Template sengaja
-    // tidak memakai '%s', sehingga title apa pun yang di-set halaman anak tetap
-    // dirender sebagai 'Erinnear Industries'. Pengecualian: /admin ('Erinnear
-    // System') dan /reseller ('Erinnear Partner') menimpanya lewat layout
-    // masing-masing.
+    // Halaman anak cukup menulis judulnya sendiri (mis. 'Produk'); suffix brand
+    // ditambahkan otomatis oleh template. Section /admin dan /reseller memakai
+    // suffix berbeda lewat layout masing-masing.
     title: {
-      default: DEFAULT_TITLE,
-      template: DEFAULT_TITLE,
+      default: title,
+      template: '%s — Erinnear Industries',
     },
     description,
     keywords: seo.keywords || undefined,

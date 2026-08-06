@@ -1,7 +1,7 @@
 import { getContactMessages } from '@/lib/contact-messages'
 import MessagesClient from './MessagesClient'
 
-export const metadata = { title: 'Messages — Admin' }
+export const metadata = { title: 'Messages' }
 export const dynamic = 'force-dynamic'
 
 export default async function MessagesPage() {

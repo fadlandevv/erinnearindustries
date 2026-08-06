@@ -1,6 +1,8 @@
 import { getCustomProductImages } from '@/lib/data'
 import CustomProductCard from '@/components/CustomProductCard'
 
+export const metadata = { title: 'Custom Products' }
+
 const PRODUCTS = [
   { id: 'tshirt',           name: 'Kaos',        sub: 'T-Shirt'   },
   { id: 'totebag',          name: 'Totebag',      sub: 'Kanvas'    },

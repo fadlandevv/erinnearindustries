@@ -6,7 +6,7 @@ import ContactHero from '@/components/ContactHero'
 
 export async function generateMetadata() {
   return buildPageMetadata('contact', {
-    title: 'Contact Us — Erinnear Industries',
+    title: 'Contact Us',
     description: 'Get in touch with Erinnear Industries.',
     path: '/contact',
   })

@@ -3,6 +3,8 @@ import { getUsers } from '@/lib/users'
 import { getMessagesByOrderIds } from '@/lib/order-messages'
 import OrdersClient from './OrdersClient'
 
+export const metadata = { title: 'Orders' }
+
 export default async function OrdersPage() {
   const orders = await getOrders()
   const [userMap, allMessages] = await Promise.all([

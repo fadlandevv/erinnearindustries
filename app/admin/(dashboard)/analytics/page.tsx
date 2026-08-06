@@ -1,5 +1,7 @@
 import AnalyticsClient from './AnalyticsClient'
 
+export const metadata = { title: 'Analytics' }
+
 function mockDays(n: number) {
   const days = []
   const now = new Date()

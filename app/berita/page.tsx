@@ -4,7 +4,7 @@ import { buildPageMetadata } from '@/lib/data'
 
 export async function generateMetadata() {
   return buildPageMetadata('berita', {
-    title: 'Berita & Artikel — Erinnear Industries',
+    title: 'Berita & Artikel',
     description: 'Kabar terbaru, tips, dan artikel seputar produk custom dari Erinnear Industries.',
     path: '/berita',
   })

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import OrderList from '@/components/OrderList'
 
-export const metadata = { title: 'Riwayat Pesanan — Erinnear Industries' }
+export const metadata = { title: 'Riwayat Pesanan' }
 export const dynamic = 'force-dynamic'
 
 export default async function OrdersPage() {

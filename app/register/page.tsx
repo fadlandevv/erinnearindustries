@@ -1,6 +1,6 @@
 import RegisterForm from '@/components/RegisterForm'
 
-export const metadata = { title: 'Daftar — Erinnear Industries' }
+export const metadata = { title: 'Daftar' }
 
 export default function RegisterPage() {
   return (

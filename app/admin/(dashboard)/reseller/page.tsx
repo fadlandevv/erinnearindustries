@@ -1,6 +1,8 @@
 import { getResellers, getAllResellerOrders } from '@/lib/resellers'
 import ResellerAdminClient from './ResellerAdminClient'
 
+export const metadata = { title: 'Reseller' }
+
 export default async function AdminResellerPage() {
   const [resellers, orders] = await Promise.all([
     getResellers(),

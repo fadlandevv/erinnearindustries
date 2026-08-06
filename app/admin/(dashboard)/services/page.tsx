@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { getServices } from '@/lib/data'
 import { deleteService } from '@/lib/actions'
+
+export const metadata = { title: 'Services' }
 export default async function AdminServicesPage() {
   const services = await getServices()
 

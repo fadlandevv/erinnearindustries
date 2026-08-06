@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { getProducts, getServices } from '@/lib/data'
 import AnalyticsClient from './analytics/AnalyticsClient'
 
+export const metadata = { title: 'Dashboard' }
+
 function mockDays(n: number) {
   const days = []
   const now = new Date()

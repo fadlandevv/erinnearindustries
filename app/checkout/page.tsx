@@ -2,7 +2,7 @@ import { getCurrentUserEmail } from '@/lib/auth'
 import { getUserByEmail } from '@/lib/users'
 import CheckoutForm from '@/components/CheckoutForm'
 
-export const metadata = { title: 'Checkout — Erinnear Industries' }
+export const metadata = { title: 'Checkout' }
 
 export default async function CheckoutPage() {
   const email = await getCurrentUserEmail()

@@ -4,6 +4,8 @@ import { getOrdersByEmail } from '@/lib/orders'
 import DeleteMemberBtn from './DeleteMemberBtn'
 import ResetLinkBtn from './ResetLinkBtn'
 
+export const metadata = { title: 'Account' }
+
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString('id-ID', {
     day: '2-digit', month: 'short', year: 'numeric',

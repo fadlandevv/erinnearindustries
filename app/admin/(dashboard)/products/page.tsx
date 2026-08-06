@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { getProducts } from '@/lib/data'
 import ProductsTable from './ProductsTable'
 
+export const metadata = { title: 'Products' }
+
 export default async function AdminProductsPage() {
   const products = await getProducts()
 

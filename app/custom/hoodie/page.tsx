@@ -7,7 +7,7 @@ import { getProductConfig } from '@/lib/product-config'
 import { DEFAULT_COLORS, DEFAULT_BAHANS, DEFAULT_SIZES } from '@/lib/custom-defaults'
 
 export const metadata: Metadata = {
-  title: 'Custom Hoodie — Erinnear Industries',
+  title: 'Custom Hoodie',
 }
 
 export default async function CustomHoodiePage() {

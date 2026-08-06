@@ -4,7 +4,7 @@ import GalleryMarquee from '@/components/GalleryMarquee'
 
 export async function generateMetadata() {
   return buildPageMetadata('products', {
-    title: 'Products — Erinnear Industries',
+    title: 'Products',
     description: 'Explore our premium clothing collections.',
     path: '/product',
   })

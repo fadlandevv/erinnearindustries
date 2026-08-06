@@ -4,6 +4,8 @@ import { hasPermission } from '@/lib/rbac'
 import { computeRekap, getManualEntries } from '@/lib/rekap'
 import RekapClient from './RekapClient'
 
+export const metadata = { title: 'Rekap' }
+
 export default async function RekapPage({
   searchParams,
 }: {

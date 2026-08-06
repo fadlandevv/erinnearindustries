@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { getUserById } from '@/lib/users'
 import { getOrdersByEmail } from '@/lib/orders'
 
+export const metadata = { title: 'Detail Account' }
+
 function formatDateTime(iso: string) {
   return new Date(iso).toLocaleString('id-ID', {
     day: '2-digit', month: 'long', year: 'numeric',

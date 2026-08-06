@@ -1,6 +1,6 @@
 import LoginForm from '@/components/LoginForm'
 
-export const metadata = { title: 'Masuk — Erinnear Industries' }
+export const metadata = { title: 'Masuk' }
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ callbackUrl?: string }> }) {
   const { callbackUrl } = await searchParams

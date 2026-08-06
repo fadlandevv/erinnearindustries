@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { getServiceById } from '@/lib/data'
 import { updateService } from '@/lib/actions'
 
+export const metadata = { title: 'Edit Service' }
+
 export default async function EditServicePage({
   params,
 }: {

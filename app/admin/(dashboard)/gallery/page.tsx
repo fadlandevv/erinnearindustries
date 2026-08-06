@@ -1,5 +1,7 @@
 import { getGallery } from '@/lib/data'
 import { updateGallerySlot } from '@/lib/actions'
+
+export const metadata = { title: 'Gallery' }
 const slotNames = ['Slot A', 'Slot B', 'Slot C', 'Slot D', 'Slot E', 'Slot F']
 
 export default async function GalleryAdminPage() {

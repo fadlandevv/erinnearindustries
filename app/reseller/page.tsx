@@ -4,8 +4,9 @@ import Link from 'next/link'
 import { getResellerById } from '@/lib/resellers'
 
 export const metadata: Metadata = {
-  // `absolute` karena template dari layout satu segmen tidak berlaku untuk page.
-  title: { absolute: 'Erinnear Partner' },
+  // Halaman marketing publik: template layout /reseller tidak berlaku untuk page
+  // satu segmen, jadi judul ini memakai suffix brand publik dari root layout.
+  title: 'Program Reseller',
   description: 'Bergabunglah sebagai reseller Erinnear Industries dan dapatkan diskon eksklusif, dukungan penuh, dan produk berkualitas premium.',
 }
 

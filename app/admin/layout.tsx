@@ -4,11 +4,11 @@ import './admin.css'
 
 // Judul tab untuk seluruh area CMS admin.
 // - `absolute` membuat segmen ini mengabaikan template dari root layout.
-// - `template` tanpa '%s' mengunci judul halaman anak agar tidak berubah.
+// - `template` memberi suffix brand CMS ke judul tiap halaman anak.
 export const metadata: Metadata = {
   title: {
     absolute: 'Erinnear System',
-    template: 'Erinnear System',
+    template: '%s — Erinnear System',
   },
 }
 

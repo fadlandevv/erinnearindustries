@@ -3,7 +3,7 @@ import { getCustomProductImages, buildPageMetadata } from '@/lib/data'
 
 export async function generateMetadata() {
   return buildPageMetadata('custom', {
-    title: 'Custom Design — Erinnear Industries',
+    title: 'Custom Design',
     description: 'Buat produk custom sesuai keinginanmu — kaos, totebag, hoodie, jersey, dan lainnya.',
     path: '/custom',
   })

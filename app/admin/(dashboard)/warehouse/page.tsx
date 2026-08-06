@@ -3,7 +3,7 @@ import { getProducts } from '@/lib/data'
 import { getStockMap, getStockLog, getPriceMap } from '@/lib/warehouse'
 import WarehouseClient from './WarehouseClient'
 
-export const metadata: Metadata = { title: 'Warehouse — Erinnear CMS' }
+export const metadata: Metadata = { title: 'Warehouse' }
 
 export default async function WarehousePage() {
   const [products, stockMap, priceMap, logs] = await Promise.all([

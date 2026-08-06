@@ -4,6 +4,8 @@ import { getResellerById, getResellerOrders } from '@/lib/resellers'
 import InsentifClient from './InsentifClient'
 import ExportPdfBtn from './ExportPdfBtn'
 
+export const metadata = { title: 'Insentif' }
+
 export default async function EarningsInsentifPage() {
   const resellerId = (await getCurrentReseller())?.id
   const reseller = resellerId ? await getResellerById(resellerId) : null

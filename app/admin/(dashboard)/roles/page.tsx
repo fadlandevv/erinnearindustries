@@ -1,6 +1,8 @@
 import { getRoles, getAdmins } from '@/lib/rbac'
 import RolesClient from './RolesClient'
 
+export const metadata = { title: 'Role Access' }
+
 export default async function RolesPage() {
   const roles = await getRoles()
   const admins = await getAdmins()

@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import ResetForm from './ResetForm'
 
-export const metadata: Metadata = { title: 'Reset Password — Erinnear Industries' }
+export const metadata: Metadata = { title: 'Reset Password' }
 
 export default function ResetPasswordPage() {
   return (

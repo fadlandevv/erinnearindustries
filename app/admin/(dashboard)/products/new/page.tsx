@@ -5,6 +5,8 @@ import AdminSelect from '@/components/AdminSelect'
 import AdminMultiSelect from '@/components/AdminMultiSelect'
 import { getContent } from '@/lib/data'
 
+export const metadata = { title: 'Produk Baru' }
+
 const tagOptions = ['New Arrival', 'Best Seller', 'Limited', 'Sale', 'Coming Soon']
 const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'One Size']
 
