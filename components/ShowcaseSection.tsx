@@ -6,7 +6,7 @@ export default async function ShowcaseSection() {
   const items = await getShowcase()
 
   return (
-    <section className="showcase-section">
+    <section className="showcase-section" id="showcase">
       <div className="showcase-inner">
         <div className="showcase-grid">
           {items.map((item) => (

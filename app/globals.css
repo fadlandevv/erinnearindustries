@@ -41,6 +41,54 @@ p:last-child { margin-bottom: 0; }
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid #f0f0f0;
   box-shadow: 0 8px 48px rgba(0, 0, 0, 0.16);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Halaman dengan banner fullscreen: navbar melayang di atas gambar.
+   `fixed` (bukan sticky) supaya banner benar-benar setinggi viewport. */
+.navbar--overlay {
+  position: fixed;
+  left: 0;
+  right: 0;
+}
+.navbar--transparent {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom-color: transparent;
+  box-shadow: none;
+}
+.navbar--transparent .nav-logo,
+.navbar--transparent .nav-logo-mark,
+.navbar--transparent .nav-links a,
+.navbar--transparent .nav-cart-btn,
+.navbar--transparent .nav-notif-btn,
+.navbar--transparent .nav-user-btn,
+.navbar--transparent .nav-toggle { color: #fff; }
+.navbar--transparent .nav-links a:hover,
+.navbar--transparent .nav-links .nav-link-active {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+.navbar--transparent .nav-toggle,
+.navbar--transparent .nav-cart-btn,
+.navbar--transparent .nav-notif-btn,
+.navbar--transparent .nav-user-btn { border-color: rgba(255, 255, 255, 0.45); }
+.navbar--transparent .nav-toggle:hover,
+.navbar--transparent .nav-cart-btn:hover,
+.navbar--transparent .nav-notif-btn:hover,
+.navbar--transparent .nav-user-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+.navbar--transparent .nav-cart-badge { border-color: transparent; }
+
+/* Panel menu mobile mengandalkan latar .navbar; di atas banner yang kontras,
+   latar semi-transparan membuat teks banner menembus. Jadikan solid saat buka. */
+.navbar--menu-open {
+  background: #fff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 .nav-inner {
   display: flex;
@@ -141,8 +189,40 @@ p:last-child { margin-bottom: 0; }
 }
 
 /* ===== HERO ===== */
-.hero { padding: 60px 0 60px; overflow: hidden; }
-.hero-inner { width: min(1200px, calc(100% - 48px)); margin: 0 auto; }
+/* ===== HERO / BANNER FULLSCREEN ===== */
+.hero {
+  position: relative;
+  /* svh mengikuti viewport asli saat address bar mobile menyusut */
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  /* navbar overlay setinggi 64px — beri ruang agar judul tak tertutup */
+  padding: 64px 0 0;
+  background: #0d0d0d;
+  /* .showcase-section tidak punya padding-top, jadi jarak ke section
+     berikutnya diambil dari sini — samakan dengan ritme 60px homepage. */
+  margin-bottom: 60px;
+}
+.hero-media { position: absolute; inset: 0; z-index: 0; }
+.hero-image { object-fit: cover; object-position: center; }
+/* Scrim gelap: menjaga kontras teks & ikon navbar di atas foto apa pun */
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  /* Dua lapis: gradien vertikal untuk navbar & bawah, plus lapisan rata
+     supaya teks tetap terbaca di atas foto seterang apa pun. */
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.60) 0%, rgba(0,0,0,0.20) 28%, rgba(0,0,0,0.35) 62%, rgba(0,0,0,0.75) 100%),
+    rgba(0, 0, 0, 0.38);
+}
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  width: min(1200px, calc(100% - 48px));
+  margin: 0 auto;
+}
 .hero-text {
   text-align: center;
   max-width: 720px;
@@ -154,15 +234,48 @@ p:last-child { margin-bottom: 0; }
   line-height: 1.04;
   letter-spacing: -0.04em;
   margin: 20px 0 20px;
-  color: #0d0d0d;
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
 }
 .hero-title em { font-style: italic; font-weight: 300; }
 .hero-sub {
   font-size: 15.6px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.82);
   max-width: 440px;
   margin: 0 auto 32px;
   line-height: 1.65;
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.4);
+}
+/* Tombol dibalik jadi terang agar kontras di atas foto */
+.hero .btn-dark { background: #fff; color: #0d0d0d; }
+.hero .btn-dark:hover { background: #f0ede8; }
+.hero-scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  z-index: 1;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: hero-cue-bob 2.4s ease-in-out infinite;
+  transition: background 0.2s, border-color 0.2s;
+}
+.hero-scroll-cue:hover { background: rgba(0, 0, 0, 0.45); border-color: rgba(255, 255, 255, 0.8); }
+@keyframes hero-cue-bob {
+  0%, 100% { transform: translate(-50%, 0); }
+  50%      { transform: translate(-50%, 5px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll-cue { animation: none; }
 }
 .hero-ctas {
   display: flex;
@@ -2628,6 +2741,8 @@ p:last-child { margin-bottom: 0; }
   width: 36px;
   height: 36px;
   color: #0d0d0d;
+  /* tanpa ini <button> memakai warna default browser (abu-abu) */
+  background: transparent;
   border: 1.5px solid #e5e5e5;
   border-radius: 10px;
   text-decoration: none;
@@ -3437,6 +3552,7 @@ p:last-child { margin-bottom: 0; }
 @media (max-width: 640px) {
   .showcase-grid { grid-template-columns: 1fr; }
   .showcase-section { padding: 0 0 48px; }
+  .hero { margin-bottom: 48px; }
 }
 
 /* ===== CHATBOT ===== */
@@ -4110,6 +4226,35 @@ p:last-child { margin-bottom: 0; }
 [data-theme="dark"] .nav-notif-item:hover { background: #1e1e1e; }
 [data-theme="dark"] .nav-notif-item-title { color: #f0ede8; }
 [data-theme="dark"] .nav-notif-footer { border-color: #222; }
+
+/* Banner selalu gelap, jadi state transparan sama di light maupun dark.
+   Blok ini perlu karena aturan dark di atas lebih spesifik dari .navbar--transparent. */
+[data-theme="dark"] .navbar--transparent {
+  background: transparent;
+  border-bottom-color: transparent;
+  box-shadow: none;
+}
+[data-theme="dark"] .navbar--menu-open { background: #0d0d0d; }
+[data-theme="dark"] .navbar--transparent .nav-logo,
+[data-theme="dark"] .navbar--transparent .nav-logo-mark,
+[data-theme="dark"] .navbar--transparent .nav-links a,
+[data-theme="dark"] .navbar--transparent .nav-cart-btn,
+[data-theme="dark"] .navbar--transparent .nav-notif-btn,
+[data-theme="dark"] .navbar--transparent .nav-user-btn,
+[data-theme="dark"] .navbar--transparent .nav-toggle { color: #fff; border-color: rgba(255, 255, 255, 0.45); }
+[data-theme="dark"] .navbar--transparent .nav-links a { border-color: transparent; }
+[data-theme="dark"] .navbar--transparent .nav-links a:hover,
+[data-theme="dark"] .navbar--transparent .nav-links .nav-link-active {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+[data-theme="dark"] .navbar--transparent .nav-cart-btn:hover,
+[data-theme="dark"] .navbar--transparent .nav-notif-btn:hover,
+[data-theme="dark"] .navbar--transparent .nav-user-btn:hover,
+[data-theme="dark"] .navbar--transparent .nav-toggle:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.7);
+}
 [data-theme="dark"] .nav-notif-footer a:hover { color: #f0ede8; }
 [data-theme="dark"] .nav-links .nav-custom-link { background: rgba(244,124,47,0.12); color: #f0945a !important; }
 [data-theme="dark"] .nav-links .nav-custom-link:hover { background: rgba(244,124,47,0.2) !important; color: #f0945a !important; }
@@ -4126,8 +4271,9 @@ p:last-child { margin-bottom: 0; }
 [data-theme="dark"] .btn-outline:hover { border-color: #555; background: #1a1a1a; }
 
 /* Hero */
-[data-theme="dark"] .hero-title { color: #f0ede8; }
-[data-theme="dark"] .hero-sub { color: #888; }
+/* Banner selalu gelap — teks tetap putih di dark mode, bukan abu-abu redup */
+[data-theme="dark"] .hero-title { color: #fff; }
+[data-theme="dark"] .hero-sub { color: rgba(255, 255, 255, 0.82); }
 
 /* Stats */
 [data-theme="dark"] .stat-card { background: #171717; }

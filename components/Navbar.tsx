@@ -36,6 +36,7 @@ export default function Navbar({ user }: NavbarProps) {
   const [open, setOpen] = useState(false)
   const [userHover, setUserHover] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
+  const [pastBanner, setPastBanner] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const notifRef = useRef<HTMLDivElement>(null)
   const userHoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -52,6 +53,30 @@ export default function Navbar({ user }: NavbarProps) {
   const { totalItems, openCart } = useCart()
   const { lang, setLang, t } = useLanguage()
   const { theme, toggleTheme } = useTheme()
+
+  // Homepage punya banner fullscreen; navbar melayang transparan di atasnya dan
+  // baru berubah solid setelah scroll melewati banner.
+  const hasBanner = pathname === '/'
+
+  useEffect(() => {
+    if (!hasBanner) return
+    const NAV_HEIGHT = 64
+    function update() {
+      const banner = document.getElementById('home')
+      const bannerHeight = banner?.offsetHeight ?? window.innerHeight
+      setPastBanner(window.scrollY >= bannerHeight - NAV_HEIGHT)
+    }
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [hasBanner])
+
+  // Menu mobile yang terbuka butuh latar solid agar isinya terbaca.
+  const transparent = hasBanner && !pastBanner && !open
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -103,13 +128,13 @@ export default function Navbar({ user }: NavbarProps) {
   )
 
   return (
-    <nav className="navbar">
+    <nav className={`navbar${hasBanner ? ' navbar--overlay' : ''}${transparent ? ' navbar--transparent' : ''}${open ? ' navbar--menu-open' : ''}`}>
       <div className="nav-inner">
         <Link href="/" className="nav-logo">
           <svg className="nav-logo-mark" viewBox="0 0 100 100" fill="none" aria-hidden="true">
             <path d="M 8 45 Q 0 45 0 37 L 0 7 Q 0 0 7 0 L 60 0 Q 100 0 100 40 L 100 100 L 57 100 L 57 57 Q 57 45 45 45 Z" fill="currentColor"/>
           </svg>
-          <span className="nav-logo-text">Erinnear</span>
+          <span className="nav-logo-text">Erinnear Industries</span>
         </Link>
 
         <ul className="nav-links">
