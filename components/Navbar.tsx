@@ -17,6 +17,24 @@ const ANNOUNCEMENTS = [
   { id: 3, title: 'Tips Merawat Pakaian Custom Anda', date: '8 Jun 2025', href: '/berita/tips-merawat-pakaian' },
 ]
 
+const NAV_ICONS: Record<string, React.ReactNode> = {
+  '/custom': (
+    <svg className="nav-link-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M11 3.5 12.7 8l4.5 1.7-4.5 1.7L11 15.9 9.3 11.4 4.8 9.7 9.3 8z"/>
+      <path d="M18 3v3.4"/><path d="M16.3 4.7h3.4"/>
+      <path d="M17.5 15.5v2.8"/><path d="M16.1 16.9h2.8"/>
+    </svg>
+  ),
+  '/reseller': (
+    <svg className="nav-link-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3.5 9 5 4h14l1.5 5"/>
+      <path d="M4.5 9v10.5a.5.5 0 0 0 .5.5h14a.5.5 0 0 0 .5-.5V9"/>
+      <path d="M3.5 9a2.6 2.6 0 0 0 4.25 0 2.6 2.6 0 0 0 4.25 0 2.6 2.6 0 0 0 4.25 0 2.6 2.6 0 0 0 4.25 0"/>
+      <path d="M9.5 20v-5h5v5"/>
+    </svg>
+  ),
+}
+
 export default function Navbar({ user }: NavbarProps) {
   const [open, setOpen] = useState(false)
   const [userHover, setUserHover] = useState(false)
@@ -113,6 +131,7 @@ export default function Navbar({ user }: NavbarProps) {
             return (
               <li key={link.href}>
                 <Link href={link.href} className={cls || undefined}>
+                  {NAV_ICONS[link.href]}
                   {link.label}
                 </Link>
               </li>
@@ -273,6 +292,7 @@ export default function Navbar({ user }: NavbarProps) {
                 className={cls || undefined}
                 onClick={() => setOpen(false)}
               >
+                {NAV_ICONS[link.href]}
                 {link.label}
               </Link>
             )
