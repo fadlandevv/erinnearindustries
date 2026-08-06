@@ -5113,10 +5113,11 @@ button.custom-product-card { cursor: pointer; border: 1px solid #ede9e3; backgro
     max-height: calc(100vh - 120px);
     overflow-y: auto;
     overscroll-behavior: contain;
-    /* ruang untuk scrollbar tanpa menggeser lebar konten */
-    padding-right: 12px;
-    margin-right: -12px;
+    /* scrollbar disembunyikan, scroll tetap jalan */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
+  .custom-controls::-webkit-scrollbar { width: 0; height: 0; display: none; }
 }
 
 /* Responsive */
@@ -6007,7 +6008,10 @@ details[open] .reseller-faq-q::after { content: '−'; }
   /* dibatasi agar tidak terpotong tepi kolom form yang kini bisa di-scroll */
   max-height: 220px;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+.cdd-menu::-webkit-scrollbar { width: 0; height: 0; display: none; }
 .cdd-item {
   display: block;
   width: 100%;
