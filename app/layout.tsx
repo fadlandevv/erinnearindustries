@@ -17,9 +17,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = seo.title || DEFAULT_TITLE
   const description = seo.description || DEFAULT_DESC
   return {
+    // Judul tab dikunci ke nama brand di semua halaman. Template sengaja tidak
+    // memakai '%s', sehingga title apa pun yang di-set halaman anak tetap
+    // dirender sebagai 'Erinnear Industries'.
     title: {
-      default: title,
-      template: '%s — Erinnear Industries',
+      default: DEFAULT_TITLE,
+      template: DEFAULT_TITLE,
     },
     description,
     keywords: seo.keywords || undefined,
