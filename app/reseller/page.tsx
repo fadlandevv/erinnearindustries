@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { getResellerById } from '@/lib/resellers'
 
 export const metadata: Metadata = {
-  title: 'Program Reseller — Erinnear Industries',
+  // `absolute` karena template dari layout satu segmen tidak berlaku untuk page.
+  title: { absolute: 'Erinnear Partner' },
   description: 'Bergabunglah sebagai reseller Erinnear Industries dan dapatkan diskon eksklusif, dukungan penuh, dan produk berkualitas premium.',
 }
 
