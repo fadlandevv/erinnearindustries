@@ -252,7 +252,7 @@ p:last-child { margin-bottom: 0; }
 .hero-scroll-cue {
   position: absolute;
   left: 50%;
-  bottom: 28px;
+  bottom: 48px;
   z-index: 1;
   transform: translateX(-50%);
   display: flex;
@@ -3552,7 +3552,15 @@ p:last-child { margin-bottom: 0; }
 @media (max-width: 640px) {
   .showcase-grid { grid-template-columns: 1fr; }
   .showcase-section { padding: 0 0 48px; }
-  .hero { margin-bottom: 48px; }
+  /* Di layar sempit banner setinggi viewport penuh terasa kepanjangan dan
+     tidak ada tanda masih ada konten di bawah. Dipendekkan sedikit supaya
+     section berikutnya mengintip. */
+  .hero {
+    min-height: 84vh;
+    min-height: 84svh;
+    margin-bottom: 48px;
+  }
+  .hero-scroll-cue { bottom: 24px; }
 }
 
 /* ===== CHATBOT ===== */
