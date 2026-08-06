@@ -5264,6 +5264,8 @@ button.custom-product-card { cursor: pointer; border: 1px solid #ede9e3; backgro
   font-size: clamp(28px, 3.5vw, 40px);
   font-weight: 700;
   letter-spacing: -0.03em;
+  /* tanpa ini mewarisi line-height 1.6 dari body — terlalu renggang untuk heading */
+  line-height: 1.15;
   margin: 0;
 }
 .reseller-section-sub {
