@@ -557,7 +557,9 @@ export default function CustomDesignClient({
       <section className="custom-section">
         <div className="custom-inner">
 
-          {/* Controls */}
+          {/* Controls — wrapper menentukan tinggi kolom; isinya diisi absolut
+              supaya form tidak ikut menentukan tinggi baris grid */}
+          <div className="custom-controls-col">
           <div className="custom-controls">
 
             {/* Warna + Bahan — hidden for amplop */}
@@ -874,6 +876,7 @@ export default function CustomDesignClient({
               onClick={handleAddToInvoice}>
               + Tambah ke Invoice
             </button>
+          </div>
           </div>
 
           {/* Mockup */}

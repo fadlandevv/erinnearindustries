@@ -691,7 +691,8 @@ p:last-child { margin-bottom: 0; }
 
 /* ===== INNER PAGE HERO ===== */
 .page-hero {
-  padding: 80px 0 64px;
+  /* dirapatkan ke navbar agar tidak banyak ruang kosong */
+  padding: 40px 0 48px;
   text-align: center;
   border-bottom: 1px solid #f0f0f0;
 }
@@ -700,11 +701,14 @@ p:last-child { margin-bottom: 0; }
   margin: 0 auto;
 }
 .page-hero-title {
-  font-size: clamp(36px, 5vw, 64px);
+  /* disamakan dengan .custom-hero-title — puncaknya 48px, dan di rentang
+     lebar menengah kurvanya identik (sama-sama 4vw) */
+  font-size: clamp(28px, 4vw, 48px);
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1.05;
-  margin: 20px 0 20px;
+  /* tanpa margin atas — padding .page-hero yang mengatur jarak ke navbar */
+  margin: 0 0 20px;
   color: #0d0d0d;
 }
 .page-hero-title em { font-style: italic; font-weight: 300; }
@@ -1551,7 +1555,7 @@ p:last-child { margin-bottom: 0; }
   .stat-num { font-size: 32px; }
 
   /* Inner page hero */
-  .page-hero { padding: 48px 0 40px; }
+  .page-hero { padding: 32px 0 36px; }
 
   /* Process */
   .process-section {
@@ -1583,7 +1587,7 @@ p:last-child { margin-bottom: 0; }
   .nav-inner { width: calc(100% - 24px); }
   .hero-ctas .btn-dark,
   .hero-ctas .btn-outline { flex: 1 1 100%; }
-  .page-hero { padding: 40px 0 32px; }
+  .page-hero { padding: 24px 0 28px; }
   .stats-about { padding: 24px; }
   .contact-form-card { padding: 20px; border-radius: 16px; }
   .footer-links { gap: 24px; }
@@ -4567,14 +4571,14 @@ p:last-child { margin-bottom: 0; }
 /* ===== CUSTOM DESIGN PAGE ===== */
 .custom-hero {
   /* disamakan dengan .page-hero, termasuk turunan responsifnya */
-  padding: 80px 0 64px;
+  padding: 40px 0 48px;
   text-align: center;
   background: var(--bg, #fff);
 }
 /* Harus di sini, bukan di blok @media umum di atas: definisi dasar
    .custom-hero berada jauh di bawahnya sehingga akan menimpanya. */
-@media (max-width: 640px) { .custom-hero { padding: 48px 0 40px; } }
-@media (max-width: 420px) { .custom-hero { padding: 40px 0 32px; } }
+@media (max-width: 640px) { .custom-hero { padding: 32px 0 36px; } }
+@media (max-width: 420px) { .custom-hero { padding: 24px 0 28px; } }
 /* Halaman detail: hanya satu baris judul + panah, tanpa subjudul — jarak ke
    navbar dibuat lebih rapat daripada hero halaman biasa. */
 .custom-hero--detail { padding: 32px 0 24px; }
@@ -4628,7 +4632,8 @@ p:last-child { margin-bottom: 0; }
   .custom-hero-row .custom-hero-title { white-space: normal; }
 }
 .custom-hero-title {
-  font-size: clamp(19.2px, 4vw, 48px);
+  /* sama persis dengan .page-hero-title */
+  font-size: clamp(28px, 4vw, 48px);
   font-weight: 700;
   letter-spacing: -0.03em;
   margin: 0;
@@ -5102,15 +5107,19 @@ button.custom-product-card { cursor: pointer; border: 1px solid #ede9e3; backgro
   border-radius: 999px;
   padding: 3px 10px;
 }
-/* Kolom form punya scrollbar sendiri saat isinya melebihi tinggi layar,
-   sehingga halaman tidak ikut bergulir — mockup tetap terlihat.
+/* Tinggi kolom form dikunci sama dengan kolom mockup: isi yang lebih panjang
+   terpotong dan bisa di-scroll di dalam kolomnya sendiri.
+   Caranya, .custom-controls-col dibiarkan stretch mengikuti tinggi baris grid
+   sementara isinya diposisikan absolut — sehingga form tidak ikut menentukan
+   tinggi baris, dan yang menentukan hanya kolom mockup.
    Hanya di layout 2 kolom; di bawah 860px grid jadi 1 kolom dan scroll
    bersarang justru menyulitkan. */
 @media (min-width: 861px) {
+  .custom-inner { align-items: stretch; }
+  .custom-controls-col { position: relative; min-height: 0; }
   .custom-controls {
-    position: sticky;
-    top: 96px;
-    max-height: calc(100vh - 120px);
+    position: absolute;
+    inset: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     /* scrollbar disembunyikan, scroll tetap jalan */
