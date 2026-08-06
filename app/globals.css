@@ -4575,6 +4575,10 @@ p:last-child { margin-bottom: 0; }
    .custom-hero berada jauh di bawahnya sehingga akan menimpanya. */
 @media (max-width: 640px) { .custom-hero { padding: 48px 0 40px; } }
 @media (max-width: 420px) { .custom-hero { padding: 40px 0 32px; } }
+/* Halaman detail: hanya satu baris judul + panah, tanpa subjudul — jarak ke
+   navbar dibuat lebih rapat daripada hero halaman biasa. */
+.custom-hero--detail { padding: 32px 0 24px; }
+@media (max-width: 640px) { .custom-hero--detail { padding: 24px 0 20px; } }
 .custom-hero-inner {
   max-width: 600px;
   margin: 0 auto;

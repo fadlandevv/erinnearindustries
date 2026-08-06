@@ -526,7 +526,7 @@ export default function CustomDesignClient({
   return (
     <div>
       {/* ── Hero ── */}
-      <div className="custom-hero">
+      <div className="custom-hero custom-hero--detail">
         {/* Judul ikut di dalam row supaya kedua panah center terhadap judul */}
         <div className="custom-hero-row">
           <Link href="/custom" className="custom-hero-nav" aria-label="Kembali ke pilihan produk">
@@ -534,7 +534,7 @@ export default function CustomDesignClient({
               <path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>
             </svg>
           </Link>
-          <h1 className="custom-hero-title">Desain {activeTabName} Sendiri</h1>
+          <h1 className="custom-hero-title">Custom {activeTabName}</h1>
           {nextProduct ? (
             <Link href={`/custom/${nextProduct.id}`} className="custom-hero-nav" aria-label={`Lanjut ke ${nextProduct.name}`} title={`Lanjut ke ${nextProduct.name}`}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
