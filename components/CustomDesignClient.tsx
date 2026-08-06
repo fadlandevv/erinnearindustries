@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react'
+import Link from 'next/link'
 import { useCart } from '@/context/CartContext'
 import { generateId } from '@/lib/utils'
 import { uploadDesignFileAction } from '@/lib/actions'
@@ -518,16 +519,33 @@ export default function CustomDesignClient({
   }
 
   const activeTabName = PRODUCT_TABS.find(t => t.id === productType)?.name ?? 'Produk'
+  // produk berikutnya sesuai urutan tab; undefined kalau ini produk terakhir
+  const activeIndex = PRODUCT_TABS.findIndex(t => t.id === productType)
+  const nextProduct = activeIndex === -1 ? undefined : PRODUCT_TABS[activeIndex + 1]
 
   return (
     <div>
       {/* ── Hero ── */}
       <div className="custom-hero">
-        <div className="custom-hero-inner">
+        {/* Judul ikut di dalam row supaya kedua panah center terhadap judul */}
+        <div className="custom-hero-row">
+          <Link href="/custom" className="custom-hero-nav" aria-label="Kembali ke pilihan produk">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>
+            </svg>
+          </Link>
           <h1 className="custom-hero-title">Desain {activeTabName} Sendiri</h1>
-          <p className="custom-hero-sub">
-            Upload desain depan & belakang, pilih warna dan ukuran — kami produksi sesuai pesananmu.
-          </p>
+          {nextProduct ? (
+            <Link href={`/custom/${nextProduct.id}`} className="custom-hero-nav" aria-label={`Lanjut ke ${nextProduct.name}`} title={`Lanjut ke ${nextProduct.name}`}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+              </svg>
+            </Link>
+          ) : (
+            /* produk terakhir: panah disembunyikan, tapi ruangnya ditahan
+               supaya judul tetap center halaman */
+            <span className="custom-hero-nav custom-hero-nav--empty" aria-hidden="true" />
+          )}
         </div>
       </div>
 

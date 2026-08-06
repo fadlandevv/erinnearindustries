@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import CustomDesignClient from '@/components/CustomDesignClient'
 import { getPricingItems } from '@/lib/pricing'
 import { getProductConfig } from '@/lib/product-config'
@@ -17,11 +16,6 @@ export default async function CustomAmplopPage() {
 
   return (
     <>
-      <div className="svc-detail-back-wrap">
-        <div className="svc-detail-back-inner">
-          <Link href="/custom" className="svc-detail-back">← Pilih Produk</Link>
-        </div>
-      </div>
       <CustomDesignClient
         bahanOptions={[]}
         sablonOptions={sablonOptions}

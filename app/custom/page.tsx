@@ -103,12 +103,6 @@ export default async function CustomPage() {
 
   return (
     <>
-      <div className="svc-detail-back-wrap">
-        <div className="svc-detail-back-inner">
-          <Link href="/" className="svc-detail-back">← Beranda</Link>
-        </div>
-      </div>
-
       <section className="custom-hero">
         <div className="custom-hero-inner">
           <h1 className="custom-hero-title">Pilih Produk Custom</h1>

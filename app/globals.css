@@ -4566,10 +4566,15 @@ p:last-child { margin-bottom: 0; }
 
 /* ===== CUSTOM DESIGN PAGE ===== */
 .custom-hero {
-  padding: 24px 0 24px;
+  /* disamakan dengan .page-hero, termasuk turunan responsifnya */
+  padding: 80px 0 64px;
   text-align: center;
   background: var(--bg, #fff);
 }
+/* Harus di sini, bukan di blok @media umum di atas: definisi dasar
+   .custom-hero berada jauh di bawahnya sehingga akan menimpanya. */
+@media (max-width: 640px) { .custom-hero { padding: 48px 0 40px; } }
+@media (max-width: 420px) { .custom-hero { padding: 40px 0 32px; } }
 .custom-hero-inner {
   max-width: 600px;
   margin: 0 auto;
@@ -4578,6 +4583,45 @@ p:last-child { margin-bottom: 0; }
   flex-direction: column;
   align-items: center;
   gap: 0;
+}
+/* Baris navigasi halaman detail custom: panah kembali, judul, panah produk
+   berikutnya. Judul ikut di dalam row supaya kedua panah center terhadapnya.
+   Lebar & padding disamakan dengan .custom-inner — container body halaman —
+   supaya panahnya sejajar dengan konten, bukan dengan container navbar. */
+.custom-hero-row {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+/* lebih kecil dari judul di /custom — di sini judul berbagi baris dengan
+   dua panah dan tidak lagi punya subjudul di bawahnya */
+.custom-hero-row .custom-hero-title {
+  flex: 1;
+  min-width: 0;
+  font-size: clamp(18px, 2.6vw, 32px);
+}
+.custom-hero-nav {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #0d0d0d;
+  background: transparent;
+  border: 1.5px solid #e5e5e5;
+  border-radius: 10px;
+  transition: background 0.15s, border-color 0.15s;
+}
+.custom-hero-nav:hover { background: #f4f4f4; border-color: #ccc; }
+.custom-hero-nav--empty { visibility: hidden; pointer-events: none; }
+@media (max-width: 640px) {
+  /* judul panjang (mis. "Amplop Packaging") tidak muat nowrap setelah
+     dipotong dua panah — biarkan membungkus */
+  .custom-hero-row .custom-hero-title { white-space: normal; }
 }
 .custom-hero-title {
   font-size: clamp(19.2px, 4vw, 48px);
