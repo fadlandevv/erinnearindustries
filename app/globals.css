@@ -3552,15 +3552,17 @@ p:last-child { margin-bottom: 0; }
 @media (max-width: 640px) {
   .showcase-grid { grid-template-columns: 1fr; }
   .showcase-section { padding: 0 0 48px; }
-  /* Di layar sempit banner setinggi viewport penuh terasa kepanjangan dan
-     tidak ada tanda masih ada konten di bawah. Dipendekkan sedikit supaya
-     section berikutnya mengintip. */
+  /* Banner tetap setinggi viewport, dikurangi selisih tetap supaya section
+     berikutnya mengintip sedikit sebagai tanda masih ada konten.
+     Pakai selisih px, bukan persentase: `svh` di Safari iOS sudah dihitung
+     saat toolbar tampil, jadi mengalikannya dengan persen membuat banner
+     jauh lebih pendek dari yang terlihat di simulator desktop. */
   .hero {
-    min-height: 84vh;
-    min-height: 84svh;
+    min-height: calc(100vh - 56px);
+    min-height: calc(100svh - 56px);
     margin-bottom: 48px;
   }
-  .hero-scroll-cue { bottom: 24px; }
+  .hero-scroll-cue { bottom: 44px; }
 }
 
 /* ===== CHATBOT ===== */
