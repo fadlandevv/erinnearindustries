@@ -712,7 +712,7 @@ p:last-child { margin-bottom: 0; }
 /* ===== INNER PAGE HERO ===== */
 .page-hero {
   /* dirapatkan ke navbar agar tidak banyak ruang kosong */
-  padding: 40px 0 48px;
+  padding: 50px 0 48px;
   text-align: center;
   border-bottom: 1px solid #f0f0f0;
 }
@@ -1575,7 +1575,7 @@ p:last-child { margin-bottom: 0; }
   .stat-num { font-size: 32px; }
 
   /* Inner page hero */
-  .page-hero { padding: 32px 0 36px; }
+  .page-hero { padding: 42px 0 36px; }
 
   /* Process */
   .process-section {
@@ -1607,7 +1607,7 @@ p:last-child { margin-bottom: 0; }
   .nav-inner { width: calc(100% - 24px); }
   .hero-ctas .btn-dark,
   .hero-ctas .btn-outline { flex: 1 1 100%; }
-  .page-hero { padding: 24px 0 28px; }
+  .page-hero { padding: 34px 0 28px; }
   .stats-about { padding: 24px; }
   .contact-form-card { padding: 20px; border-radius: 16px; }
   .footer-links { gap: 24px; }
@@ -4591,18 +4591,18 @@ p:last-child { margin-bottom: 0; }
 /* ===== CUSTOM DESIGN PAGE ===== */
 .custom-hero {
   /* disamakan dengan .page-hero, termasuk turunan responsifnya */
-  padding: 40px 0 48px;
+  padding: 50px 0 48px;
   text-align: center;
   background: var(--bg, #fff);
 }
 /* Harus di sini, bukan di blok @media umum di atas: definisi dasar
    .custom-hero berada jauh di bawahnya sehingga akan menimpanya. */
-@media (max-width: 640px) { .custom-hero { padding: 32px 0 36px; } }
-@media (max-width: 420px) { .custom-hero { padding: 24px 0 28px; } }
+@media (max-width: 640px) { .custom-hero { padding: 42px 0 36px; } }
+@media (max-width: 420px) { .custom-hero { padding: 34px 0 28px; } }
 /* Halaman detail: hanya satu baris judul + panah, tanpa subjudul — jarak ke
    navbar dibuat lebih rapat daripada hero halaman biasa. */
-.custom-hero--detail { padding: 32px 0 24px; }
-@media (max-width: 640px) { .custom-hero--detail { padding: 24px 0 20px; } }
+.custom-hero--detail { padding: 42px 0 24px; }
+@media (max-width: 640px) { .custom-hero--detail { padding: 34px 0 20px; } }
 .custom-hero-inner {
   max-width: 600px;
   margin: 0 auto;
@@ -5164,12 +5164,12 @@ button.custom-product-card { cursor: pointer; border: 1px solid #ede9e3; backgro
 /* ===== RESELLER PAGE ===== */
 .reseller-hero {
   /* disamakan dengan .page-hero / .custom-hero */
-  padding: 40px 0 48px;
+  padding: 50px 0 48px;
   text-align: center;
   background: var(--bg, #fff);
 }
-@media (max-width: 640px) { .reseller-hero { padding: 32px 0 36px; } }
-@media (max-width: 420px) { .reseller-hero { padding: 24px 0 28px; } }
+@media (max-width: 640px) { .reseller-hero { padding: 42px 0 36px; } }
+@media (max-width: 420px) { .reseller-hero { padding: 34px 0 28px; } }
 .reseller-hero-inner {
   max-width: 680px;
   margin: 0 auto;
