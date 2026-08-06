@@ -5059,12 +5059,30 @@ button.custom-product-card { cursor: pointer; border: 1px solid #ede9e3; backgro
   background: #22c55e;
   flex-shrink: 0;
 }
+/* Panggung mockup dipaksa persegi supaya semua produk punya ukuran yang sama.
+   Amplop-packaging punya viewBox 300x375 (produk lain 300x300); dengan
+   height:100% + width:auto, tingginya ikut panggung dan lebarnya menyesuaikan
+   rasio aslinya — jadi tidak gepeng dan kotak SVG tetap pas dengan gambarnya
+   (penting karena perhitungan drag desain memakai bounding box SVG). */
 .custom-shirt-wrap {
+  position: relative;
   width: 100%;
   max-width: 500px;
+  aspect-ratio: 1 / 1;
   filter: drop-shadow(0 20px 60px rgba(0,0,0,0.1));
 }
-.custom-shirt-svg { width: 100%; height: auto; display: block; }
+/* absolut supaya tinggi panggung definitif — kalau statis, height:100% tidak
+   bisa di-resolve dan SVG amplop memaksa panggung ikut tinggi aslinya */
+.custom-shirt-svg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  display: block;
+}
 .custom-mockup-hint {
   font-size: 12.8px;
   color: #aaa;
@@ -5084,6 +5102,23 @@ button.custom-product-card { cursor: pointer; border: 1px solid #ede9e3; backgro
   border-radius: 999px;
   padding: 3px 10px;
 }
+/* Kolom form punya scrollbar sendiri saat isinya melebihi tinggi layar,
+   sehingga halaman tidak ikut bergulir — mockup tetap terlihat.
+   Hanya di layout 2 kolom; di bawah 860px grid jadi 1 kolom dan scroll
+   bersarang justru menyulitkan. */
+@media (min-width: 861px) {
+  .custom-controls {
+    position: sticky;
+    top: 96px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* ruang untuk scrollbar tanpa menggeser lebar konten */
+    padding-right: 12px;
+    margin-right: -12px;
+  }
+}
+
 /* Responsive */
 @media (max-width: 860px) {
   .custom-inner {
@@ -5969,7 +6004,9 @@ details[open] .reseller-faq-q::after { content: '−'; }
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(160,114,42,0.12);
   z-index: 50;
-  overflow: hidden;
+  /* dibatasi agar tidak terpotong tepi kolom form yang kini bisa di-scroll */
+  max-height: 220px;
+  overflow-y: auto;
 }
 .cdd-item {
   display: block;

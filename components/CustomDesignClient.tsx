@@ -519,9 +519,13 @@ export default function CustomDesignClient({
   }
 
   const activeTabName = PRODUCT_TABS.find(t => t.id === productType)?.name ?? 'Produk'
-  // produk berikutnya sesuai urutan tab; undefined kalau ini produk terakhir
   const activeIndex = PRODUCT_TABS.findIndex(t => t.id === productType)
+  // produk berikutnya; undefined kalau ini produk terakhir
   const nextProduct = activeIndex === -1 ? undefined : PRODUCT_TABS[activeIndex + 1]
+  // panah kiri: ke produk sebelumnya, atau balik ke daftar kalau sudah paling kiri
+  const prevProduct = activeIndex > 0 ? PRODUCT_TABS[activeIndex - 1] : undefined
+  const backHref = prevProduct ? `/custom/${prevProduct.id}` : '/custom'
+  const backLabel = prevProduct ? `Kembali ke ${prevProduct.name}` : 'Kembali ke pilihan produk'
 
   return (
     <div>
@@ -529,7 +533,7 @@ export default function CustomDesignClient({
       <div className="custom-hero custom-hero--detail">
         {/* Judul ikut di dalam row supaya kedua panah center terhadap judul */}
         <div className="custom-hero-row">
-          <Link href="/custom" className="custom-hero-nav" aria-label="Kembali ke pilihan produk">
+          <Link href={backHref} className="custom-hero-nav" aria-label={backLabel} title={backLabel}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>
             </svg>
