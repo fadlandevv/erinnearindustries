@@ -24,12 +24,10 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
       <path d="M80 0v-160h800V0H80Zm160-320h56l312-311-29-29-28-28-311 312v56Zm-80 80v-170l448-447q11-11 25.5-17t30.5-6q16 0 31 6t27 18l55 56q12 11 17.5 26t5.5 31q0 15-5.5 29.5T777-687L330-240H160Zm560-504-56-56 56 56ZM608-631l-29-29-28-28 57 57Z"/>
     </svg>
   ),
+  /* Material Symbols Outlined — storefront */
   '/reseller': (
-    <svg className="nav-link-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M3.5 9 5 4h14l1.5 5"/>
-      <path d="M4.5 9v10.5a.5.5 0 0 0 .5.5h14a.5.5 0 0 0 .5-.5V9"/>
-      <path d="M3.5 9a2.6 2.6 0 0 0 4.25 0 2.6 2.6 0 0 0 4.25 0 2.6 2.6 0 0 0 4.25 0 2.6 2.6 0 0 0 4.25 0"/>
-      <path d="M9.5 20v-5h5v5"/>
+    <svg className="nav-link-icon" width="15" height="15" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true">
+      <path d="M841-518v318q0 33-23.5 56.5T761-120H201q-33 0-56.5-23.5T121-200v-318q-23-21-35.5-54t-.5-72l42-136q8-26 28.5-43t47.5-17h556q27 0 47 16.5t29 43.5l42 136q12 39-.5 71T841-518Zm-272-42q27 0 41-18.5t11-41.5l-22-140h-78v148q0 21 14 36.5t34 15.5Zm-180 0q23 0 37.5-15.5T441-612v-148h-78l-22 140q-4 24 10.5 42t37.5 18Zm-178 0q18 0 31.5-13t16.5-33l22-154h-78l-40 134q-6 20 6.5 43t41.5 23Zm540 0q29 0 42-23t6-43l-42-134h-76l22 154q3 20 16.5 33t31.5 13ZM201-200h560v-282q-5 2-6.5 2H751q-27 0-47.5-9T663-518q-18 18-41 28t-49 10q-27 0-50.5-10T481-518q-17 18-39.5 28T393-480q-29 0-52.5-10T299-518q-21 21-41.5 29.5T211-480h-4.5q-2.5 0-5.5-2v282Zm560 0H201h560Z"/>
     </svg>
   ),
 }
