@@ -18,11 +18,10 @@ const ANNOUNCEMENTS = [
 ]
 
 const NAV_ICONS: Record<string, React.ReactNode> = {
+  /* Material Symbols Outlined — border_color */
   '/custom': (
-    <svg className="nav-link-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M11 3.5 12.7 8l4.5 1.7-4.5 1.7L11 15.9 9.3 11.4 4.8 9.7 9.3 8z"/>
-      <path d="M18 3v3.4"/><path d="M16.3 4.7h3.4"/>
-      <path d="M17.5 15.5v2.8"/><path d="M16.1 16.9h2.8"/>
+    <svg className="nav-link-icon" width="15" height="15" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true">
+      <path d="M80 0v-160h800V0H80Zm160-320h56l312-311-29-29-28-28-311 312v56Zm-80 80v-170l448-447q11-11 25.5-17t30.5-6q16 0 31 6t27 18l55 56q12 11 17.5 26t5.5 31q0 15-5.5 29.5T777-687L330-240H160Zm560-504-56-56 56 56ZM608-631l-29-29-28-28 57 57Z"/>
     </svg>
   ),
   '/reseller': (
