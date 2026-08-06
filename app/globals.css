@@ -3495,7 +3495,7 @@ p:last-child { margin-bottom: 0; }
   position: relative;
   /* rasio landai supaya kartu tidak terlalu tinggi; di mobile kolomnya
      tunggal dan lebih lebar, jadi dibuat persegi (lihat media query) */
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 6 / 5;
   background: #111;
   display: flex;
   flex-direction: column;
@@ -3553,7 +3553,7 @@ p:last-child { margin-bottom: 0; }
 
 @media (max-width: 640px) {
   .showcase-grid { grid-template-columns: 1fr; }
-  .showcase-card { aspect-ratio: 1 / 1; }
+  .showcase-card { aspect-ratio: 6 / 7; }
   .showcase-section { padding: 0 0 48px; }
   /* Banner tetap setinggi viewport, dikurangi selisih tetap supaya section
      berikutnya mengintip sedikit sebagai tanda masih ada konten.
