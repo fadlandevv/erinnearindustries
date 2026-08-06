@@ -5143,10 +5143,13 @@ button.custom-product-card { cursor: pointer; border: 1px solid #ede9e3; backgro
 
 /* ===== RESELLER PAGE ===== */
 .reseller-hero {
-  padding: 96px 0 80px;
+  /* disamakan dengan .page-hero / .custom-hero */
+  padding: 40px 0 48px;
   text-align: center;
   background: var(--bg, #fff);
 }
+@media (max-width: 640px) { .reseller-hero { padding: 32px 0 36px; } }
+@media (max-width: 420px) { .reseller-hero { padding: 24px 0 28px; } }
 .reseller-hero-inner {
   max-width: 680px;
   margin: 0 auto;
@@ -5157,7 +5160,8 @@ button.custom-product-card { cursor: pointer; border: 1px solid #ede9e3; backgro
   gap: 20px;
 }
 .reseller-hero-title {
-  font-size: clamp(36px, 5vw, 56px);
+  /* sama persis dengan .page-hero-title */
+  font-size: clamp(28px, 4vw, 48px);
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.1;
