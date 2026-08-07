@@ -19,6 +19,28 @@ function renderTitle(title: string) {
 
 export default function Hero() {
   const { t } = useLanguage()
+
+  // Anchor biasa menempelkan section ke tepi atas viewport sehingga tertutup
+  // navbar yang melayang. Di sini posisinya dihitung sesuai tinggi konten:
+  // section yang muat dalam satu layar didudukkan di tengah, yang lebih tinggi
+  // dari layar dirapatkan ke bawah navbar supaya bagian atasnya tidak terpotong.
+  function scrollToNextSection(e: React.MouseEvent<HTMLAnchorElement>) {
+    const target = document.getElementById('showcase')
+    if (!target) return
+    e.preventDefault()
+
+    const NAV_HEIGHT = 64
+    const rect = target.getBoundingClientRect()
+    const absoluteTop = rect.top + window.scrollY
+    const muatSatuLayar = rect.height + NAV_HEIGHT < window.innerHeight
+    const top = muatSatuLayar
+      ? absoluteTop - (window.innerHeight - rect.height) / 2
+      : absoluteTop - NAV_HEIGHT - 16
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.scrollTo({ top, behavior: reduceMotion ? 'auto' : 'smooth' })
+  }
+
   return (
     <section className="hero" id="home">
       <div className="hero-media">
@@ -47,7 +69,7 @@ export default function Hero() {
         </div>
       </div>
 
-      <a href="#showcase" className="hero-scroll-cue" aria-label="Scroll ke bawah">
+      <a href="#showcase" onClick={scrollToNextSection} className="hero-scroll-cue" aria-label="Scroll ke bawah">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>
         </svg>
