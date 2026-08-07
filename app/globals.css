@@ -864,18 +864,52 @@ p:last-child { margin-bottom: 0; }
 .process-step p { font-size: 13.12px; color: #666; line-height: 1.6; margin: 0; }
 
 /* ===== CTA BANNER ===== */
-.cta-banner { padding: 80px 0 96px; text-align: center; }
+/* CTA berupa panel gelap, bukan teks polos — memberi jeda visual yang tegas
+   tanpa perlu ruang kosong besar di atas dan bawahnya. */
+.cta-banner { padding: 24px 0 72px; text-align: center; }
 .cta-banner-inner {
-  width: min(580px, calc(100% - 48px));
+  position: relative;
+  overflow: hidden;
+  width: min(1100px, calc(100% - 48px));
   margin: 0 auto;
+  padding: 56px 40px 60px;
+  border-radius: 24px;
+  background: #0d0d0d;
 }
+/* sorot lembut warna brand di belakang judul */
+.cta-banner-inner::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: -55%;
+  left: 50%;
+  width: 680px;
+  height: 680px;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(244,124,47,0.30) 0%, rgba(244,124,47,0) 70%);
+  pointer-events: none;
+}
+.cta-banner-inner > * { position: relative; z-index: 1; }
 .cta-banner-inner h2 {
-  font-size: clamp(28px, 3.5vw, 44px);
+  font-size: clamp(26px, 3.2vw, 40px);
   font-weight: 700;
   letter-spacing: -0.03em;
-  margin: 16px 0 12px;
+  /* tanpa ini mewarisi line-height 1.6 dari body — judul 2 baris jadi renggang */
+  line-height: 1.15;
+  max-width: 620px;
+  margin: 0 auto 14px;
+  color: #fff;
 }
-.cta-banner-inner p { font-size: 14.4px; color: #666; margin: 0; }
+.cta-banner-inner p {
+  font-size: 15.2px;
+  color: rgba(255,255,255,0.68);
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+/* tombol dibalik jadi terang supaya kontras di atas panel gelap */
+.cta-banner-inner .btn-dark { background: #fff; color: #0d0d0d; }
+.cta-banner-inner .btn-dark:hover { background: #f0ede8; }
 
 /* ===== CONTACT PAGE ===== */
 .contact-section { padding: 64px 0 96px; }
@@ -1583,7 +1617,8 @@ p:last-child { margin-bottom: 0; }
     border-radius: 20px;
     margin: 24px 12px;
   }
-  .cta-banner { padding: 48px 0 64px; }
+  .cta-banner { padding: 16px 0 48px; }
+  .cta-banner-inner { padding: 40px 24px 44px; border-radius: 20px; }
 
   /* Product detail */
   .product-detail-section { padding: 18px 18px; }
@@ -4369,8 +4404,9 @@ p:last-child { margin-bottom: 0; }
 [data-theme="dark"] .process-step-num { box-shadow: 0 0 0 6px #141414; }
 
 /* CTA banner */
-[data-theme="dark"] .cta-banner-inner h2 { color: #f0ede8; }
-[data-theme="dark"] .cta-banner-inner p { color: #888; }
+/* panelnya sudah gelap di kedua tema, jadi warna teksnya tetap terang;
+   hanya latarnya sedikit diangkat agar terpisah dari background gelap halaman */
+[data-theme="dark"] .cta-banner-inner { background: #161616; }
 
 /* Contact */
 [data-theme="dark"] .contact-info h3 { color: #f0ede8; }
