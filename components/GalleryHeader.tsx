@@ -7,11 +7,8 @@ export default function GalleryHeader() {
 
   return (
     <div className="gbn-header">
-      <h2>
-        {section.title.split('\n').map((line: string, i: number) => (
-          <span key={i}>{line}{i === 0 && <br />}</span>
-        ))}
-      </h2>
+      {/* newline dari CMS diratakan jadi spasi supaya judulnya satu baris */}
+      <h2>{section.title.replace(/\s*\n\s*/g, ' ')}</h2>
       <p>{section.sub}</p>
     </div>
   )
