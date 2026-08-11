@@ -2016,3 +2016,280 @@
 [data-theme="dark"] .msg-preview { color: #bbb; }
 [data-theme="dark"] .msg-btn { border-color: #2a2a2a; color: #aaa; }
 [data-theme="dark"] .msg-btn:hover { border-color: #555; color: #eee; }
+
+/* ═══════════ INVOICE ═══════════ */
+
+.inv-badge-sent { background: #dbeafe; color: #1d4ed8; }
+
+.inv-overdue-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.inv-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.inv-status-bar .admin-order-status-form { display: flex; align-items: center; gap: 8px; }
+.inv-order-link {
+  font-size: 12.5px;
+  color: #777;
+  text-decoration: none;
+  border-bottom: 1px dashed #ccc;
+}
+.inv-order-link:hover { color: #f47c2f; border-bottom-color: #f47c2f; }
+
+/* ── Form ── */
+.inv-form-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  align-items: start;
+}
+.inv-summary-card { position: sticky; top: 96px; }
+
+.inv-items-editor { display: flex; flex-direction: column; gap: 8px; }
+.inv-item-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px 130px 120px 32px;
+  gap: 8px;
+  align-items: center;
+}
+.inv-item-row .admin-form-input { margin: 0; }
+.inv-item-row--head {
+  font-size: 11.2px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-bottom: 2px;
+}
+.inv-item-row--head > span:nth-child(2),
+.inv-item-row--head > span:nth-child(3),
+.inv-item-row--head > span:nth-child(4) { text-align: right; }
+.inv-item-amount {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+  color: #0d0d0d;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.inv-item-remove {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid #e5e5e5;
+  background: transparent;
+  color: #999;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.inv-item-remove:hover:not(:disabled) { background: #fef2f2; color: #ef4444; border-color: #fca5a5; }
+.inv-item-remove:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── Totals (dipakai form & dokumen) ── */
+.inv-totals { margin-top: 8px; padding-top: 12px; border-top: 1px solid #f0ede8; }
+.inv-total-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: #555;
+  padding: 5px 0;
+}
+.inv-total-row--grand {
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid #ebebeb;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0d0d0d;
+}
+.inv-total-row--due {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px dashed #e5e5e5;
+  font-size: 14px;
+  font-weight: 700;
+  color: #b45309;
+}
+
+/* ── Dokumen invoice ── */
+.inv-doc {
+  background: #fff;
+  border: 1px solid #ebebeb;
+  border-radius: 16px;
+  padding: 44px 48px;
+  max-width: 860px;
+  color: #0d0d0d;
+}
+.inv-doc-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid #0d0d0d;
+}
+.inv-doc-brand { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; }
+.inv-doc-tagline { font-size: 12px; color: #777; margin-top: 2px; }
+.inv-doc-issuer-meta { font-size: 11.5px; color: #999; line-height: 1.7; margin-top: 12px; }
+.inv-doc-head-right { text-align: right; flex-shrink: 0; }
+.inv-doc-label {
+  font-size: 11px; font-weight: 700; color: #999;
+  text-transform: uppercase; letter-spacing: 0.18em;
+}
+.inv-doc-number { font-size: 16px; font-weight: 700; margin-top: 4px; }
+.inv-stamp {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  border: 2px solid currentColor;
+}
+.inv-stamp--paid      { color: #15803d; }
+.inv-stamp--cancelled { color: #b91c1c; }
+.inv-stamp--overdue   { color: #b45309; }
+
+.inv-doc-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 24px 0;
+}
+.inv-doc-meta-label {
+  font-size: 10.5px; font-weight: 700; color: #999;
+  text-transform: uppercase; letter-spacing: 0.1em;
+}
+.inv-doc-billto-name { font-size: 15px; font-weight: 700; margin-top: 6px; }
+.inv-doc-billto-line { font-size: 12.5px; color: #666; line-height: 1.7; }
+.inv-doc-dates { min-width: 220px; }
+.inv-doc-date-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 12.5px;
+  padding: 3px 0;
+}
+
+.inv-doc-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.inv-doc-table th {
+  font-size: 10.5px; font-weight: 700; color: #999;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  text-align: left; padding: 10px 12px;
+  background: #fafafa;
+  border-top: 1px solid #ebebeb;
+  border-bottom: 1px solid #ebebeb;
+}
+.inv-doc-table td {
+  font-size: 13px;
+  padding: 12px;
+  border-bottom: 1px solid #f4f4f4;
+  vertical-align: top;
+}
+
+.inv-doc-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  margin-top: 28px;
+}
+.inv-doc-notes { flex: 1; min-width: 0; }
+.inv-doc-notes-body {
+  font-size: 12.5px;
+  color: #555;
+  line-height: 1.75;
+  margin-top: 5px;
+  white-space: pre-wrap;
+}
+.inv-doc-totals { width: 300px; flex-shrink: 0; }
+.inv-doc-totals .inv-total-row:first-child { padding-top: 0; }
+
+.inv-doc-foot {
+  margin-top: 36px;
+  padding-top: 18px;
+  border-top: 1px solid #f0ede8;
+  font-size: 11.5px;
+  color: #999;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .inv-form-layout { grid-template-columns: 1fr; }
+  .inv-summary-card { position: static; }
+}
+@media (max-width: 768px) {
+  .inv-item-row { grid-template-columns: minmax(0, 1fr) 64px 110px 32px; }
+  .inv-item-row--head { display: none; }
+  .inv-item-amount { display: none; }
+  .inv-doc { padding: 24px 20px; }
+  .inv-doc-head, .inv-doc-meta, .inv-doc-summary { flex-direction: column; }
+  .inv-doc-head-right { text-align: left; }
+  .inv-doc-totals { width: 100%; }
+}
+
+/* ── Cetak: hanya dokumen invoice yang keluar ── */
+@media print {
+  .admin-sidebar,
+  .admin-sidebar-overlay,
+  .admin-mobile-header,
+  .admin-toast-wrap,
+  .inv-no-print { display: none !important; }
+
+  .admin-layout-wrapper,
+  .admin-content,
+  .admin-main { display: block !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
+
+  .inv-doc {
+    border: none;
+    border-radius: 0;
+    max-width: none;
+    padding: 0;
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .inv-doc-table tr { break-inside: avoid; }
+  .inv-doc-summary { break-inside: avoid; }
+
+  @page { size: A4; margin: 16mm; }
+}
+
+/* ── Dark mode ── */
+[data-theme="dark"] .inv-badge-sent { background: #12263f; color: #7aa8f0; }
+[data-theme="dark"] .inv-overdue-tag { background: #2a0a0a; color: #f87171; }
+[data-theme="dark"] .inv-order-link { color: #888; border-bottom-color: #333; }
+[data-theme="dark"] .inv-item-row--head { color: #666; }
+[data-theme="dark"] .inv-item-amount { color: #f0ede8; }
+[data-theme="dark"] .inv-item-remove { border-color: #2a2a2a; color: #777; }
+[data-theme="dark"] .inv-item-remove:hover:not(:disabled) { background: rgba(239,68,68,0.12); border-color: #7f1d1d; }
+[data-theme="dark"] .inv-totals { border-top-color: #1e1e1e; }
+[data-theme="dark"] .inv-total-row { color: #aaa; }
+[data-theme="dark"] .inv-total-row--grand { border-top-color: #222; color: #f0ede8; }
+[data-theme="dark"] .inv-total-row--due { border-top-color: #2a2a2a; color: #f4a52f; }
+[data-theme="dark"] .inv-doc { background: #141414; border-color: #1e1e1e; color: #f0ede8; }
+[data-theme="dark"] .inv-doc-head { border-bottom-color: #f0ede8; }
+[data-theme="dark"] .inv-doc-tagline,
+[data-theme="dark"] .inv-doc-issuer-meta,
+[data-theme="dark"] .inv-doc-label,
+[data-theme="dark"] .inv-doc-meta-label,
+[data-theme="dark"] .inv-doc-foot { color: #777; }
+[data-theme="dark"] .inv-doc-billto-line,
+[data-theme="dark"] .inv-doc-notes-body { color: #aaa; }
+[data-theme="dark"] .inv-doc-table th { background: #1a1a1a; border-top-color: #222; border-bottom-color: #222; color: #666; }
+[data-theme="dark"] .inv-doc-table td { border-bottom-color: #1a1a1a; }
+[data-theme="dark"] .inv-doc-foot { border-top-color: #1e1e1e; }
+[data-theme="dark"] .inv-stamp--paid      { color: #4ade80; }
+[data-theme="dark"] .inv-stamp--cancelled { color: #f87171; }
+[data-theme="dark"] .inv-stamp--overdue   { color: #fbbf24; }

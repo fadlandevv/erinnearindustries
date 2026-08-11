@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useMemo, useActionState, useEffect, useRef } from 'react'
+import Link from 'next/link'
 import type { Order } from '@/lib/orders'
 import type { OrderMessage } from '@/lib/order-messages'
 import { updateOrderStatusFormAction, adminSendOrderMessageAction, getOrderMessagesAction, adminMarkOrderMessagesReadAction } from '@/lib/actions'
@@ -41,6 +42,8 @@ type Props = {
   orders: Order[]
   userMap: Record<string, string>
   allMessages: OrderMessage[]
+  /** Sembunyikan pintasan invoice untuk role yang tidak punya akses ke halamannya. */
+  canInvoice: boolean
 }
 
 function AdminChatPanel({ orderId, onClose }: { orderId: string; onClose: () => void }) {
@@ -116,7 +119,7 @@ function AdminChatPanel({ orderId, onClose }: { orderId: string; onClose: () => 
   )
 }
 
-export default function OrdersClient({ orders, userMap, allMessages }: Props) {
+export default function OrdersClient({ orders, userMap, allMessages, canInvoice }: Props) {
   const [search, setSearch]   = useState('')
   const [year, setYear]       = useState('all')
   const [month, setMonth]     = useState('all')
@@ -355,6 +358,14 @@ export default function OrdersClient({ orders, userMap, allMessages }: Props) {
                           <strong style={{ fontSize: '0.95rem' }}>
                             Rp {order.totalPrice.toLocaleString('id-ID')}
                           </strong>
+                          {canInvoice && (
+                            <Link
+                              href={`/admin/invoices/new?orderId=${order.id}`}
+                              className="btn-admin-edit"
+                            >
+                              Buat Invoice
+                            </Link>
+                          )}
                           <form action={updateOrderStatusFormAction} className="admin-order-status-form">
                             <input type="hidden" name="orderId" value={order.id} />
                             <select name="status" defaultValue={order.status} className="admin-order-status-select">

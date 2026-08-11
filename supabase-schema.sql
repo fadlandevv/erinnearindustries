@@ -328,3 +328,30 @@ $$;
 
 -- Mempercepat cek idempotensi webhook (lookup warehouse_log by note)
 create index if not exists warehouse_log_note_idx on warehouse_log (note);
+
+-- ── Invoice ─────────────────────────────────────────────────────────────
+-- Dokumen tagihan. Bisa berdiri sendiri (manual) atau dibuat dari sebuah order.
+-- `number` unik supaya dua admin yang menekan "Buat Invoice" bersamaan tidak
+-- bisa menghasilkan nomor kembar — lib/invoices.ts mengandalkan itu untuk retry.
+create table if not exists invoices (
+  id            text primary key,
+  number        text unique not null,
+  order_id      text,
+  issue_date    date not null,
+  due_date      date,
+  status        text not null default 'draft'
+                check (status in ('draft', 'sent', 'paid', 'cancelled')),
+  bill_to       jsonb not null,
+  items         jsonb not null default '[]'::jsonb,
+  discount      bigint not null default 0,
+  shipping      bigint not null default 0,
+  tax_percent   numeric not null default 0,
+  paid_amount   bigint not null default 0,
+  notes         text,
+  created_by    text,
+  created_at    timestamptz not null default now(),
+  updated_at    timestamptz
+);
+
+create index if not exists invoices_issue_date_idx on invoices (issue_date desc);
+create index if not exists invoices_order_id_idx on invoices (order_id);

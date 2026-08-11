@@ -19,6 +19,8 @@ import {
 import { adjustStock, upsertSizeEntry } from './warehouse'
 import { saveManualEntry, deleteManualEntry, type RekapSource } from './rekap'
 import { savePembukuanEntry, deletePembukuanEntry, type EntryType } from './pembukuan'
+import { createInvoice, updateInvoice, deleteInvoice as _deleteInvoice } from './invoices'
+import { INVOICE_STATUSES, type InvoiceItem, type InvoiceStatus } from './invoice-constants'
 import { logAdminAccess } from './access-log'
 import { getPricingItems, upsertPricingItem, insertPricingItem, deletePricingItem } from './pricing'
 import { fetchShippingCost, fetchShippingCostByName, type ShippingOption } from './rajaongkir'
@@ -1014,6 +1016,151 @@ export async function deletePembukuanAction(id: string) {
   await requireAdmin('pembukuan')
   await deletePembukuanEntry(id)
   revalidatePath('/admin/pembukuan')
+}
+
+// ── Invoice ───────────────────────────────────────────────────────────────
+
+const toAmount = (v: FormDataEntryValue | null): number => {
+  // Field uang boleh diketik "1.500.000" atau "1500000" — buang pemisah ribuan.
+  const n = parseFloat(String(v ?? '').replace(/[^\d.-]/g, '').replace(/\.(?=\d{3}\b)/g, ''))
+  return Number.isFinite(n) ? Math.max(Math.round(n), 0) : 0
+}
+
+type InvoiceFormValue = {
+  orderId?: string
+  issueDate: string
+  dueDate?: string
+  status: InvoiceStatus
+  billTo: { name: string; email: string; phone: string; address: string }
+  items: InvoiceItem[]
+  discount: number
+  shipping: number
+  taxPercent: number
+  paidAmount: number
+  notes?: string
+}
+
+function parseInvoiceForm(formData: FormData):
+  | { ok: false; error: string }
+  | { ok: true; value: InvoiceFormValue } {
+  const issueDate = String(formData.get('issueDate') ?? '').trim()
+  const dueDate = String(formData.get('dueDate') ?? '').trim() || undefined
+  const status = String(formData.get('status') ?? 'draft').trim() as InvoiceStatus
+  const name = String(formData.get('billName') ?? '').trim()
+
+  if (!issueDate) return { ok: false, error: 'Tanggal invoice wajib diisi.' }
+  if (!name) return { ok: false, error: 'Nama penerima tagihan wajib diisi.' }
+  if (!INVOICE_STATUSES.includes(status)) return { ok: false, error: 'Status invoice tidak valid.' }
+  if (dueDate && dueDate < issueDate) return { ok: false, error: 'Jatuh tempo tidak boleh sebelum tanggal invoice.' }
+
+  const descs = formData.getAll('itemDescription').map(v => String(v).trim())
+  const qtys = formData.getAll('itemQuantity')
+  const prices = formData.getAll('itemUnitPrice')
+
+  const items: InvoiceItem[] = []
+  for (let i = 0; i < descs.length; i++) {
+    if (!descs[i]) continue  // baris kosong dari form dinamis, abaikan
+    const quantity = Math.round(Number(qtys[i] ?? 0))
+    if (!Number.isFinite(quantity) || quantity <= 0)
+      return { ok: false, error: `Qty item "${descs[i]}" harus lebih dari 0.` }
+    items.push({ description: descs[i], quantity, unitPrice: toAmount(prices[i]) })
+  }
+  if (items.length === 0) return { ok: false, error: 'Minimal satu item harus diisi.' }
+
+  const taxPercentRaw = Number(String(formData.get('taxPercent') ?? '0').replace(',', '.'))
+  if (!Number.isFinite(taxPercentRaw) || taxPercentRaw < 0 || taxPercentRaw > 100)
+    return { ok: false, error: 'Pajak harus di antara 0 dan 100.' }
+
+  return {
+    ok: true,
+    value: {
+      orderId: String(formData.get('orderId') ?? '').trim() || undefined,
+      issueDate,
+      dueDate,
+      status,
+      billTo: {
+        name,
+        email: String(formData.get('billEmail') ?? '').trim(),
+        phone: String(formData.get('billPhone') ?? '').trim(),
+        address: String(formData.get('billAddress') ?? '').trim(),
+      },
+      items,
+      discount: toAmount(formData.get('discount')),
+      shipping: toAmount(formData.get('shipping')),
+      taxPercent: taxPercentRaw,
+      paidAmount: toAmount(formData.get('paidAmount')),
+      notes: String(formData.get('notes') ?? '').trim() || undefined,
+    },
+  }
+}
+
+export async function createInvoiceAction(
+  _prev: { error?: string } | null,
+  formData: FormData,
+): Promise<{ error?: string }> {
+  const guard = await guardAdmin('invoices')
+  if (!guard.session) return { error: guard.error }
+
+  const parsed = parseInvoiceForm(formData)
+  if (!parsed.ok) return { error: parsed.error }
+
+  let id: string
+  try {
+    const invoice = await createInvoice({ ...parsed.value, createdBy: guard.session.admin.username })
+    id = invoice.id
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Gagal menyimpan invoice.' }
+  }
+
+  revalidatePath('/admin/invoices')
+  redirect(`/admin/invoices/${id}`)
+}
+
+export async function updateInvoiceAction(
+  _prev: { error?: string } | null,
+  formData: FormData,
+): Promise<{ error?: string }> {
+  const { error: authError } = await guardAdmin('invoices')
+  if (authError) return { error: authError }
+
+  const id = String(formData.get('id') ?? '').trim()
+  if (!id) return { error: 'Invoice tidak ditemukan.' }
+
+  const parsed = parseInvoiceForm(formData)
+  if (!parsed.ok) return { error: parsed.error }
+
+  try {
+    await updateInvoice(id, parsed.value)
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Gagal menyimpan invoice.' }
+  }
+
+  revalidatePath('/admin/invoices')
+  redirect(`/admin/invoices/${id}`)
+}
+
+export async function updateInvoiceStatusAction(formData: FormData): Promise<void> {
+  await requireAdmin('invoices')
+  const id = String(formData.get('id') ?? '').trim()
+  const status = String(formData.get('status') ?? '').trim() as InvoiceStatus
+  if (!id || !INVOICE_STATUSES.includes(status)) return
+
+  await updateInvoice(id, { status })
+  revalidatePath('/admin/invoices')
+  revalidatePath(`/admin/invoices/${id}`)
+}
+
+export async function deleteInvoiceAction(id: string): Promise<{ error?: string }> {
+  const { error: authError } = await guardAdmin('invoices')
+  if (authError) return { error: authError }
+
+  try {
+    await _deleteInvoice(id)
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Gagal menghapus invoice.' }
+  }
+  revalidatePath('/admin/invoices')
+  return {}
 }
 
 export async function updatePricingAction(

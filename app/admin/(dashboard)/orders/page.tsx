@@ -1,11 +1,16 @@
 import { getOrders } from '@/lib/orders'
 import { getUsers } from '@/lib/users'
 import { getMessagesByOrderIds } from '@/lib/order-messages'
+import { getCurrentAdmin } from '@/lib/auth'
+import { hasPermission } from '@/lib/rbac'
 import OrdersClient from './OrdersClient'
 
 export const metadata = { title: 'Orders' }
 
 export default async function OrdersPage() {
+  const session = await getCurrentAdmin()
+  const canInvoice = !!session && (session.role?.locked || hasPermission(session.role, 'invoices'))
+
   const orders = await getOrders()
   const [userMap, allMessages] = await Promise.all([
     getUsers().then(users => Object.fromEntries(users.map(u => [u.email.toLowerCase(), u.id]))),
@@ -49,7 +54,7 @@ export default async function OrdersPage() {
         </div>
       </div>
 
-      <OrdersClient orders={orders} userMap={userMap} allMessages={allMessages} />
+      <OrdersClient orders={orders} userMap={userMap} allMessages={allMessages} canInvoice={canInvoice} />
     </>
   )
 }
