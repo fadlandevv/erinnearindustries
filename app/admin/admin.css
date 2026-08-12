@@ -2036,16 +2036,25 @@
   color: #b91c1c;
 }
 
-.inv-status-bar {
-  display: flex;
+/* Header detail: tombol kembali di kiri judul, aksi + ubah status di kanan. */
+.inv-head-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.inv-back-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: 1.5px solid #e5e5e5;
+  border-radius: 10px;
+  color: #555;
+  background: transparent;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.inv-status-form { display: flex; align-items: center; gap: 10px; }
-.inv-status-form-label { font-size: 12.48px; font-weight: 600; color: #555; white-space: nowrap; }
-.inv-status-select { width: 170px; }
+.inv-back-btn:hover { background: #f4f4f4; color: #0d0d0d; border-color: #ccc; }
+.inv-head-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.inv-status-form { display: flex; align-items: center; gap: 8px; }
+.inv-status-select { width: 150px; }
 
 /* Baris 3 kolom untuk form yang padat (tanggal/tempo/status, nama/telepon) */
 .inv-form-row-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
@@ -2095,8 +2104,7 @@
 /* Sel deskripsi item: dropdown produk + input manual saat "Lainnya" dipilih */
 .inv-item-desc { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .inv-order-link {
-  font-size: 12.5px;
-  color: #777;
+  color: inherit;
   text-decoration: none;
   border-bottom: 1px dashed #ccc;
 }
@@ -2393,8 +2401,9 @@
     border-bottom: 1px solid #f0ede8;
   }
   .inv-item-row > .inv-item-desc { grid-column: 1 / -1; }
-  .inv-status-form { flex-wrap: wrap; }
-  .inv-status-select { width: 100%; }
+  .inv-head-actions { width: 100%; }
+  .inv-status-form { flex: 1 1 100%; }
+  .inv-status-select { flex: 1; width: auto; }
   .inv-item-row--head { display: none; }
   .inv-item-amount { display: none; }
   .inv-doc { padding: 24px 20px; }
@@ -2436,7 +2445,8 @@
 [data-theme="dark"] .inv-order-link { color: #888; border-bottom-color: #333; }
 [data-theme="dark"] .inv-item-row--head { color: #666; }
 [data-theme="dark"] .inv-item-row { border-bottom-color: #1e1e1e; }
-[data-theme="dark"] .inv-status-form-label { color: #888; }
+[data-theme="dark"] .inv-back-btn { color: #888; border-color: #2a2a2a; }
+[data-theme="dark"] .inv-back-btn:hover { background: #1a1a1a; color: #f0ede8; border-color: #333; }
 [data-theme="dark"] .inv-money-prefix,
 [data-theme="dark"] .inv-money-suffix { color: #666; }
 [data-theme="dark"] .inv-item-amount {

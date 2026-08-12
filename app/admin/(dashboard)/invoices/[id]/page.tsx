@@ -37,38 +37,45 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
   return (
     <>
       <div className="admin-page-header inv-no-print">
-        <div>
-          <h1 className="admin-page-title">{invoice.number}</h1>
-          <p className="admin-page-subtitle">
-            {INVOICE_STATUS_LABELS[invoice.status]}
-            {invoice.createdBy && ` · dibuat oleh ${invoice.createdBy}`}
-          </p>
+        <div className="inv-head-left">
+          <Link href="/admin/invoices" className="inv-back-btn" aria-label="Kembali ke daftar invoice">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M9.5 3.5L5 8l4.5 4.5" stroke="currentColor" strokeWidth="1.8"
+                strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </Link>
+          <div>
+            <h1 className="admin-page-title">{invoice.number}</h1>
+            <p className="admin-page-subtitle">
+              {INVOICE_STATUS_LABELS[invoice.status]}
+              {invoice.createdBy && ` · dibuat oleh ${invoice.createdBy}`}
+              {invoice.orderId && (
+                <>
+                  {' · '}
+                  <Link href="/admin/orders" className="inv-order-link">
+                    Order #{invoice.orderId.slice(-6).toUpperCase()}
+                  </Link>
+                </>
+              )}
+            </p>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-          <Link href="/admin/invoices" className="btn-admin-secondary">← Kembali</Link>
+
+        <div className="inv-head-actions">
+          <form action={updateInvoiceStatusAction} className="inv-status-form">
+            <input type="hidden" name="id" value={invoice.id} />
+            <div className="inv-status-select">
+              <AdminSelect
+                name="status"
+                defaultValue={invoice.status}
+                options={INVOICE_STATUSES.map(s => ({ value: s, label: INVOICE_STATUS_LABELS[s] }))}
+              />
+            </div>
+            <button type="submit" className="btn-admin-secondary">Simpan</button>
+          </form>
           <Link href={`/admin/invoices/${invoice.id}/edit`} className="btn-admin-secondary">Edit</Link>
           <PrintButton />
         </div>
-      </div>
-
-      <div className="inv-status-bar inv-no-print">
-        <form action={updateInvoiceStatusAction} className="inv-status-form">
-          <input type="hidden" name="id" value={invoice.id} />
-          <span className="inv-status-form-label">Ubah status</span>
-          <div className="inv-status-select">
-            <AdminSelect
-              name="status"
-              defaultValue={invoice.status}
-              options={INVOICE_STATUSES.map(s => ({ value: s, label: INVOICE_STATUS_LABELS[s] }))}
-            />
-          </div>
-          <button type="submit" className="btn-admin-primary">Simpan</button>
-        </form>
-        {invoice.orderId && (
-          <Link href="/admin/orders" className="inv-order-link">
-            Order #{invoice.orderId.slice(-6).toUpperCase()}
-          </Link>
-        )}
       </div>
 
       {/* ── Dokumen yang tercetak ── */}
