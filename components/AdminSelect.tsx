@@ -1,7 +1,20 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
 
-type Option = { value: string; label: string }
+/** `swatch` opsional: kode warna CSS yang ditampilkan sebagai bulatan di depan label. */
+type Option = { value: string; label: string; swatch?: string }
+
+function Swatch({ color }: { color: string }) {
+  return (
+    <span
+      aria-hidden
+      style={{
+        width: 12, height: 12, flexShrink: 0, borderRadius: '50%',
+        background: color, border: '1px solid rgba(0,0,0,0.18)',
+      }}
+    />
+  )
+}
 
 type Props = {
   value?: string
@@ -51,6 +64,7 @@ export default function AdminSelect({ value, defaultValue, onChange, options, na
         onClick={() => setOpen(o => !o)}
         className={`admin-cselect-trigger${open ? ' open' : ''}${!selected ? ' placeholder' : ''}`}
       >
+        {selected?.swatch && <Swatch color={selected.swatch} />}
         <span className="admin-cselect-value">
           {selected?.label ?? placeholder ?? 'Pilih...'}
         </span>
@@ -80,6 +94,7 @@ export default function AdminSelect({ value, defaultValue, onChange, options, na
                 ) : (
                   <span style={{ width: 12, flexShrink: 0 }} />
                 )}
+                {opt.swatch && <Swatch color={opt.swatch} />}
                 <span>{opt.label}</span>
               </button>
             )

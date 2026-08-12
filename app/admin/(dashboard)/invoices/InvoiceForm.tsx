@@ -19,6 +19,71 @@ const CUSTOM = '__custom__'
  */
 const selectOnFocus = (e: React.FocusEvent<HTMLInputElement>) => e.target.select()
 
+type VariantOption = { value: string; label: string; swatch?: string }
+
+/**
+ * Pilihan varian untuk satu baris item: kosong, milik produk, lalu "Lainnya".
+ * Nilai yang sudah tersimpan tapi tidak ada di katalog (produk berubah, atau
+ * diketik manual) tetap dimunculkan supaya tidak hilang saat invoice dibuka lagi.
+ */
+function variantOptions(fromProduct: VariantOption[], current?: string): VariantOption[] {
+  const opts = [{ value: '', label: '—' }, ...fromProduct]
+  if (current && !opts.some(o => o.value === current)) {
+    opts.push({ value: current, label: current })
+  }
+  return [...opts, { value: CUSTOM, label: 'Lainnya…' }]
+}
+
+/**
+ * Kolom warna/ukuran. Selama produk katalog menyediakan pilihan, ini dropdown;
+ * memilih "Lainnya…" menukarnya jadi input teks untuk varian di luar katalog.
+ */
+function VariantField({
+  name, label, placeholder, options, value, onChange,
+}: {
+  name: string
+  label: string
+  placeholder: string
+  options: VariantOption[]
+  value: string
+  onChange: (v: string) => void
+}) {
+  // Hanya opsi '—' dan 'Lainnya…' berarti produknya tidak punya varian tercatat.
+  const [typing, setTyping] = useState(options.length <= 2)
+
+  if (typing) {
+    return (
+      <div className="inv-variant-field">
+        <input
+          name={name} type="text" maxLength={40}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          onBlur={() => { if (options.length > 2 && !value) setTyping(false) }}
+          className="admin-form-input"
+          placeholder={placeholder}
+          aria-label={label}
+          autoFocus={options.length > 2}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="inv-variant-field">
+      <AdminSelect
+        value={value}
+        options={options}
+        placeholder="—"
+        onChange={v => {
+          if (v === CUSTOM) { onChange(''); setTyping(true); return }
+          onChange(v)
+        }}
+      />
+      <input type="hidden" name={name} value={value} />
+    </div>
+  )
+}
+
 /** Input rupiah: tampil "1.500.000" untuk admin, kirim angka mentah ke server. */
 function RupiahInput({
   name, value, onChange, id,
@@ -103,10 +168,16 @@ export default function InvoiceForm({
     }
     const product = products.find(p => p.title === value)
     // Harga katalog hanya jadi titik awal — admin tetap bisa menimpanya.
-    // Ukuran ikut dikosongkan kalau produk baru tidak menyediakannya, supaya
-    // tidak tersisa ukuran milik produk sebelumnya.
+    // Varian dipertahankan hanya kalau produk baru juga menyediakannya, supaya
+    // tidak tersisa warna/ukuran milik produk sebelumnya.
     const keepSize = product?.sizes.includes(items[i].size ?? '') ? items[i].size : undefined
-    patchItem(i, { description: value, unitPrice: product?.unitPrice ?? 0, size: keepSize })
+    const keepColor = product?.colors.some(c => c.name === items[i].color) ? items[i].color : undefined
+    patchItem(i, {
+      description: value,
+      unitPrice: product?.unitPrice ?? 0,
+      size: keepSize,
+      color: keepColor,
+    })
   }
 
   function pickCustomer(value: string) {
@@ -241,7 +312,15 @@ export default function InvoiceForm({
 
               {items.map((item, i) => {
                 const isManual = manualRows.has(i)
-                const sizeChoices = products.find(p => p.title === item.description)?.sizes ?? []
+                const product = isManual ? undefined : products.find(p => p.title === item.description)
+                const colorOpts = variantOptions(
+                  (product?.colors ?? []).map(c => ({ value: c.name, label: c.name, swatch: c.hex })),
+                  item.color,
+                )
+                const sizeOpts = variantOptions(
+                  (product?.sizes ?? []).map(s => ({ value: s, label: s })),
+                  item.size,
+                )
                 return (
                   <div className="inv-item-row" key={i}>
                     <div className="inv-item-desc">
@@ -264,37 +343,26 @@ export default function InvoiceForm({
                       {/* Deskripsi selalu dikirim lewat field ini, apa pun modenya. */}
                       <input type="hidden" name="itemDescription" value={item.description} />
                     </div>
-                    <input
-                      name="itemColor" type="text" maxLength={40}
-                      value={item.color ?? ''}
-                      onChange={e => patchItem(i, { color: e.target.value })}
-                      className="admin-form-input"
+                    {/* key = produk baris ini: ganti produk → field kembali ke
+                        mode dropdown dengan pilihan milik produk yang baru. */}
+                    <VariantField
+                      key={`color-${product?.title ?? 'manual'}`}
+                      name="itemColor"
+                      label="Warna"
                       placeholder="Hitam"
-                      aria-label="Warna"
+                      options={colorOpts}
+                      value={item.color ?? ''}
+                      onChange={v => patchItem(i, { color: v })}
                     />
-                    {sizeChoices.length > 0 && !isManual ? (
-                      <>
-                        <AdminSelect
-                          value={item.size ?? ''}
-                          onChange={v => patchItem(i, { size: v })}
-                          options={[
-                            { value: '', label: '—' },
-                            ...sizeChoices.map(s => ({ value: s, label: s })),
-                          ]}
-                          placeholder="—"
-                        />
-                        <input type="hidden" name="itemSize" value={item.size ?? ''} />
-                      </>
-                    ) : (
-                      <input
-                        name="itemSize" type="text" maxLength={40}
-                        value={item.size ?? ''}
-                        onChange={e => patchItem(i, { size: e.target.value })}
-                        className="admin-form-input"
-                        placeholder="XL"
-                        aria-label="Ukuran"
-                      />
-                    )}
+                    <VariantField
+                      key={`size-${product?.title ?? 'manual'}`}
+                      name="itemSize"
+                      label="Ukuran"
+                      placeholder="XL"
+                      options={sizeOpts}
+                      value={item.size ?? ''}
+                      onChange={v => patchItem(i, { size: v })}
+                    />
                     <input
                       name="itemQuantity" type="number" min={1} step={1}
                       value={item.quantity}

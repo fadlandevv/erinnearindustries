@@ -89,31 +89,78 @@ export function joinAddress(address?: string, city?: string, postalCode?: string
   return parts.join(', ')
 }
 
+/** Warna produk: nama untuk dicetak, hex untuk contoh warna di dropdown. */
+export type InvoiceColorOption = { name: string; hex: string }
+
 /** Produk katalog yang bisa dipilih di baris item invoice. */
 export type InvoiceProductOption = {
   title: string
   unitPrice: number
-  /** Ukuran yang tersedia; jadi pilihan dropdown di kolom Ukuran. */
+  /** Ukuran & warna yang tersedia; jadi pilihan dropdown di kolomnya masing-masing. */
   sizes: string[]
+  colors: InvoiceColorOption[]
+}
+
+/**
+ * Nama warna acuan. Katalog produk hanya menyimpan kode hex tanpa nama, padahal
+ * yang pantas tercetak di invoice adalah namanya — jadi hex dicocokkan ke daftar
+ * ini lewat jarak RGB terdekat. Namanya tebakan terdidik, bukan data resmi;
+ * admin tetap bisa menimpanya lewat opsi "Lainnya".
+ */
+const COLOR_NAMES: [name: string, hex: string][] = [
+  ['Hitam', '#000000'], ['Putih', '#ffffff'], ['Broken White', '#f5f2ec'],
+  ['Krem', '#f0e6d2'], ['Abu Muda', '#c4c4c4'], ['Abu-abu', '#808080'],
+  ['Abu Tua', '#4a5568'], ['Navy', '#1a3a5c'], ['Biru', '#1e40af'],
+  ['Biru Muda', '#60a5fa'], ['Tosca', '#14b8a6'], ['Hijau', '#16a34a'],
+  ['Hijau Army', '#4b5320'], ['Merah', '#dc2626'], ['Maroon', '#7f1d1d'],
+  ['Pink', '#ec4899'], ['Ungu', '#7c3aed'], ['Kuning', '#eab308'],
+  ['Mustard', '#d97706'], ['Oranye', '#f97316'], ['Coklat', '#78350f'],
+]
+
+const hexToRgb = (hex: string): [number, number, number] | null => {
+  const h = hex.trim().replace('#', '')
+  const full = h.length === 3 ? h.split('').map(c => c + c).join('') : h
+  if (!/^[0-9a-f]{6}$/i.test(full)) return null
+  return [0, 2, 4].map(i => parseInt(full.slice(i, i + 2), 16)) as [number, number, number]
+}
+
+/** Nama warna terdekat untuk sebuah hex; kalau tidak terbaca, hex-nya dikembalikan apa adanya. */
+export function colorNameFromHex(hex: string): string {
+  const rgb = hexToRgb(hex)
+  if (!rgb) return hex
+  let best = COLOR_NAMES[0][0]
+  let bestDist = Infinity
+  for (const [name, ref] of COLOR_NAMES) {
+    const refRgb = hexToRgb(ref)!
+    const dist = rgb.reduce((sum, c, i) => sum + (c - refRgb[i]) ** 2, 0)
+    if (dist < bestDist) { bestDist = dist; best = name }
+  }
+  return best
 }
 
 /**
  * Katalog → opsi dropdown. Judul dipakai sebagai nilai opsi, jadi judul kembar
  * (varian yang tercatat dua kali) harus dibuang dulu supaya pilihannya tidak ambigu.
  *
- * Warna sengaja tidak diambil dari katalog: di DB isinya kode hex (`#0d0d0d`)
- * tanpa nama, dan kode hex tidak layak tercetak di invoice pelanggan.
+ * Warna diterjemahkan dari hex ke nama; dua hex yang jatuh ke nama sama
+ * (mis. #000000 dan #0d0d0d → "Hitam") digabung jadi satu pilihan.
  */
 export function toProductOptions(
-  products: { title: string; price: string; sizes?: string[] }[],
+  products: { title: string; price: string; sizes?: string[]; colors?: string[] }[],
 ): InvoiceProductOption[] {
   const byTitle = new Map<string, InvoiceProductOption>()
   for (const p of products) {
     if (!p.title || byTitle.has(p.title)) continue
+    const colors: InvoiceColorOption[] = []
+    for (const hex of p.colors ?? []) {
+      const name = colorNameFromHex(hex)
+      if (!colors.some(c => c.name === name)) colors.push({ name, hex })
+    }
     byTitle.set(p.title, {
       title: p.title,
       unitPrice: parseInt(p.price.replace(/[^\d]/g, ''), 10) || 0,
       sizes: p.sizes ?? [],
+      colors,
     })
   }
   return [...byTitle.values()]
