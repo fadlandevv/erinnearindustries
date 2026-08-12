@@ -84,6 +84,39 @@ function VariantField({
   )
 }
 
+/**
+ * Kartu section yang bisa dibuka-tutup.
+ *
+ * Isinya disembunyikan dengan atribut `hidden`, BUKAN di-unmount — input yang
+ * dilepas dari DOM tidak ikut terkirim saat submit, dan datanya akan hilang
+ * diam-diam. Dengan `hidden` semuanya tetap terkirim seperti biasa.
+ */
+function FormSection({
+  title, open, onToggle, children, footer, className = '',
+}: {
+  title: string
+  open: boolean
+  onToggle: () => void
+  children: React.ReactNode
+  /** Selalu terlihat walau section ditutup (mis. tombol simpan). */
+  footer?: React.ReactNode
+  className?: string
+}) {
+  return (
+    <div className={`admin-form-card inv-section${open ? '' : ' inv-section--closed'} ${className}`}>
+      <button type="button" className="inv-section-head" onClick={onToggle} aria-expanded={open}>
+        <h3 className="admin-form-section-title">{title}</h3>
+        <svg className="inv-section-chevron" width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+          <path d="M3 6l5 5 5-5" stroke="currentColor" strokeWidth="1.7"
+            strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      <div className="inv-section-body" hidden={!open}>{children}</div>
+      {footer}
+    </div>
+  )
+}
+
 /** Input rupiah: tampil "1.500.000" untuk admin, kirim angka mentah ke server. */
 function RupiahInput({
   name, value, onChange, id,
@@ -202,6 +235,17 @@ export default function InvoiceForm({
     })
   }
 
+  // Section yang sedang ditutup. Disimpan di parent supaya bisa dibuka semua
+  // sekaligus saat ada field wajib yang tidak lolos validasi di dalamnya —
+  // browser tidak bisa menyorot input yang tersembunyi.
+  const [closed, setClosed] = useState<Set<string>>(new Set())
+  const isOpen = (key: string) => !closed.has(key)
+  const toggle = (key: string) => setClosed(prev => {
+    const next = new Set(prev)
+    if (!next.delete(key)) next.add(key)
+    return next
+  })
+
   // Kosong → dropdown menampilkan placeholder; ada isian tapi bukan pelanggan
   // terdaftar → dianggap manual.
   const knownCustomer = billTo.email && customers.some(c => c.email === billTo.email)
@@ -209,7 +253,7 @@ export default function InvoiceForm({
   const selectedCustomer = knownCustomer ? billTo.email : hasBillTo ? CUSTOM : ''
 
   return (
-    <form action={formAction}>
+    <form action={formAction} onInvalid={() => setClosed(new Set())}>
       {mode === 'edit' && <input type="hidden" name="id" value={invoiceId} />}
       {initial.orderId && <input type="hidden" name="orderId" value={initial.orderId} />}
 
@@ -222,8 +266,7 @@ export default function InvoiceForm({
       <div className="inv-form-layout">
         <div className="inv-form-col">
           {/* ── Detail invoice ── */}
-          <div className="admin-form-card">
-            <h3 className="admin-form-section-title">Detail Invoice</h3>
+          <FormSection title="Detail Invoice" open={isOpen('detail')} onToggle={() => toggle('detail')}>
             <div className="inv-form-row-3">
               <div className="admin-form-group">
                 <label htmlFor="issueDate">Tanggal Invoice</label>
@@ -249,11 +292,10 @@ export default function InvoiceForm({
                 Terhubung ke order <strong>{initial.orderId.slice(-6).toUpperCase()}</strong>
               </p>
             )}
-          </div>
+          </FormSection>
 
           {/* ── Ditagihkan kepada ── */}
-          <div className="admin-form-card">
-            <h3 className="admin-form-section-title">Ditagihkan Kepada</h3>
+          <FormSection title="Ditagihkan Kepada" open={isOpen('billto')} onToggle={() => toggle('billto')}>
 
             {customers.length > 0 && (
               <div className="admin-form-group">
@@ -293,11 +335,10 @@ export default function InvoiceForm({
                 value={billTo.address} onChange={e => setBillTo(b => ({ ...b, address: e.target.value }))}
                 className="admin-form-textarea" />
             </div>
-          </div>
+          </FormSection>
 
           {/* ── Item ── */}
-          <div className="admin-form-card">
-            <h3 className="admin-form-section-title">Item Tagihan</h3>
+          <FormSection title="Item Tagihan" open={isOpen('items')} onToggle={() => toggle('items')}>
 
             <div className="inv-items-editor">
               <div className="inv-item-row inv-item-row--head">
@@ -398,7 +439,7 @@ export default function InvoiceForm({
             >
               + Tambah Item
             </button>
-          </div>
+          </FormSection>
 
         </div>
 
@@ -462,13 +503,12 @@ export default function InvoiceForm({
             </div>
           </div>
 
-          <div className="admin-form-card">
+          {/* Catatan mengisi sisa tinggi kolom sampai ke bawah. */}
+          <div className="admin-form-card inv-notes-card">
             <h3 className="admin-form-section-title">Catatan</h3>
-            <div className="admin-form-group" style={{ marginBottom: 0 }}>
-              <textarea name="notes" rows={3} maxLength={600}
-                defaultValue={initial.notes} className="admin-form-textarea"
-                placeholder="Syarat pembayaran, instruksi transfer, terima kasih…" />
-            </div>
+            <textarea name="notes" maxLength={600}
+              defaultValue={initial.notes} className="admin-form-textarea"
+              placeholder="Syarat pembayaran, instruksi transfer, terima kasih…" />
           </div>
         </div>
       </div>

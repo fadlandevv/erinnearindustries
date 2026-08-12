@@ -2065,6 +2065,50 @@
 .inv-form-col { display: flex; flex-direction: column; gap: 12px; }
 .inv-form-col .admin-form-card,
 .inv-summary-card { padding: 20px 22px; }
+
+/* Section yang bisa dibuka-tutup */
+.inv-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+/* Menang atas `.inv-form-layout .admin-form-section-title` yang datang belakangan:
+   di dalam header, judul tidak boleh punya margin bawah — margin itulah yang
+   membuat teksnya menempel ke atas alih-alih sejajar dengan ikon panah. */
+.inv-form-layout .inv-section-head .admin-form-section-title { margin-bottom: 0; }
+.inv-section-chevron {
+  flex-shrink: 0;
+  color: #aaa;
+  transition: transform 0.18s ease, color 0.15s;
+}
+.inv-section-head:hover .inv-section-chevron { color: #0d0d0d; }
+.inv-section--closed .inv-section-chevron { transform: rotate(-90deg); }
+/* Jarak judul→isi hanya perlu saat terbuka; kalau ditutup kartunya rapat. */
+.inv-section .inv-section-body { margin-top: 12px; }
+.inv-section .inv-section-body > *:last-child { margin-bottom: 0; }
+.inv-section--closed .admin-form-actions { margin-top: 12px; }
+
+/* Catatan memakan sisa tinggi kolom kanan; textarea-nya ikut memanjang. */
+.inv-notes-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 120px;
+}
+.inv-form-layout .inv-notes-card .admin-form-textarea {
+  flex: 1;
+  margin-top: 12px;
+  resize: none;
+}
 .inv-form-row-3 > .admin-form-group,
 .inv-form-layout .admin-form-grid > .admin-form-group { margin-bottom: 0; }
 /* Jarak dipindah dari tiap field ke barisnya, supaya tidak berlipat. */
@@ -2115,7 +2159,14 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
   gap: 16px;
-  align-items: start;
+  /* stretch (bukan start) supaya kolom kanan setinggi kolom kiri — itu yang
+     memberi Catatan ruang sisa untuk diisi sampai ke bawah. */
+  align-items: stretch;
+  /* Form selalu setinggi sisa layar: 109px terpakai page header + padding atas
+     .admin-main, 32px untuk padding bawahnya. Kolom kiri boleh lebih panjang
+     (min-height, bukan height), tapi tidak pernah lebih pendek — jadi kartu
+     Catatan tetap turun sampai dasar layar walau section lain ditutup. */
+  min-height: calc(100vh - 141px);
 }
 /* Sticky dimatikan: kolom kanan sekarang ikut menampung Catatan, dan formnya
    sudah muat satu layar sehingga tidak ada yang perlu "mengikuti" scroll. */
@@ -2445,6 +2496,8 @@
 [data-theme="dark"] .inv-order-link { color: #888; border-bottom-color: #333; }
 [data-theme="dark"] .inv-item-row--head { color: #666; }
 [data-theme="dark"] .inv-item-row { border-bottom-color: #1e1e1e; }
+[data-theme="dark"] .inv-section-chevron { color: #666; }
+[data-theme="dark"] .inv-section-head:hover .inv-section-chevron { color: #f0ede8; }
 [data-theme="dark"] .inv-back-btn { color: #888; border-color: #2a2a2a; }
 [data-theme="dark"] .inv-back-btn:hover { background: #1a1a1a; color: #f0ede8; border-color: #333; }
 [data-theme="dark"] .inv-money-prefix,
