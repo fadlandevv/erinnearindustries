@@ -112,22 +112,34 @@ export async function createInvoice(
   throw new Error('Gagal mendapatkan nomor invoice, coba lagi.')
 }
 
+/**
+ * Patch parsial. Field yang *ada* di `patch` selalu ditulis, termasuk kalau
+ * nilainya `undefined` — itulah cara admin mengosongkan jatuh tempo atau catatan
+ * lewat form edit. Field yang tidak disebut sama sekali dibiarkan apa adanya.
+ */
 export async function updateInvoice(
   id: string,
   patch: Partial<Omit<Invoice, 'id' | 'number' | 'createdAt'>>,
 ): Promise<void> {
   const row: Record<string, unknown> = { updated_at: new Date().toISOString() }
-  if (patch.orderId !== undefined) row.order_id = patch.orderId ?? null
-  if (patch.issueDate !== undefined) row.issue_date = patch.issueDate
-  if (patch.dueDate !== undefined) row.due_date = patch.dueDate ?? null
-  if (patch.status !== undefined) row.status = patch.status
-  if (patch.billTo !== undefined) row.bill_to = patch.billTo
-  if (patch.items !== undefined) row.items = patch.items
-  if (patch.discount !== undefined) row.discount = patch.discount
-  if (patch.shipping !== undefined) row.shipping = patch.shipping
-  if (patch.taxPercent !== undefined) row.tax_percent = patch.taxPercent
-  if (patch.paidAmount !== undefined) row.paid_amount = patch.paidAmount
-  if (patch.notes !== undefined) row.notes = patch.notes ?? null
+  const set = (key: keyof typeof patch, column: string, nullable = false) => {
+    if (!(key in patch)) return
+    const value = patch[key]
+    if (value === undefined && !nullable) return
+    row[column] = value ?? null
+  }
+
+  set('orderId', 'order_id', true)
+  set('issueDate', 'issue_date')
+  set('dueDate', 'due_date', true)
+  set('status', 'status')
+  set('billTo', 'bill_to')
+  set('items', 'items')
+  set('discount', 'discount')
+  set('shipping', 'shipping')
+  set('taxPercent', 'tax_percent')
+  set('paidAmount', 'paid_amount')
+  set('notes', 'notes', true)
 
   const { error } = await db.from('invoices').update(row).eq('id', id)
   if (error) throw new Error(error.message)
