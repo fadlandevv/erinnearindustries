@@ -18,8 +18,8 @@ import {
 } from './resellers'
 import { adjustStock, upsertSizeEntry } from './warehouse'
 import { saveManualEntry, deleteManualEntry, type RekapSource } from './rekap'
-import { savePembukuanEntry, deletePembukuanEntry, type EntryType } from './pembukuan'
-import { createInvoice, updateInvoice, deleteInvoice as _deleteInvoice } from './invoices'
+import { savePembukuanEntry, deletePembukuanEntry, syncInvoiceIncome, removeInvoiceIncome, type EntryType } from './pembukuan'
+import { createInvoice, updateInvoice, getInvoiceById, deleteInvoice as _deleteInvoice } from './invoices'
 import { INVOICE_STATUSES, type InvoiceItem, type InvoiceStatus } from './invoice-constants'
 import { logAdminAccess } from './access-log'
 import { getPricingItems, upsertPricingItem, insertPricingItem, deletePricingItem } from './pricing'
@@ -1114,15 +1114,26 @@ export async function createInvoiceAction(
   const parsed = parseInvoiceForm(formData)
   if (!parsed.ok) return { error: parsed.error }
 
-  let id: string
+  let invoice: Awaited<ReturnType<typeof createInvoice>>
   try {
-    const invoice = await createInvoice({ ...parsed.value, createdBy: guard.session.admin.username })
-    id = invoice.id
+    invoice = await createInvoice({ ...parsed.value, createdBy: guard.session.admin.username })
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Gagal menyimpan invoice.' }
   }
 
+  // Sengaja di luar try di atas: invoice-nya sudah tersimpan. Kalau kegagalan
+  // pencatatan ikut dilaporkan sebagai error form, admin akan menekan Simpan
+  // lagi dan membuat invoice kembar. Pembukuan bisa diselaraskan ulang cukup
+  // dengan menyimpan ulang invoice-nya.
+  try {
+    await syncInvoiceIncome(invoice)
+  } catch (e) {
+    console.error('Gagal mencatat invoice ke pembukuan:', e)
+  }
+  const id = invoice.id
+
   revalidatePath('/admin/invoices')
+  revalidatePath('/admin/pembukuan')
   redirect(`/admin/invoices/${id}`)
 }
 
@@ -1144,8 +1155,15 @@ export async function updateInvoiceAction(
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Gagal menyimpan invoice.' }
   }
+  try {
+    const saved = await getInvoiceById(id)
+    if (saved) await syncInvoiceIncome(saved)
+  } catch (e) {
+    console.error('Gagal mencatat invoice ke pembukuan:', e)
+  }
 
   revalidatePath('/admin/invoices')
+  revalidatePath('/admin/pembukuan')
   redirect(`/admin/invoices/${id}`)
 }
 
@@ -1156,8 +1174,69 @@ export async function updateInvoiceStatusAction(formData: FormData): Promise<voi
   if (!id || !INVOICE_STATUSES.includes(status)) return
 
   await updateInvoice(id, { status })
+  try {
+    const saved = await getInvoiceById(id)
+    if (saved) await syncInvoiceIncome(saved)
+  } catch (e) {
+    console.error('Gagal mencatat invoice ke pembukuan:', e)
+  }
+
   revalidatePath('/admin/invoices')
   revalidatePath(`/admin/invoices/${id}`)
+  revalidatePath('/admin/pembukuan')
+}
+
+const PROOF_MAX_BYTES = 5 * 1024 * 1024
+const PROOF_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+
+/** Unggah bukti transfer untuk sebuah invoice. Mengganti berkas lama bila ada. */
+export async function uploadPaymentProofAction(
+  _prev: { error?: string; url?: string } | null,
+  formData: FormData,
+): Promise<{ error?: string; url?: string }> {
+  const { error: authError } = await guardAdmin('invoices')
+  if (authError) return { error: authError }
+
+  const id = String(formData.get('invoiceId') ?? '').trim()
+  const file = formData.get('proof')
+  if (!id) return { error: 'Invoice tidak ditemukan.' }
+  if (!(file instanceof File) || file.size === 0) return { error: 'Pilih berkas bukti transfer dulu.' }
+  if (file.size > PROOF_MAX_BYTES) return { error: 'Ukuran berkas maksimal 5 MB.' }
+  if (!PROOF_TYPES.includes(file.type)) return { error: 'Format harus JPG, PNG, WEBP, atau PDF.' }
+
+  const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+  // Nama berkas memakai timestamp supaya URL lama tidak tertahan cache CDN
+  // saat admin mengganti buktinya.
+  const path = `invoices/${id}/bukti-${Date.now()}.${ext}`
+  const { error: upErr } = await db.storage.from('images').upload(path, Buffer.from(await file.arrayBuffer()), {
+    upsert: true,
+    contentType: file.type,
+  })
+  if (upErr) return { error: upErr.message }
+
+  const { data: { publicUrl } } = db.storage.from('images').getPublicUrl(path)
+  try {
+    await updateInvoice(id, { paymentProof: publicUrl })
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Gagal menyimpan bukti transfer.' }
+  }
+
+  revalidatePath('/admin/invoices')
+  revalidatePath(`/admin/invoices/${id}`)
+  return { url: publicUrl }
+}
+
+export async function removePaymentProofAction(id: string): Promise<{ error?: string }> {
+  const { error: authError } = await guardAdmin('invoices')
+  if (authError) return { error: authError }
+  try {
+    await updateInvoice(id, { paymentProof: undefined })
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Gagal menghapus bukti transfer.' }
+  }
+  revalidatePath('/admin/invoices')
+  revalidatePath(`/admin/invoices/${id}`)
+  return {}
 }
 
 export async function deleteInvoiceAction(id: string): Promise<{ error?: string }> {
@@ -1165,11 +1244,13 @@ export async function deleteInvoiceAction(id: string): Promise<{ error?: string 
   if (authError) return { error: authError }
 
   try {
+    await removeInvoiceIncome(id)
     await _deleteInvoice(id)
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Gagal menghapus invoice.' }
   }
   revalidatePath('/admin/invoices')
+  revalidatePath('/admin/pembukuan')
   return {}
 }
 

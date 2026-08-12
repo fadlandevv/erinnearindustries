@@ -27,6 +27,7 @@ function toInvoice(row: Record<string, unknown>): Invoice {
     paidAmount: Number(row.paid_amount ?? 0),
     notes: (row.notes as string) ?? undefined,
     createdBy: (row.created_by as string) ?? undefined,
+    paymentProof: (row.payment_proof as string) ?? undefined,
     createdAt: row.created_at as string,
     updatedAt: (row.updated_at as string) ?? undefined,
   }
@@ -48,6 +49,7 @@ function toRow(inv: Invoice) {
     paid_amount: inv.paidAmount,
     notes: inv.notes ?? null,
     created_by: inv.createdBy ?? null,
+    payment_proof: inv.paymentProof ?? null,
   }
 }
 
@@ -143,6 +145,7 @@ export async function updateInvoice(
   set('taxPercent', 'tax_percent')
   set('paidAmount', 'paid_amount')
   set('notes', 'notes', true)
+  set('paymentProof', 'payment_proof', true)
 
   const { error } = await db.from('invoices').update(row).eq('id', id)
   if (error) throw new Error(error.message)

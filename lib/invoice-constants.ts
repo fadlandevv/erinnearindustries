@@ -46,6 +46,8 @@ export type Invoice = {
   paidAmount: number         // DP / pembayaran yang sudah masuk
   notes?: string
   createdBy?: string
+  /** URL bukti transfer yang diunggah admin untuk verifikasi. */
+  paymentProof?: string
   createdAt: string
   updatedAt?: string
 }

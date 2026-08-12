@@ -3,6 +3,8 @@ import { useMemo, useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { deleteInvoiceAction } from '@/lib/actions'
+import AdminSelect from '@/components/AdminSelect'
+import PaymentProof from './PaymentProof'
 import { useAdminToast } from '@/context/AdminToastContext'
 import {
   computeInvoiceTotals, formatInvoiceDate, formatRupiah, isOverdue,
@@ -47,22 +49,31 @@ export default function InvoicesClient({ invoices }: { invoices: Invoice[] }) {
 
   return (
     <>
-      <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
-        <input
-          type="text" value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Cari nomor invoice atau nama…"
-          className="admin-search-input" style={{ flex: '1 1 220px', minWidth: 0 }}
-        />
-        <select
-          value={status} onChange={e => setStatus(e.target.value as typeof status)}
-          className="admin-select-inline"
-        >
-          <option value="all">Semua Status</option>
-          <option value="draft">Draft</option>
-          <option value="sent">Terkirim</option>
-          <option value="paid">Lunas</option>
-          <option value="cancelled">Batal</option>
-        </select>
+      <div className="inv-filter-bar">
+        <div className="inv-search">
+          <svg className="inv-search-icon" width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden>
+            <circle cx="7" cy="7" r="4.6" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M10.5 10.5L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+          <input
+            type="text" value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Cari nomor invoice atau nama pelanggan…"
+            className="admin-form-input" aria-label="Cari invoice"
+          />
+        </div>
+        <div className="inv-filter-select">
+          <AdminSelect
+            value={status}
+            onChange={v => setStatus(v as typeof status)}
+            options={[
+              { value: 'all', label: 'Semua Status' },
+              { value: 'draft', label: 'Draft' },
+              { value: 'sent', label: 'Terkirim' },
+              { value: 'paid', label: 'Lunas' },
+              { value: 'cancelled', label: 'Batal' },
+            ]}
+          />
+        </div>
       </div>
 
       {filtered.length === 0 ? (
@@ -79,7 +90,6 @@ export default function InvoicesClient({ invoices }: { invoices: Invoice[] }) {
                 <th>Ditagihkan Kepada</th>
                 <th>Jatuh Tempo</th>
                 <th style={{ textAlign: 'right' }}>Total</th>
-                <th style={{ textAlign: 'right' }}>Sisa</th>
                 <th>Status</th>
                 <th />
               </tr>
@@ -108,9 +118,6 @@ export default function InvoicesClient({ invoices }: { invoices: Invoice[] }) {
                       {overdue && <span className="inv-overdue-tag">Lewat tempo</span>}
                     </td>
                     <td style={{ textAlign: 'right' }}>{formatRupiah(totals.total)}</td>
-                    <td style={{ textAlign: 'right', fontWeight: totals.balance > 0 ? 600 : 400 }}>
-                      {formatRupiah(totals.balance)}
-                    </td>
                     <td>
                       <span className={`admin-badge ${statusBadge[inv.status]}`}>
                         {INVOICE_STATUS_LABELS[inv.status]}
@@ -118,6 +125,7 @@ export default function InvoicesClient({ invoices }: { invoices: Invoice[] }) {
                     </td>
                     <td>
                       <div className="admin-table-actions">
+                        <PaymentProof invoiceId={inv.id} url={inv.paymentProof} />
                         <Link href={`/admin/invoices/${inv.id}`} className="btn-admin-edit">Lihat</Link>
                         <button type="button" className="btn-admin-danger"
                           onClick={() => handleDelete(inv)} disabled={pending}>

@@ -9,6 +9,8 @@ export type PembukuanEntry = {
   amount: number
   note?: string
   filledBy?: string
+  /** Terisi kalau entri ini dibuat otomatis dari sebuah invoice yang lunas. */
+  invoiceId?: string
   createdAt: string
 }
 
