@@ -2214,6 +2214,11 @@
   max-width: 860px;
   color: #0d0d0d;
 }
+/* globals.css memberi setiap <p> margin-bawah 16px — terlalu renggang untuk
+   dokumen invoice yang barisnya pendek-pendek (alamat, email, telepon). */
+.inv-doc p { margin-bottom: 8px; }
+.inv-doc p:last-child { margin-bottom: 0; }
+
 .inv-doc-head {
   display: flex;
   justify-content: space-between;
