@@ -2176,14 +2176,16 @@
 .inv-summary-card .admin-form-group { margin-bottom: 12px; }
 .inv-summary-card .admin-form-actions { margin-top: 16px; }
 
-.inv-items-editor { display: flex; flex-direction: column; gap: 8px; }
+/* Dibatasi lebarnya: tanpa ini kolom Deskripsi (1fr) menelan semua ruang sisa
+   di layar lebar dan barisnya jadi melar. */
+.inv-items-editor { display: flex; flex-direction: column; gap: 8px; max-width: 900px; }
 .inv-item-row {
   /* Tinggi kontrol dipatok eksplisit supaya jumlah & tombol hapus sejajar dengan
      input di baris yang sama — sel deskripsi bisa memanjang saat input manual
      muncul, jadi perataan tidak bisa diserahkan ke tinggi baris grid. */
   --inv-ctl-h: 42px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 122px 88px 54px 118px 130px 30px;
+  grid-template-columns: minmax(0, 1fr) 148px 92px 56px 120px 132px 30px;
   gap: 7px;
   align-items: start;
 }

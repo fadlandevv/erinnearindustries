@@ -89,16 +89,13 @@ export function joinAddress(address?: string, city?: string, postalCode?: string
   return parts.join(', ')
 }
 
-/** Warna produk: nama untuk dicetak, hex untuk contoh warna di dropdown. */
-export type InvoiceColorOption = { name: string; hex: string }
-
 /** Produk katalog yang bisa dipilih di baris item invoice. */
 export type InvoiceProductOption = {
   title: string
   unitPrice: number
-  /** Ukuran & warna yang tersedia; jadi pilihan dropdown di kolomnya masing-masing. */
+  /** Ukuran & nama warna yang tersedia; jadi pilihan dropdown di kolomnya masing-masing. */
   sizes: string[]
-  colors: InvoiceColorOption[]
+  colors: string[]
 }
 
 /**
@@ -151,10 +148,10 @@ export function toProductOptions(
   const byTitle = new Map<string, InvoiceProductOption>()
   for (const p of products) {
     if (!p.title || byTitle.has(p.title)) continue
-    const colors: InvoiceColorOption[] = []
+    const colors: string[] = []
     for (const hex of p.colors ?? []) {
       const name = colorNameFromHex(hex)
-      if (!colors.some(c => c.name === name)) colors.push({ name, hex })
+      if (!colors.includes(name)) colors.push(name)
     }
     byTitle.set(p.title, {
       title: p.title,

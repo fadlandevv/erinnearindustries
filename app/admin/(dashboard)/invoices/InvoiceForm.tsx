@@ -19,7 +19,7 @@ const CUSTOM = '__custom__'
  */
 const selectOnFocus = (e: React.FocusEvent<HTMLInputElement>) => e.target.select()
 
-type VariantOption = { value: string; label: string; swatch?: string }
+type VariantOption = { value: string; label: string }
 
 /**
  * Pilihan varian untuk satu baris item: kosong, milik produk, lalu "Lainnya".
@@ -204,7 +204,7 @@ export default function InvoiceForm({
     // Varian dipertahankan hanya kalau produk baru juga menyediakannya, supaya
     // tidak tersisa warna/ukuran milik produk sebelumnya.
     const keepSize = product?.sizes.includes(items[i].size ?? '') ? items[i].size : undefined
-    const keepColor = product?.colors.some(c => c.name === items[i].color) ? items[i].color : undefined
+    const keepColor = product?.colors.includes(items[i].color ?? '') ? items[i].color : undefined
     patchItem(i, {
       description: value,
       unitPrice: product?.unitPrice ?? 0,
@@ -355,7 +355,7 @@ export default function InvoiceForm({
                 const isManual = manualRows.has(i)
                 const product = isManual ? undefined : products.find(p => p.title === item.description)
                 const colorOpts = variantOptions(
-                  (product?.colors ?? []).map(c => ({ value: c.name, label: c.name, swatch: c.hex })),
+                  (product?.colors ?? []).map(c => ({ value: c, label: c })),
                   item.color,
                 )
                 const sizeOpts = variantOptions(
