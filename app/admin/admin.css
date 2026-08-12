@@ -2524,9 +2524,32 @@
   .admin-toast-wrap,
   .inv-no-print { display: none !important; }
 
-  /* `min-height: 100vh` di layar mengunci tinggi jadi persis satu halaman saat
-     dicetak — invoice yang lebih panjang terpotong, bukan lanjut ke halaman
-     berikutnya. Tingginya harus dibiarkan mengikuti isi. */
+  /* Root layout tetap merender kroma situs publik (navbar, footer, chatbot,
+     keranjang) di belakang area admin. Di layar mereka tertutup .admin-overlay
+     yang `fixed`; begitu overlay itu dikembalikan ke aliran normal untuk cetak,
+     mereka ikut muncul di kertas. Harus disembunyikan eksplisit. */
+  .navbar,
+  .footer,
+  .chatbot-fab,
+  .chatbot-window,
+  .cart-backdrop,
+  .cart-drawer { display: none !important; }
+
+  /* Seluruh area admin dibungkus .admin-overlay yang `position: fixed` + 100vh.
+     Isi elemen fixed tidak bisa dipecah browser ke halaman berikutnya, jadi apa
+     pun yang melebihi satu halaman terpotong. Untuk media cetak pembungkus itu
+     harus dikembalikan ke aliran normal. */
+  .admin-overlay {
+    position: static !important;
+    inset: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  /* `min-height: 100vh` di layar juga mengunci tinggi jadi persis satu halaman.
+     Tingginya harus dibiarkan mengikuti isi. */
   .admin-layout-wrapper,
   .admin-content,
   .admin-main {
