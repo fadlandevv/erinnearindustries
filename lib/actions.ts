@@ -1218,7 +1218,14 @@ export async function uploadPaymentProofAction(
   try {
     await updateInvoice(id, { paymentProof: publicUrl })
   } catch (e) {
-    return { error: e instanceof Error ? e.message : 'Gagal menyimpan bukti transfer.' }
+    // Berkasnya sudah terlanjur naik ke storage; kalau baris DB gagal ditulis,
+    // buang lagi supaya tidak meninggalkan file yatim yang tak terjangkau UI.
+    await db.storage.from('images').remove([path])
+    const raw = e instanceof Error ? e.message : ''
+    if (raw.includes('payment_proof')) {
+      return { error: 'Kolom payment_proof belum ada di database. Jalankan dulu SQL migrasi di Supabase SQL Editor.' }
+    }
+    return { error: raw || 'Gagal menyimpan bukti transfer.' }
   }
 
   revalidatePath('/admin/invoices')
