@@ -59,7 +59,8 @@ export default async function NewInvoicePage({
       address: joinAddress(order.customer.address, order.customer.city, order.customer.postalCode),
     }
     draft.items = order.items.map(it => ({
-      description: `${it.title}${it.size ? ` — Size ${it.size}` : ''}`,
+      description: it.title,
+      ...(it.size ? { size: it.size } : {}),
       quantity: it.quantity,
       unitPrice: it.unitPrice,
     }))

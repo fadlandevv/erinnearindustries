@@ -103,7 +103,10 @@ export default function InvoiceForm({
     }
     const product = products.find(p => p.title === value)
     // Harga katalog hanya jadi titik awal — admin tetap bisa menimpanya.
-    patchItem(i, { description: value, unitPrice: product?.unitPrice ?? 0 })
+    // Ukuran ikut dikosongkan kalau produk baru tidak menyediakannya, supaya
+    // tidak tersisa ukuran milik produk sebelumnya.
+    const keepSize = product?.sizes.includes(items[i].size ?? '') ? items[i].size : undefined
+    patchItem(i, { description: value, unitPrice: product?.unitPrice ?? 0, size: keepSize })
   }
 
   function pickCustomer(value: string) {
@@ -196,18 +199,12 @@ export default function InvoiceForm({
               </div>
             )}
 
-            <div className="inv-form-row-3">
+            <div className="admin-form-grid">
               <div className="admin-form-group">
                 <label htmlFor="billName">Nama / Perusahaan</label>
                 <input id="billName" name="billName" type="text" required maxLength={120}
                   value={billTo.name} onChange={e => setBillTo(b => ({ ...b, name: e.target.value }))}
                   className="admin-form-input" placeholder="PT Contoh Jaya" />
-              </div>
-              <div className="admin-form-group">
-                <label htmlFor="billEmail">Email</label>
-                <input id="billEmail" name="billEmail" type="email" maxLength={120}
-                  value={billTo.email} onChange={e => setBillTo(b => ({ ...b, email: e.target.value }))}
-                  className="admin-form-input" placeholder="billing@contoh.com" />
               </div>
               <div className="admin-form-group">
                 <label htmlFor="billPhone">Telepon</label>
@@ -216,6 +213,9 @@ export default function InvoiceForm({
                   className="admin-form-input" placeholder="08xxxxxxxxxx" />
               </div>
             </div>
+            {/* Email tidak lagi diisi manual, tapi tetap ikut tersimpan: itu yang
+                menautkan invoice ke pelanggan saat form dibuka lagi. */}
+            <input type="hidden" name="billEmail" value={billTo.email} />
             <div className="admin-form-group" style={{ marginBottom: 0 }}>
               <label htmlFor="billAddress">Alamat</label>
               <textarea id="billAddress" name="billAddress" rows={2} maxLength={400}
@@ -231,6 +231,8 @@ export default function InvoiceForm({
             <div className="inv-items-editor">
               <div className="inv-item-row inv-item-row--head">
                 <span>Deskripsi</span>
+                <span>Warna</span>
+                <span>Ukuran</span>
                 <span>Qty</span>
                 <span>Harga Satuan</span>
                 <span>Jumlah</span>
@@ -239,6 +241,7 @@ export default function InvoiceForm({
 
               {items.map((item, i) => {
                 const isManual = manualRows.has(i)
+                const sizeChoices = products.find(p => p.title === item.description)?.sizes ?? []
                 return (
                   <div className="inv-item-row" key={i}>
                     <div className="inv-item-desc">
@@ -261,6 +264,37 @@ export default function InvoiceForm({
                       {/* Deskripsi selalu dikirim lewat field ini, apa pun modenya. */}
                       <input type="hidden" name="itemDescription" value={item.description} />
                     </div>
+                    <input
+                      name="itemColor" type="text" maxLength={40}
+                      value={item.color ?? ''}
+                      onChange={e => patchItem(i, { color: e.target.value })}
+                      className="admin-form-input"
+                      placeholder="Hitam"
+                      aria-label="Warna"
+                    />
+                    {sizeChoices.length > 0 && !isManual ? (
+                      <>
+                        <AdminSelect
+                          value={item.size ?? ''}
+                          onChange={v => patchItem(i, { size: v })}
+                          options={[
+                            { value: '', label: '—' },
+                            ...sizeChoices.map(s => ({ value: s, label: s })),
+                          ]}
+                          placeholder="—"
+                        />
+                        <input type="hidden" name="itemSize" value={item.size ?? ''} />
+                      </>
+                    ) : (
+                      <input
+                        name="itemSize" type="text" maxLength={40}
+                        value={item.size ?? ''}
+                        onChange={e => patchItem(i, { size: e.target.value })}
+                        className="admin-form-input"
+                        placeholder="XL"
+                        aria-label="Ukuran"
+                      />
+                    )}
                     <input
                       name="itemQuantity" type="number" min={1} step={1}
                       value={item.quantity}

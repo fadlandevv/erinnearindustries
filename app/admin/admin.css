@@ -2093,8 +2093,8 @@
 .inv-items-editor { display: flex; flex-direction: column; gap: 8px; }
 .inv-item-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 76px 150px 120px 32px;
-  gap: 8px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr) 78px 62px 128px minmax(0, 0.75fr) 30px;
+  gap: 7px;
   align-items: start;
 }
 .inv-item-row > .admin-form-input,
@@ -2113,9 +2113,9 @@
   letter-spacing: 0.06em;
   padding-bottom: 2px;
 }
-.inv-item-row--head > span:nth-child(2),
-.inv-item-row--head > span:nth-child(3),
-.inv-item-row--head > span:nth-child(4) { text-align: right; }
+.inv-item-row--head > span:nth-child(4),
+.inv-item-row--head > span:nth-child(5),
+.inv-item-row--head > span:nth-child(6) { text-align: right; }
 .inv-item-amount {
   font-size: 13px;
   font-weight: 600;
@@ -2275,7 +2275,14 @@
   .inv-form-row-3 { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
-  .inv-item-row { grid-template-columns: minmax(0, 1fr) 64px 130px 32px; }
+  /* Terlalu sempit untuk 7 kolom: deskripsi satu baris penuh, sisanya berpasangan. */
+  .inv-item-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    row-gap: 7px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0ede8;
+  }
+  .inv-item-row > .inv-item-desc { grid-column: 1 / -1; }
   .inv-status-form { flex-wrap: wrap; }
   .inv-status-select { width: 100%; }
   .inv-item-row--head { display: none; }
@@ -2317,6 +2324,7 @@
 [data-theme="dark"] .inv-overdue-tag { background: #2a0a0a; color: #f87171; }
 [data-theme="dark"] .inv-order-link { color: #888; border-bottom-color: #333; }
 [data-theme="dark"] .inv-item-row--head { color: #666; }
+[data-theme="dark"] .inv-item-row { border-bottom-color: #1e1e1e; }
 [data-theme="dark"] .inv-status-form-label { color: #888; }
 [data-theme="dark"] .inv-money-prefix,
 [data-theme="dark"] .inv-money-suffix { color: #666; }

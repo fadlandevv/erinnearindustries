@@ -13,9 +13,16 @@ export const INVOICE_STATUS_LABELS: Record<InvoiceStatus, string> = {
 
 export type InvoiceItem = {
   description: string
+  /** Nama warna sebagaimana dicetak, mis. "Hitam" — bukan kode hex. */
+  color?: string
+  size?: string
   quantity: number
   unitPrice: number
 }
+
+/** Apakah ada item yang mengisi varian, untuk memutuskan kolom dicetak atau tidak. */
+export const hasVariants = (items: InvoiceItem[], key: 'color' | 'size') =>
+  items.some(it => Boolean(it[key]))
 
 export type InvoiceBillTo = {
   name: string
@@ -83,14 +90,22 @@ export function joinAddress(address?: string, city?: string, postalCode?: string
 }
 
 /** Produk katalog yang bisa dipilih di baris item invoice. */
-export type InvoiceProductOption = { title: string; unitPrice: number }
+export type InvoiceProductOption = {
+  title: string
+  unitPrice: number
+  /** Ukuran yang tersedia; jadi pilihan dropdown di kolom Ukuran. */
+  sizes: string[]
+}
 
 /**
  * Katalog → opsi dropdown. Judul dipakai sebagai nilai opsi, jadi judul kembar
  * (varian yang tercatat dua kali) harus dibuang dulu supaya pilihannya tidak ambigu.
+ *
+ * Warna sengaja tidak diambil dari katalog: di DB isinya kode hex (`#0d0d0d`)
+ * tanpa nama, dan kode hex tidak layak tercetak di invoice pelanggan.
  */
 export function toProductOptions(
-  products: { title: string; price: string }[],
+  products: { title: string; price: string; sizes?: string[] }[],
 ): InvoiceProductOption[] {
   const byTitle = new Map<string, InvoiceProductOption>()
   for (const p of products) {
@@ -98,6 +113,7 @@ export function toProductOptions(
     byTitle.set(p.title, {
       title: p.title,
       unitPrice: parseInt(p.price.replace(/[^\d]/g, ''), 10) || 0,
+      sizes: p.sizes ?? [],
     })
   }
   return [...byTitle.values()]

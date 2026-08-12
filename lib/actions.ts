@@ -1054,6 +1054,8 @@ function parseInvoiceForm(formData: FormData):
   if (dueDate && dueDate < issueDate) return { ok: false, error: 'Jatuh tempo tidak boleh sebelum tanggal invoice.' }
 
   const descs = formData.getAll('itemDescription').map(v => String(v).trim())
+  const colors = formData.getAll('itemColor').map(v => String(v).trim())
+  const sizes = formData.getAll('itemSize').map(v => String(v).trim())
   const qtys = formData.getAll('itemQuantity')
   const prices = formData.getAll('itemUnitPrice')
 
@@ -1063,7 +1065,15 @@ function parseInvoiceForm(formData: FormData):
     const quantity = Math.round(Number(qtys[i] ?? 0))
     if (!Number.isFinite(quantity) || quantity <= 0)
       return { ok: false, error: `Qty item "${descs[i]}" harus lebih dari 0.` }
-    items.push({ description: descs[i], quantity, unitPrice: toAmount(prices[i]) })
+    items.push({
+      description: descs[i],
+      // Varian opsional — jangan simpan string kosong supaya kolomnya
+      // benar-benar hilang dari invoice yang tidak memakainya.
+      ...(colors[i] ? { color: colors[i] } : {}),
+      ...(sizes[i] ? { size: sizes[i] } : {}),
+      quantity,
+      unitPrice: toAmount(prices[i]),
+    })
   }
   if (items.length === 0) return { ok: false, error: 'Minimal satu item harus diisi.' }
 

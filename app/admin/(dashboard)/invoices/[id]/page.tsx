@@ -4,7 +4,7 @@ import { getCurrentAdmin } from '@/lib/auth'
 import { hasPermission } from '@/lib/rbac'
 import { getInvoiceById } from '@/lib/invoices'
 import {
-  computeInvoiceTotals, formatInvoiceDate, formatRupiah, isOverdue,
+  computeInvoiceTotals, formatInvoiceDate, formatRupiah, hasVariants, isOverdue,
   INVOICE_ISSUER, INVOICE_STATUSES, INVOICE_STATUS_LABELS,
 } from '@/lib/invoice-constants'
 import { updateInvoiceStatusAction } from '@/lib/actions'
@@ -28,6 +28,10 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
 
   const totals = computeInvoiceTotals(invoice)
   const overdue = isOverdue(invoice)
+  // Invoice jasa tidak punya varian — kolomnya disembunyikan daripada
+  // mencetak sekolom strip.
+  const showColor = hasVariants(invoice.items, 'color')
+  const showSize = hasVariants(invoice.items, 'size')
 
   return (
     <>
@@ -117,6 +121,8 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
             <tr>
               <th style={{ width: '48px' }}>No</th>
               <th>Deskripsi</th>
+              {showColor && <th style={{ width: '110px' }}>Warna</th>}
+              {showSize && <th style={{ width: '90px' }}>Ukuran</th>}
               <th style={{ textAlign: 'right', width: '70px' }}>Qty</th>
               <th style={{ textAlign: 'right', width: '140px' }}>Harga</th>
               <th style={{ textAlign: 'right', width: '150px' }}>Jumlah</th>
@@ -127,6 +133,8 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
               <tr key={i}>
                 <td>{i + 1}</td>
                 <td>{item.description}</td>
+                {showColor && <td>{item.color || '—'}</td>}
+                {showSize && <td>{item.size || '—'}</td>}
                 <td style={{ textAlign: 'right' }}>{item.quantity}</td>
                 <td style={{ textAlign: 'right' }}>{formatRupiah(item.unitPrice)}</td>
                 <td style={{ textAlign: 'right' }}>{formatRupiah(item.quantity * item.unitPrice)}</td>
