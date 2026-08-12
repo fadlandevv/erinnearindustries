@@ -220,7 +220,7 @@ export default function InvoiceForm({
       )}
 
       <div className="inv-form-layout">
-        <div>
+        <div className="inv-form-col">
           {/* ── Detail invoice ── */}
           <div className="admin-form-card">
             <h3 className="admin-form-section-title">Detail Invoice</h3>
@@ -252,7 +252,7 @@ export default function InvoiceForm({
           </div>
 
           {/* ── Ditagihkan kepada ── */}
-          <div className="admin-form-card" style={{ marginTop: '1rem' }}>
+          <div className="admin-form-card">
             <h3 className="admin-form-section-title">Ditagihkan Kepada</h3>
 
             {customers.length > 0 && (
@@ -296,7 +296,7 @@ export default function InvoiceForm({
           </div>
 
           {/* ── Item ── */}
-          <div className="admin-form-card" style={{ marginTop: '1rem' }}>
+          <div className="admin-form-card">
             <h3 className="admin-form-section-title">Item Tagihan</h3>
 
             <div className="inv-items-editor">
@@ -401,7 +401,7 @@ export default function InvoiceForm({
           </div>
 
           {/* ── Catatan ── */}
-          <div className="admin-form-card" style={{ marginTop: '1rem' }}>
+          <div className="admin-form-card">
             <h3 className="admin-form-section-title">Catatan</h3>
             <div className="admin-form-group" style={{ marginBottom: 0 }}>
               <textarea name="notes" rows={3} maxLength={600}

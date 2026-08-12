@@ -2043,8 +2043,25 @@
 .inv-status-form-label { font-size: 12.48px; font-weight: 600; color: #555; white-space: nowrap; }
 .inv-status-select { width: 170px; }
 
-/* Baris 3 kolom untuk form yang padat (tanggal/tempo/status, nama/email/telepon) */
-.inv-form-row-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+/* Baris 3 kolom untuk form yang padat (tanggal/tempo/status, nama/telepon) */
+.inv-form-row-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+
+/* Ritme vertikal form invoice dirapatkan: jarak antar kartu diatur satu tempat,
+   dan margin bawah bawaan .admin-form-group dimatikan di dalam baris grid —
+   margin itu ikut menaikkan tinggi baris dan menyisakan ruang kosong di bawahnya. */
+.inv-form-col { display: flex; flex-direction: column; gap: 12px; }
+.inv-form-col .admin-form-card,
+.inv-summary-card { padding: 20px 22px; }
+.inv-form-row-3 > .admin-form-group,
+.inv-form-layout .admin-form-grid > .admin-form-group { margin-bottom: 0; }
+/* Jarak dipindah dari tiap field ke barisnya, supaya tidak berlipat. */
+.inv-form-layout .inv-form-row-3,
+.inv-form-layout .admin-form-grid { margin-bottom: 14px; }
+.inv-form-layout .admin-form-section-title { margin-bottom: 12px; }
+.inv-form-layout .admin-form-card > .admin-form-group:last-child,
+.inv-form-layout .admin-form-card > .inv-form-row-3:last-child,
+.inv-form-layout .admin-form-card > .admin-form-grid:last-child { margin-bottom: 0; }
+.inv-form-layout .admin-form-hint { margin-top: 6px; }
 
 /* Field uang: awalan "Rp" di dalam kotak input */
 .inv-money-input { position: relative; display: block; }
@@ -2089,6 +2106,8 @@
   align-items: start;
 }
 .inv-summary-card { position: sticky; top: 96px; }
+.inv-summary-card .admin-form-group { margin-bottom: 12px; }
+.inv-summary-card .admin-form-actions { margin-top: 16px; }
 
 .inv-items-editor { display: flex; flex-direction: column; gap: 8px; }
 .inv-item-row {
