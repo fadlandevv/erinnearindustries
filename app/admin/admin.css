@@ -76,6 +76,10 @@
 .admin-layout-wrapper {
   display: flex;
   min-height: 100vh;
+  /* body memakai line-height 1.6 yang enak untuk halaman publik, tapi terlalu
+     lapang untuk UI admin yang padat. Blok teks yang memang butuh nafas
+     (alamat, catatan, isi pesan) menetapkan line-height-nya sendiri. */
+  line-height: normal;
 }
 .admin-sidebar {
   width: 230px;
