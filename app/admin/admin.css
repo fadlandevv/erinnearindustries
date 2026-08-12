@@ -2524,23 +2524,61 @@
   .admin-toast-wrap,
   .inv-no-print { display: none !important; }
 
+  /* `min-height: 100vh` di layar mengunci tinggi jadi persis satu halaman saat
+     dicetak — invoice yang lebih panjang terpotong, bukan lanjut ke halaman
+     berikutnya. Tingginya harus dibiarkan mengikuti isi. */
   .admin-layout-wrapper,
   .admin-content,
-  .admin-main { display: block !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
-
-  .inv-doc {
-    border: none;
-    border-radius: 0;
-    max-width: none;
-    padding: 0;
+  .admin-main {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
     background: #fff !important;
-    color: #000 !important;
+    min-height: 0 !important;
+    height: auto !important;
   }
+
+  /* Tanpa ini browser membuang semua warna latar saat mencetak, sehingga header
+     tabel, stempel, dan aksen jumlah hilang — hasilnya tidak lagi mirip layar. */
+  .inv-doc,
+  .inv-doc * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Kartunya dipertahankan apa adanya (border, radius, padding) supaya hasil
+     cetak sama persis dengan yang tampil di admin. */
+  .inv-doc { width: 100%; }
+
+  /* Kertas selalu memakai palet terang, walau admin sedang memakai dark mode. */
+  [data-theme="dark"] .inv-doc { background: #fff !important; border-color: #ebebeb !important; color: #0d0d0d !important; }
+  [data-theme="dark"] .inv-doc-head { border-bottom-color: #0d0d0d !important; }
+  [data-theme="dark"] .inv-doc-tagline,
+  [data-theme="dark"] .inv-doc-issuer-meta,
+  [data-theme="dark"] .inv-doc-label,
+  [data-theme="dark"] .inv-doc-meta-label,
+  [data-theme="dark"] .inv-doc-foot { color: #999 !important; }
+  [data-theme="dark"] .inv-doc-billto-meta,
+  [data-theme="dark"] .inv-doc-notes-body,
+  [data-theme="dark"] .inv-doc-bank { color: #666 !important; }
+  [data-theme="dark"] .inv-doc-table th { background: #fafafa !important; border-color: #ebebeb !important; color: #999 !important; }
+  [data-theme="dark"] .inv-doc-table td { border-bottom-color: #f4f4f4 !important; }
+  [data-theme="dark"] .inv-doc-foot { border-top-color: #f0ede8 !important; }
+  [data-theme="dark"] .inv-total-row { color: #555 !important; }
+  [data-theme="dark"] .inv-total-row--grand { border-top-color: #ebebeb !important; color: #0d0d0d !important; }
+  [data-theme="dark"] .inv-total-row--due { border-top-color: #e5e5e5 !important; color: #b45309 !important; }
+  [data-theme="dark"] .inv-stamp--paid { color: #15803d !important; }
+  [data-theme="dark"] .inv-stamp--cancelled { color: #b91c1c !important; }
+  [data-theme="dark"] .inv-stamp--overdue { color: #b45309 !important; }
+
+  /* Nomor rekening tercetak sebagai teks biasa, bukan tombol. */
   .inv-copy-account { color: inherit !important; border-bottom: none !important; }
+
   .inv-doc-table tr { break-inside: avoid; }
   .inv-doc-summary { break-inside: avoid; }
 
-  @page { size: A4; margin: 16mm; }
+  /* Lanskap mengikuti proporsi dokumen di layar yang memang melebar. */
+  @page { size: A4 landscape; margin: 12mm; }
 }
 
 /* ── Dark mode ── */
