@@ -189,9 +189,9 @@ export const INVOICE_ISSUER = {
   address: 'Jakarta, Indonesia',
   email: 'hello@erinnear.com',
   phone: '+62 812-3456-7890',
-  bankName: 'BCA',
+  bankName: 'BANK BCA',
   bankAccount: '1234567890',
-  bankHolder: 'Erinnear Industries',
+  bankHolder: 'Fadlan Hidayatulloh',
 }
 
 export type InvoiceTotals = {

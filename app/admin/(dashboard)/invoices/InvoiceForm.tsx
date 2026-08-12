@@ -400,19 +400,10 @@ export default function InvoiceForm({
             </button>
           </div>
 
-          {/* ── Catatan ── */}
-          <div className="admin-form-card">
-            <h3 className="admin-form-section-title">Catatan</h3>
-            <div className="admin-form-group" style={{ marginBottom: 0 }}>
-              <textarea name="notes" rows={3} maxLength={600}
-                defaultValue={initial.notes} className="admin-form-textarea"
-                placeholder="Syarat pembayaran, instruksi transfer, terima kasih…" />
-            </div>
-          </div>
         </div>
 
-        {/* ── Ringkasan ── */}
-        <div>
+        {/* ── Ringkasan + Catatan ── */}
+        <div className="inv-form-col">
           <div className="admin-form-card inv-summary-card">
             <h3 className="admin-form-section-title">Ringkasan</h3>
 
@@ -468,6 +459,15 @@ export default function InvoiceForm({
                 {isPending ? 'Menyimpan…' : mode === 'create' ? 'Buat Invoice' : 'Simpan Perubahan'}
               </button>
               <Link href={cancelHref} className="btn-admin-secondary">Batal</Link>
+            </div>
+          </div>
+
+          <div className="admin-form-card">
+            <h3 className="admin-form-section-title">Catatan</h3>
+            <div className="admin-form-group" style={{ marginBottom: 0 }}>
+              <textarea name="notes" rows={3} maxLength={600}
+                defaultValue={initial.notes} className="admin-form-textarea"
+                placeholder="Syarat pembayaran, instruksi transfer, terima kasih…" />
             </div>
           </div>
         </div>

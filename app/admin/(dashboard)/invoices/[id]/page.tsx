@@ -10,6 +10,7 @@ import {
 import { updateInvoiceStatusAction } from '@/lib/actions'
 import AdminSelect from '@/components/AdminSelect'
 import PrintButton from '../PrintButton'
+import CopyAccount from '../CopyAccount'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -94,9 +95,13 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
           <div>
             <p className="inv-doc-meta-label">Ditagihkan Kepada</p>
             <p className="inv-doc-billto-name">{invoice.billTo.name}</p>
-            {invoice.billTo.address && <p className="inv-doc-billto-line">{invoice.billTo.address}</p>}
-            {invoice.billTo.email && <p className="inv-doc-billto-line">{invoice.billTo.email}</p>}
-            {invoice.billTo.phone && <p className="inv-doc-billto-line">{invoice.billTo.phone}</p>}
+            {/* Sebaris, dipisah titik bulat — field yang kosong tidak
+                menyisakan pemisah menggantung. */}
+            <div className="inv-doc-billto-meta">
+              {invoice.billTo.address && <span>{invoice.billTo.address}</span>}
+              {invoice.billTo.email && <span>{invoice.billTo.email}</span>}
+              {invoice.billTo.phone && <span>{invoice.billTo.phone}</span>}
+            </div>
           </div>
           <div className="inv-doc-dates">
             <div className="inv-doc-date-row">
@@ -152,10 +157,11 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
               </>
             )}
             <p className="inv-doc-meta-label" style={{ marginTop: '1rem' }}>Pembayaran</p>
-            <p className="inv-doc-notes-body">
-              {INVOICE_ISSUER.bankName} — {INVOICE_ISSUER.bankAccount}<br />
-              a.n. {INVOICE_ISSUER.bankHolder}
-            </p>
+            <div className="inv-doc-bank">
+              <span>{INVOICE_ISSUER.bankName}</span>
+              <CopyAccount value={INVOICE_ISSUER.bankAccount} />
+            </div>
+            <p className="inv-doc-notes-body">A/n {INVOICE_ISSUER.bankHolder}</p>
           </div>
 
           <div className="inv-doc-totals">

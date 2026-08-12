@@ -2109,7 +2109,11 @@
   gap: 16px;
   align-items: start;
 }
-.inv-summary-card { position: sticky; top: 96px; }
+/* Sticky dimatikan: kolom kanan sekarang ikut menampung Catatan, dan formnya
+   sudah muat satu layar sehingga tidak ada yang perlu "mengikuti" scroll. */
+.inv-summary-card { position: static; }
+/* min-height 100px bawaan textarea memaksa tinggi berlebih di form yang padat. */
+.inv-form-layout .admin-form-textarea { min-height: 62px; }
 .inv-summary-card .admin-form-group { margin-bottom: 12px; }
 .inv-summary-card .admin-form-actions { margin-top: 16px; }
 
@@ -2210,8 +2214,10 @@
   background: #fff;
   border: 1px solid #ebebeb;
   border-radius: 16px;
-  padding: 44px 48px;
-  max-width: 860px;
+  padding: 32px 40px;
+  /* Ikut lebar area konten (lanskap), bukan dipatok selebar kertas — saat
+     dicetak @media print yang menentukan ukurannya. */
+  width: 100%;
   color: #0d0d0d;
 }
 /* globals.css memberi setiap <p> margin-bawah 16px — terlalu renggang untuk
@@ -2260,15 +2266,66 @@
   text-transform: uppercase; letter-spacing: 0.1em;
 }
 .inv-doc-billto-name { font-size: 15px; font-weight: 700; margin-top: 6px; }
-/* Baris alamat/email/telepon berdempet jadi satu blok — jaraknya cukup dari
-   line-height, tanpa margin bawaan <p>. Selector disertai `p` supaya
-   spesifisitasnya melewati `.inv-doc p` di atas. */
-.inv-doc p.inv-doc-billto-line {
+/* Baris info sebaris dengan pemisah titik bulat; membungkus rapi kalau ruang habis. */
+.inv-doc-billto-meta,
+.inv-doc-bank {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 10px;
+  margin-top: 4px;
   font-size: 12.5px;
   color: #666;
   line-height: 1.7;
-  margin-bottom: 0;
 }
+/* Pemisah menempel pada item ke-2 dst., jadi field kosong tidak meninggalkan
+   titik menggantung. */
+.inv-doc-billto-meta > * + *::before,
+.inv-doc-bank > * + *::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.45;
+  vertical-align: middle;
+}
+
+/* Nomor rekening: tampil seperti teks biasa, ikon salin muncul saat disentuh. */
+.inv-copy-account {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-bottom: 1px dashed transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.inv-copy-account:hover { color: #f47c2f; border-bottom-color: rgba(244, 124, 47, 0.5); }
+.inv-copy-icon { display: inline-flex; opacity: 0.55; }
+.inv-copy-account:hover .inv-copy-icon { opacity: 1; }
+.inv-copy-toast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%);
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #15803d;
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.inv-copy-toast--err { background: #b91c1c; }
 .inv-doc-dates { min-width: 220px; }
 .inv-doc-date-row {
   display: flex;
@@ -2366,6 +2423,7 @@
     background: #fff !important;
     color: #000 !important;
   }
+  .inv-copy-account { color: inherit !important; border-bottom: none !important; }
   .inv-doc-table tr { break-inside: avoid; }
   .inv-doc-summary { break-inside: avoid; }
 
@@ -2399,7 +2457,7 @@
 [data-theme="dark"] .inv-doc-label,
 [data-theme="dark"] .inv-doc-meta-label,
 [data-theme="dark"] .inv-doc-foot { color: #777; }
-[data-theme="dark"] .inv-doc-billto-line,
+[data-theme="dark"] .inv-doc-billto-meta,
 [data-theme="dark"] .inv-doc-notes-body { color: #aaa; }
 [data-theme="dark"] .inv-doc-table th { background: #1a1a1a; border-top-color: #222; border-bottom-color: #222; color: #666; }
 [data-theme="dark"] .inv-doc-table td { border-bottom-color: #1a1a1a; }
