@@ -3,7 +3,10 @@ import { redirect } from 'next/navigation'
 import { getCurrentAdmin } from '@/lib/auth'
 import { hasPermission } from '@/lib/rbac'
 import { getOrderById } from '@/lib/orders'
-import InvoiceForm, { type InvoiceDraft } from '../InvoiceForm'
+import { getProducts } from '@/lib/data'
+import { getInvoiceCustomerOptions } from '@/lib/invoices'
+import { joinAddress, toProductOptions, type InvoiceDraft } from '@/lib/invoice-constants'
+import InvoiceForm from '../InvoiceForm'
 
 export const metadata = { title: 'Buat Invoice' }
 
@@ -29,6 +32,9 @@ export default async function NewInvoicePage({
 
   const { orderId } = await searchParams
 
+  const [catalog, customers] = await Promise.all([getProducts(), getInvoiceCustomerOptions()])
+  const products = toProductOptions(catalog)
+
   const draft: InvoiceDraft = {
     issueDate: todayYmd(),
     dueDate: plusDaysYmd(14),
@@ -50,8 +56,7 @@ export default async function NewInvoicePage({
       name: order.customer.name,
       email: order.customer.email,
       phone: order.customer.phone,
-      address: [order.customer.address, order.customer.city, order.customer.postalCode]
-        .filter(Boolean).join(', '),
+      address: joinAddress(order.customer.address, order.customer.city, order.customer.postalCode),
     }
     draft.items = order.items.map(it => ({
       description: `${it.title}${it.size ? ` — Size ${it.size}` : ''}`,
@@ -86,7 +91,13 @@ export default async function NewInvoicePage({
         </div>
       )}
 
-      <InvoiceForm mode="create" initial={draft} cancelHref="/admin/invoices" />
+      <InvoiceForm
+        mode="create"
+        initial={draft}
+        cancelHref="/admin/invoices"
+        products={products}
+        customers={customers}
+      />
     </>
   )
 }

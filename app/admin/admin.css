@@ -2039,7 +2039,40 @@
   flex-wrap: wrap;
   margin-bottom: 16px;
 }
-.inv-status-bar .admin-order-status-form { display: flex; align-items: center; gap: 8px; }
+.inv-status-form { display: flex; align-items: center; gap: 10px; }
+.inv-status-form-label { font-size: 12.48px; font-weight: 600; color: #555; white-space: nowrap; }
+.inv-status-select { width: 170px; }
+
+/* Baris 3 kolom untuk form yang padat (tanggal/tempo/status, nama/email/telepon) */
+.inv-form-row-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+
+/* Field uang: awalan "Rp" di dalam kotak input */
+.inv-money-input { position: relative; display: block; }
+.inv-money-input .admin-form-input { width: 100%; padding-left: 38px; }
+.inv-money-prefix {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  font-weight: 600;
+  color: #aaa;
+  pointer-events: none;
+}
+.inv-money-input--suffix .admin-form-input { padding-left: 14.4px; padding-right: 34px; }
+.inv-money-suffix {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  font-weight: 600;
+  color: #aaa;
+  pointer-events: none;
+}
+
+/* Sel deskripsi item: dropdown produk + input manual saat "Lainnya" dipilih */
+.inv-item-desc { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .inv-order-link {
   font-size: 12.5px;
   color: #777;
@@ -2060,10 +2093,17 @@
 .inv-items-editor { display: flex; flex-direction: column; gap: 8px; }
 .inv-item-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 76px 130px 120px 32px;
+  grid-template-columns: minmax(0, 1fr) 76px 150px 120px 32px;
   gap: 8px;
-  align-items: center;
+  align-items: start;
 }
+.inv-item-row > .admin-form-input,
+.inv-item-row > .inv-money-input,
+.inv-item-row > .inv-item-amount,
+.inv-item-row > .inv-item-remove { margin-top: 0; }
+/* Sejajarkan jumlah & tombol hapus dengan baris kontrol pertama, bukan tengah
+   sel — sel deskripsi bisa memanjang saat input manual muncul. */
+.inv-item-row .inv-item-amount { align-self: start; padding-top: 12px; }
 .inv-item-row .admin-form-input { margin: 0; }
 .inv-item-row--head {
   font-size: 11.2px;
@@ -2084,6 +2124,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.inv-item-remove { margin-top: 5px; }
 .inv-item-remove {
   width: 32px; height: 32px;
   border-radius: 8px;
@@ -2230,8 +2271,13 @@
   .inv-form-layout { grid-template-columns: 1fr; }
   .inv-summary-card { position: static; }
 }
+@media (max-width: 900px) {
+  .inv-form-row-3 { grid-template-columns: 1fr; }
+}
 @media (max-width: 768px) {
-  .inv-item-row { grid-template-columns: minmax(0, 1fr) 64px 110px 32px; }
+  .inv-item-row { grid-template-columns: minmax(0, 1fr) 64px 130px 32px; }
+  .inv-status-form { flex-wrap: wrap; }
+  .inv-status-select { width: 100%; }
   .inv-item-row--head { display: none; }
   .inv-item-amount { display: none; }
   .inv-doc { padding: 24px 20px; }
@@ -2271,6 +2317,9 @@
 [data-theme="dark"] .inv-overdue-tag { background: #2a0a0a; color: #f87171; }
 [data-theme="dark"] .inv-order-link { color: #888; border-bottom-color: #333; }
 [data-theme="dark"] .inv-item-row--head { color: #666; }
+[data-theme="dark"] .inv-status-form-label { color: #888; }
+[data-theme="dark"] .inv-money-prefix,
+[data-theme="dark"] .inv-money-suffix { color: #666; }
 [data-theme="dark"] .inv-item-amount { color: #f0ede8; }
 [data-theme="dark"] .inv-item-remove { border-color: #2a2a2a; color: #777; }
 [data-theme="dark"] .inv-item-remove:hover:not(:disabled) { background: rgba(239,68,68,0.12); border-color: #7f1d1d; }

@@ -2,8 +2,10 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { getCurrentAdmin } from '@/lib/auth'
 import { hasPermission } from '@/lib/rbac'
-import { getInvoiceById } from '@/lib/invoices'
-import InvoiceForm, { draftFromInvoice } from '../../InvoiceForm'
+import { getInvoiceById, getInvoiceCustomerOptions } from '@/lib/invoices'
+import { getProducts } from '@/lib/data'
+import { draftFromInvoice, toProductOptions } from '@/lib/invoice-constants'
+import InvoiceForm from '../../InvoiceForm'
 
 export const metadata = { title: 'Edit Invoice' }
 
@@ -15,6 +17,9 @@ export default async function EditInvoicePage({ params }: { params: Promise<{ id
   const { id } = await params
   const invoice = await getInvoiceById(id)
   if (!invoice) notFound()
+
+  const [catalog, customers] = await Promise.all([getProducts(), getInvoiceCustomerOptions()])
+  const products = toProductOptions(catalog)
 
   return (
     <>
@@ -31,6 +36,8 @@ export default async function EditInvoicePage({ params }: { params: Promise<{ id
         invoiceId={invoice.id}
         initial={draftFromInvoice(invoice)}
         cancelHref={`/admin/invoices/${invoice.id}`}
+        products={products}
+        customers={customers}
       />
     </>
   )

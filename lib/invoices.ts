@@ -1,5 +1,8 @@
 import { db } from './db'
 import { generateId } from './utils'
+import { getUsers } from './users'
+import { getOrders } from './orders'
+import { joinAddress } from './invoice-constants'
 import type { Invoice, InvoiceItem, InvoiceStatus } from './invoice-constants'
 
 export type { Invoice, InvoiceItem, InvoiceStatus, InvoiceBillTo } from './invoice-constants'
@@ -148,4 +151,49 @@ export async function updateInvoice(
 export async function deleteInvoice(id: string): Promise<void> {
   const { error } = await db.from('invoices').delete().eq('id', id)
   if (error) throw new Error(error.message)
+}
+
+export type InvoiceCustomerOption = {
+  name: string
+  email: string
+  phone: string
+  address: string
+  source: 'member' | 'order'
+}
+
+/**
+ * Kandidat penerima tagihan untuk dropdown di form invoice: member terdaftar
+ * digabung dengan pembeli yang pernah checkout. Deduplikasi memakai email —
+ * data order lebih diutamakan karena membawa alamat pengiriman.
+ * Order reseller (`@reseller.internal`) dilewati, itu bukan pelanggan akhir.
+ */
+export async function getInvoiceCustomerOptions(): Promise<InvoiceCustomerOption[]> {
+  const [users, orders] = await Promise.all([getUsers(), getOrders()])
+  const byEmail = new Map<string, InvoiceCustomerOption>()
+
+  for (const u of users) {
+    const key = u.email.toLowerCase()
+    if (!key) continue
+    byEmail.set(key, {
+      name: u.name, email: u.email, phone: u.phone ?? '', address: '', source: 'member',
+    })
+  }
+
+  for (const o of orders) {
+    const email = (o.customer.email ?? '').toLowerCase()
+    if (!email || email.endsWith('@reseller.internal')) continue
+    const address = joinAddress(o.customer.address, o.customer.city, o.customer.postalCode)
+    const existing = byEmail.get(email)
+    // getOrders() terurut terbaru dulu, jadi entri pertama yang menang.
+    if (existing?.source === 'order') continue
+    byEmail.set(email, {
+      name: o.customer.name || existing?.name || email,
+      email: o.customer.email,
+      phone: o.customer.phone || existing?.phone || '',
+      address,
+      source: 'order',
+    })
+  }
+
+  return [...byEmail.values()].sort((a, b) => a.name.localeCompare(b.name, 'id'))
 }

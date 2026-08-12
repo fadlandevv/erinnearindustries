@@ -8,6 +8,7 @@ import {
   INVOICE_ISSUER, INVOICE_STATUSES, INVOICE_STATUS_LABELS,
 } from '@/lib/invoice-constants'
 import { updateInvoiceStatusAction } from '@/lib/actions'
+import AdminSelect from '@/components/AdminSelect'
 import PrintButton from '../PrintButton'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -46,15 +47,17 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
       </div>
 
       <div className="inv-status-bar inv-no-print">
-        <form action={updateInvoiceStatusAction} className="admin-order-status-form">
+        <form action={updateInvoiceStatusAction} className="inv-status-form">
           <input type="hidden" name="id" value={invoice.id} />
-          <label htmlFor="inv-status" style={{ fontSize: '0.8rem', color: '#777' }}>Ubah status</label>
-          <select id="inv-status" name="status" defaultValue={invoice.status} className="admin-order-status-select">
-            {INVOICE_STATUSES.map(s => (
-              <option key={s} value={s}>{INVOICE_STATUS_LABELS[s]}</option>
-            ))}
-          </select>
-          <button type="submit" className="admin-order-status-btn">✓</button>
+          <span className="inv-status-form-label">Ubah status</span>
+          <div className="inv-status-select">
+            <AdminSelect
+              name="status"
+              defaultValue={invoice.status}
+              options={INVOICE_STATUSES.map(s => ({ value: s, label: INVOICE_STATUS_LABELS[s] }))}
+            />
+          </div>
+          <button type="submit" className="btn-admin-primary">Simpan</button>
         </form>
         {invoice.orderId && (
           <Link href="/admin/orders" className="inv-order-link">

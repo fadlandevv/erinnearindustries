@@ -43,6 +43,82 @@ export type Invoice = {
   updatedAt?: string
 }
 
+/**
+ * Bentuk invoice sebagaimana diisi di form. Beda dari `Invoice`: field opsional
+ * memakai string kosong, bukan `undefined`, karena itu yang dipegang input HTML.
+ *
+ * Tinggal di sini — bukan di komponen form — supaya halaman edit (server
+ * component) bisa memanggil `draftFromInvoice()` tanpa melintasi batas 'use client'.
+ */
+export type InvoiceDraft = {
+  orderId?: string
+  issueDate: string
+  dueDate: string
+  status: InvoiceStatus
+  billTo: InvoiceBillTo
+  items: InvoiceItem[]
+  discount: number
+  shipping: number
+  taxPercent: number
+  paidAmount: number
+  notes: string
+}
+
+export const EMPTY_INVOICE_ITEM: InvoiceItem = { description: '', quantity: 1, unitPrice: 0 }
+
+/**
+ * Rangkai alamat pengiriman jadi satu baris untuk invoice. Kolom `address` pada
+ * order sering sudah memuat kota/kode pos, jadi keduanya hanya ditambahkan bila
+ * belum ada — kalau tidak, alamat cetak jadi "…, Depok (16454), Depok, 16454".
+ */
+export function joinAddress(address?: string, city?: string, postalCode?: string): string {
+  const main = (address ?? '').trim()
+  const parts = main ? [main] : []
+  const haystack = main.toLowerCase()
+  for (const extra of [city, postalCode]) {
+    const value = (extra ?? '').trim()
+    if (value && !haystack.includes(value.toLowerCase())) parts.push(value)
+  }
+  return parts.join(', ')
+}
+
+/** Produk katalog yang bisa dipilih di baris item invoice. */
+export type InvoiceProductOption = { title: string; unitPrice: number }
+
+/**
+ * Katalog → opsi dropdown. Judul dipakai sebagai nilai opsi, jadi judul kembar
+ * (varian yang tercatat dua kali) harus dibuang dulu supaya pilihannya tidak ambigu.
+ */
+export function toProductOptions(
+  products: { title: string; price: string }[],
+): InvoiceProductOption[] {
+  const byTitle = new Map<string, InvoiceProductOption>()
+  for (const p of products) {
+    if (!p.title || byTitle.has(p.title)) continue
+    byTitle.set(p.title, {
+      title: p.title,
+      unitPrice: parseInt(p.price.replace(/[^\d]/g, ''), 10) || 0,
+    })
+  }
+  return [...byTitle.values()]
+}
+
+export function draftFromInvoice(inv: Invoice): InvoiceDraft {
+  return {
+    orderId: inv.orderId,
+    issueDate: inv.issueDate,
+    dueDate: inv.dueDate ?? '',
+    status: inv.status,
+    billTo: inv.billTo,
+    items: inv.items.length ? inv.items : [{ ...EMPTY_INVOICE_ITEM }],
+    discount: inv.discount,
+    shipping: inv.shipping,
+    taxPercent: inv.taxPercent,
+    paidAmount: inv.paidAmount,
+    notes: inv.notes ?? '',
+  }
+}
+
 /** Identitas penerbit yang tercetak di kop invoice. */
 export const INVOICE_ISSUER = {
   name: 'Erinnear Industries',
