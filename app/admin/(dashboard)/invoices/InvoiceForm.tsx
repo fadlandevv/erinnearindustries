@@ -75,7 +75,7 @@ export default function InvoiceForm({
   const totals = computeInvoiceTotals({ items, discount, shipping, taxPercent, paidAmount })
 
   const productOptions = [
-    ...products.map(p => ({ value: p.title, label: `${p.title} — ${formatRupiah(p.unitPrice)}` })),
+    ...products.map(p => ({ value: p.title, label: p.title })),
     { value: CUSTOM, label: 'Lainnya (ketik manual)' },
   ]
 
