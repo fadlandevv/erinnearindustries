@@ -1,5 +1,6 @@
 import { db } from './db'
 import { getOrders } from './orders'
+import { computeInvoiceTotals, type Invoice } from './invoice-constants'
 
 export type RekapSource = 'marketplace' | 'offline'
 
@@ -56,6 +57,46 @@ export async function saveManualEntry(entry: ManualEntry): Promise<void> {
 
 export async function deleteManualEntry(id: string): Promise<void> {
   await db.from('rekap_manual').delete().eq('id', id)
+}
+
+/** Id entri rekap milik sebuah invoice — deterministik, jadi upsert-nya idempoten. */
+const rekapIdForInvoice = (invoiceId: string) => `inv-${invoiceId}`
+
+/**
+ * Menyelaraskan satu entri rekap dengan status sebuah invoice.
+ *
+ * Invoice yang berasal dari order website SENGAJA dilewati: computeRekap() sudah
+ * menghitung order berbayar sebagai omzet `web`, jadi menambahkannya lagi di sini
+ * membuat nilainya terhitung dua kali. Yang dicatat hanya invoice yang dibuat
+ * manual — itulah penjualan yang belum terwakili di mana pun.
+ */
+export async function syncInvoiceRekap(invoice: Invoice): Promise<void> {
+  const id = rekapIdForInvoice(invoice.id)
+  const totals = computeInvoiceTotals(invoice)
+  // "Jumlah yang benar-benar dibayar" = kolom Sudah Dibayar / DP; kalau admin
+  // menandai Lunas tanpa mengisinya, total invoice yang dipakai.
+  const amount = totals.paid > 0 ? totals.paid : totals.total
+
+  if (invoice.status !== 'paid' || invoice.orderId || amount <= 0) {
+    await deleteManualEntry(id)
+    return
+  }
+
+  const { error } = await db.from('rekap_manual').upsert({
+    id,
+    date: invoice.issueDate,
+    source: 'offline' satisfies RekapSource,
+    platform: 'Invoice',
+    amount,
+    note: `${invoice.number} — ${invoice.billTo.name}`,
+    filled_by: invoice.createdBy ?? null,
+  })
+  if (error) throw new Error(error.message)
+}
+
+/** Membersihkan entri rekap otomatis saat invoice-nya dihapus. */
+export async function removeInvoiceRekap(invoiceId: string): Promise<void> {
+  await deleteManualEntry(rekapIdForInvoice(invoiceId))
 }
 
 // ── Date helpers ────────────────────────────────────────────────────

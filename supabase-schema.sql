@@ -356,14 +356,14 @@ create table if not exists invoices (
 create index if not exists invoices_issue_date_idx on invoices (issue_date desc);
 create index if not exists invoices_order_id_idx on invoices (order_id);
 
--- ── Sambungan Invoice → Pembukuan & bukti transfer ──────────────────────
+-- ── Bukti transfer invoice ──────────────────────────────────────────────
 -- WAJIB dijalankan manual di Supabase SQL Editor.
 --
--- `pembukuan.invoice_id` menandai entri yang dibuat otomatis saat invoice
--- ditandai Lunas. Dipakai sebagai kunci idempoten: bolak-balik mengubah status
--- hanya memperbarui satu entri yang sama, bukan menumpuk entri baru.
-alter table pembukuan add column if not exists invoice_id text;
-create index if not exists pembukuan_invoice_id_idx on pembukuan (invoice_id);
-
 -- URL bukti transfer yang diunggah admin untuk verifikasi pembayaran.
 alter table invoices add column if not exists payment_proof text;
+
+-- Catatan: invoice yang lunas dicatat ke `rekap_manual`, bukan ke `pembukuan`.
+-- Idempotensinya tidak butuh kolom tambahan — id entri dibuat deterministik
+-- (`inv-<id invoice>`) dan disimpan lewat upsert, lihat syncInvoiceRekap()
+-- di lib/rekap.ts. Kolom `pembukuan.invoice_id` dari revisi sebelumnya boleh
+-- dibiarkan; tidak dipakai lagi dan tidak mengganggu.

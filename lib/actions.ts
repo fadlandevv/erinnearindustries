@@ -17,8 +17,8 @@ import {
   getResellerOrders, type ResellerOrderStatus,
 } from './resellers'
 import { adjustStock, upsertSizeEntry } from './warehouse'
-import { saveManualEntry, deleteManualEntry, type RekapSource } from './rekap'
-import { savePembukuanEntry, deletePembukuanEntry, syncInvoiceIncome, removeInvoiceIncome, type EntryType } from './pembukuan'
+import { saveManualEntry, deleteManualEntry, syncInvoiceRekap, removeInvoiceRekap, type RekapSource } from './rekap'
+import { savePembukuanEntry, deletePembukuanEntry, type EntryType } from './pembukuan'
 import { createInvoice, updateInvoice, getInvoiceById, deleteInvoice as _deleteInvoice } from './invoices'
 import { INVOICE_STATUSES, type InvoiceItem, type InvoiceStatus } from './invoice-constants'
 import { logAdminAccess } from './access-log'
@@ -1126,14 +1126,14 @@ export async function createInvoiceAction(
   // lagi dan membuat invoice kembar. Pembukuan bisa diselaraskan ulang cukup
   // dengan menyimpan ulang invoice-nya.
   try {
-    await syncInvoiceIncome(invoice)
+    await syncInvoiceRekap(invoice)
   } catch (e) {
-    console.error('Gagal mencatat invoice ke pembukuan:', e)
+    console.error('Gagal mencatat invoice ke rekap:', e)
   }
   const id = invoice.id
 
   revalidatePath('/admin/invoices')
-  revalidatePath('/admin/pembukuan')
+  revalidatePath('/admin/rekap')
   redirect(`/admin/invoices/${id}`)
 }
 
@@ -1157,13 +1157,13 @@ export async function updateInvoiceAction(
   }
   try {
     const saved = await getInvoiceById(id)
-    if (saved) await syncInvoiceIncome(saved)
+    if (saved) await syncInvoiceRekap(saved)
   } catch (e) {
-    console.error('Gagal mencatat invoice ke pembukuan:', e)
+    console.error('Gagal mencatat invoice ke rekap:', e)
   }
 
   revalidatePath('/admin/invoices')
-  revalidatePath('/admin/pembukuan')
+  revalidatePath('/admin/rekap')
   redirect(`/admin/invoices/${id}`)
 }
 
@@ -1176,14 +1176,14 @@ export async function updateInvoiceStatusAction(formData: FormData): Promise<voi
   await updateInvoice(id, { status })
   try {
     const saved = await getInvoiceById(id)
-    if (saved) await syncInvoiceIncome(saved)
+    if (saved) await syncInvoiceRekap(saved)
   } catch (e) {
-    console.error('Gagal mencatat invoice ke pembukuan:', e)
+    console.error('Gagal mencatat invoice ke rekap:', e)
   }
 
   revalidatePath('/admin/invoices')
   revalidatePath(`/admin/invoices/${id}`)
-  revalidatePath('/admin/pembukuan')
+  revalidatePath('/admin/rekap')
 }
 
 const PROOF_MAX_BYTES = 5 * 1024 * 1024
@@ -1251,13 +1251,13 @@ export async function deleteInvoiceAction(id: string): Promise<{ error?: string 
   if (authError) return { error: authError }
 
   try {
-    await removeInvoiceIncome(id)
+    await removeInvoiceRekap(id)
     await _deleteInvoice(id)
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Gagal menghapus invoice.' }
   }
   revalidatePath('/admin/invoices')
-  revalidatePath('/admin/pembukuan')
+  revalidatePath('/admin/rekap')
   return {}
 }
 

@@ -1,5 +1,4 @@
 import { db } from './db'
-import { computeInvoiceTotals, type Invoice } from './invoice-constants'
 import type { EntryType, PembukuanEntry } from './pembukuan-constants'
 
 export type { EntryType, PembukuanEntry } from './pembukuan-constants'
@@ -48,7 +47,6 @@ export async function getPembukuanByMonth(
     amount: row.amount,
     note: row.note ?? undefined,
     filledBy: row.filled_by ?? undefined,
-    invoiceId: row.invoice_id ?? undefined,
     createdAt: row.created_at,
   }))
 }
@@ -64,56 +62,7 @@ export async function savePembukuanEntry(
     amount: entry.amount,
     note: entry.note ?? null,
     filled_by: entry.filledBy ?? null,
-    invoice_id: entry.invoiceId ?? null,
   })
-}
-
-/**
- * Menyelaraskan satu entri pemasukan dengan status sebuah invoice.
- *
- * Dipanggil setiap kali invoice disimpan. `invoice_id` jadi kunci idempoten:
- * mengubah status Lunas → Draft → Lunas berkali-kali tetap menyisakan paling
- * banyak satu entri, dan mengubah nominal invoice ikut memperbarui entrinya.
- * Begitu status bukan Lunas lagi, entrinya dihapus supaya pembukuan tidak
- * menyimpan pemasukan hantu.
- */
-export async function syncInvoiceIncome(invoice: Invoice): Promise<void> {
-  const { data } = await db.from('pembukuan').select('id').eq('invoice_id', invoice.id).maybeSingle()
-  const existingId = data?.id as string | undefined
-
-  const totals = computeInvoiceTotals(invoice)
-  // "Jumlah yang benar-benar dibayar" = kolom Sudah Dibayar / DP. Kalau admin
-  // menandai Lunas tanpa mengisinya, total invoice yang dipakai — mencatat Rp 0
-  // jelas bukan yang dimaksud.
-  const amount = totals.paid > 0 ? totals.paid : totals.total
-
-  if (invoice.status !== 'paid' || amount <= 0) {
-    if (existingId) await db.from('pembukuan').delete().eq('id', existingId)
-    return
-  }
-
-  const row = {
-    date: invoice.issueDate,
-    type: 'pemasukan' as EntryType,
-    // Invoice dari order web dicatat sebagai penjualan web; sisanya invoice
-    // yang dibuat manual, jadi masuk penjualan offline.
-    category: invoice.orderId ? 'Penjualan Web' : 'Penjualan Offline',
-    description: `Invoice ${invoice.number} — ${invoice.billTo.name}`,
-    amount,
-    note: 'Tercatat otomatis dari invoice',
-    filled_by: invoice.createdBy ?? null,
-    invoice_id: invoice.id,
-  }
-
-  const { error } = existingId
-    ? await db.from('pembukuan').update(row).eq('id', existingId)
-    : await db.from('pembukuan').insert(row)
-  if (error) throw new Error(error.message)
-}
-
-/** Membersihkan entri otomatis saat invoice-nya dihapus. */
-export async function removeInvoiceIncome(invoiceId: string): Promise<void> {
-  await db.from('pembukuan').delete().eq('invoice_id', invoiceId)
 }
 
 export async function deletePembukuanEntry(id: string): Promise<void> {
@@ -140,7 +89,6 @@ export async function getPembukuanByYear(year: number): Promise<PembukuanEntry[]
     amount: row.amount,
     note: row.note ?? undefined,
     filledBy: row.filled_by ?? undefined,
-    invoiceId: row.invoice_id ?? undefined,
     createdAt: row.created_at,
   }))
 }
