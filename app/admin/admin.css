@@ -2176,9 +2176,7 @@
 .inv-summary-card .admin-form-group { margin-bottom: 12px; }
 .inv-summary-card .admin-form-actions { margin-top: 16px; }
 
-/* Dibatasi lebarnya: tanpa ini kolom Deskripsi (1fr) menelan semua ruang sisa
-   di layar lebar dan barisnya jadi melar. */
-.inv-items-editor { display: flex; flex-direction: column; gap: 8px; max-width: 900px; }
+.inv-items-editor { display: flex; flex-direction: column; gap: 8px; }
 .inv-item-row {
   /* Tinggi kontrol dipatok eksplisit supaya jumlah & tombol hapus sejajar dengan
      input di baris yang sama — sel deskripsi bisa memanjang saat input manual
