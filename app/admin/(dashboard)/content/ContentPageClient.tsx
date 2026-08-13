@@ -51,6 +51,14 @@ export default function ContentPageClient({ content, showcase }: { content: Cont
     return () => document.removeEventListener('click', handleClick, true)
   }, [isDirty])
 
+  // Esc membatalkan kepindahan; sebelumnya dialog hanya bisa ditutup lewat tombol.
+  useEffect(() => {
+    if (!modal) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setModal(null) }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [modal])
+
   function confirmLeave() {
     if (!modal) return
     setIsDirty(false)
@@ -60,47 +68,46 @@ export default function ContentPageClient({ content, showcase }: { content: Cont
 
   return (
     <>
-      {/* Unsaved changes modal */}
+      {/* Konfirmasi saat pindah halaman dengan perubahan yang belum disimpan */}
       {modal && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 1000,
-          background: 'rgba(0,0,0,0.4)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          backdropFilter: 'blur(4px)',
-          animation: 'fadeIn 0.15s ease',
-        }}>
-          <div style={{
-            background: '#fff', borderRadius: 20, padding: '32px',
-            maxWidth: 400, width: '90%', boxShadow: '0 24px 64px rgba(0,0,0,0.15)',
-            animation: 'slideUp 0.2s cubic-bezier(0.34,1.56,0.64,1)',
-          }}>
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <div
+          className="admin-confirm-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="confirm-leave-title"
+          onClick={e => { if (e.target === e.currentTarget) setModal(null) }}
+        >
+          <div className="admin-confirm">
+            <div className="admin-confirm-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                  stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: '0 0 8px', color: '#0d0d0d' }}>
+            <h3 className="admin-confirm-title" id="confirm-leave-title">
               Perubahan belum disimpan
             </h3>
-            <p style={{ fontSize: '0.875rem', color: '#666', margin: '0 0 24px', lineHeight: 1.6 }}>
-              Kamu memiliki perubahan yang belum disimpan. Apakah kamu yakin ingin meninggalkan halaman ini?
+            <p className="admin-confirm-desc">
+              Kalau kamu pindah halaman sekarang, semua perubahan pada konten ini akan hilang
+              dan tidak bisa dikembalikan.
             </p>
-            <div style={{ display: 'flex', gap: 10 }}>
+            <div className="admin-confirm-actions">
+              {/* Aksi aman difokuskan lebih dulu: menekan Enter tidak sengaja
+                  membuang pekerjaan. */}
               <button
                 type="button"
                 className="btn-admin-secondary"
                 onClick={() => setModal(null)}
-                style={{ flex: 1, justifyContent: 'center' }}
+                autoFocus
               >
-                Tetap di sini
+                Lanjut Edit
               </button>
               <button
                 type="button"
-                className="btn-admin-danger"
+                className="btn-admin-danger-solid"
                 onClick={confirmLeave}
-                style={{ flex: 1, justifyContent: 'center' }}
               >
-                Tinggalkan
+                Buang Perubahan
               </button>
             </div>
           </div>
