@@ -7,7 +7,7 @@ import AdminSelect from '@/components/AdminSelect'
 import PaymentProof from './PaymentProof'
 import { useAdminToast } from '@/context/AdminToastContext'
 import {
-  computeInvoiceTotals, formatInvoiceDate, formatRupiah, isOverdue,
+  computeInvoiceTotals, formatInvoiceDate, formatRupiah,
   INVOICE_STATUS_LABELS, type Invoice, type InvoiceStatus,
 } from '@/lib/invoice-constants'
 
@@ -88,7 +88,6 @@ export default function InvoicesClient({ invoices }: { invoices: Invoice[] }) {
                 <th>Nomor</th>
                 <th>Tanggal</th>
                 <th>Ditagihkan Kepada</th>
-                <th>Jatuh Tempo</th>
                 <th style={{ textAlign: 'right' }}>Total</th>
                 <th>Status</th>
                 <th />
@@ -97,7 +96,6 @@ export default function InvoicesClient({ invoices }: { invoices: Invoice[] }) {
             <tbody>
               {filtered.map(inv => {
                 const totals = computeInvoiceTotals(inv)
-                const overdue = isOverdue(inv)
                 return (
                   <tr key={inv.id}>
                     <td>
@@ -112,10 +110,6 @@ export default function InvoicesClient({ invoices }: { invoices: Invoice[] }) {
                       {inv.billTo.email && (
                         <div style={{ fontSize: '0.75rem', color: '#999' }}>{inv.billTo.email}</div>
                       )}
-                    </td>
-                    <td>
-                      {inv.dueDate ? formatInvoiceDate(inv.dueDate) : '—'}
-                      {overdue && <span className="inv-overdue-tag">Lewat tempo</span>}
                     </td>
                     <td style={{ textAlign: 'right' }}>{formatRupiah(totals.total)}</td>
                     <td>
