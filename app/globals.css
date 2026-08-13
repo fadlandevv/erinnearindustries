@@ -6449,3 +6449,42 @@ details[open] .reseller-faq-q::after { content: '−'; }
 @media (max-width: 560px) {
   .berita-grid { grid-template-columns: 1fr; }
 }
+
+
+/* ===== HALAMAN ERROR / 404 (publik) ===== */
+.errpage {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+}
+.errpage-inner { text-align: center; max-width: 480px; }
+.errpage-code {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #aaa;
+  margin-bottom: 14px;
+}
+.errpage-title {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin-bottom: 14px;
+}
+.errpage-desc { font-size: 15px; color: #666; line-height: 1.7; margin-bottom: 30px; }
+.errpage-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.errpage-digest { margin-top: 24px; font-size: 12px; color: #bbb; }
+
+@media (max-width: 560px) {
+  .errpage { padding: 56px 20px; min-height: 60vh; }
+  .errpage-title { font-size: 26px; }
+}
+
+[data-theme="dark"] .errpage-code { color: #666; }
+[data-theme="dark"] .errpage-title { color: #f0ede8; }
+[data-theme="dark"] .errpage-desc { color: #888; }
+[data-theme="dark"] .errpage-digest { color: #555; }
