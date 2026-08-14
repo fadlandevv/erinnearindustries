@@ -188,12 +188,14 @@ function clientToSVG(svg: SVGSVGElement, clientX: number, clientY: number): Desi
   }
 }
 
-function ProductMockupSVG({ color, design, side, productType, designPos, isDragging, onDesignPointerDown, onSVGPointerMove, onSVGPointerUp, svgRef, designSize, amplopDesignSize }: {
+function ProductMockupSVG({ color, design, side, productType, designPos, designRot = 0, isDragging, onDesignPointerDown, onSVGPointerMove, onSVGPointerUp, svgRef, designSize, amplopDesignSize }: {
   color: string
   design: string | null
   side: Side
   productType: string
   designPos?: DesignPos
+  /** Rotasi desain dalam derajat, berputar pada titik tengahnya sendiri. */
+  designRot?: number
   isDragging: boolean
   onDesignPointerDown?: (e: React.PointerEvent<SVGImageElement>) => void
   onSVGPointerMove?: (e: React.PointerEvent<SVGElement>) => void
@@ -218,6 +220,10 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
       : photoCfg.da
   const ox = designPos?.x ?? 0
   const oy = designPos?.y ?? 0
+  // Diputar pada titik tengah desain supaya tidak melayang keluar area saat dirotasi.
+  const cx = da.x + ox + da.w / 2
+  const cy = da.y + oy + da.h / 2
+  const rot = designRot ? `rotate(${designRot} ${cx} ${cy})` : undefined
   return (
     <svg
       ref={svgRef as React.RefObject<SVGSVGElement>}
@@ -238,7 +244,7 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
       {design
         ? design.startsWith('__pdf__:')
           ? (
-            <g>
+            <g transform={rot}>
               <rect x={da.x} y={da.y} width={da.w} height={da.h} fill="rgba(220,38,38,0.08)" stroke="rgba(220,38,38,0.35)" strokeWidth="1.2" strokeDasharray="6 4" rx="6"/>
               <text x={da.x + da.w / 2} y={da.y + da.h / 2 - 8} textAnchor="middle" fontSize="11" fill="rgba(220,38,38,0.7)" fontFamily="inherit" fontWeight="600">PDF</text>
               <text x={da.x + da.w / 2} y={da.y + da.h / 2 + 8} textAnchor="middle" fontSize="9" fill="rgba(220,38,38,0.5)" fontFamily="inherit">{design.replace('__pdf__:', '').slice(0, 20)}</text>
@@ -250,6 +256,7 @@ function ProductMockupSVG({ color, design, side, productType, designPos, isDragg
               y={da.y + oy}
               width={da.w}
               height={da.h}
+              transform={rot}
               preserveAspectRatio="xMidYMid meet"
               style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none' }}
               onPointerDown={onDesignPointerDown}
@@ -316,6 +323,8 @@ export default function CustomDesignClient({
   const [frontPos, setFrontPos] = useState<DesignPos>({ x: 0, y: 0 })
   const [backPos,  setBackPos]  = useState<DesignPos>({ x: 0, y: 0 })
   const [dragState, setDragState] = useState<DragState>(null)
+  const [frontRot, setFrontRot] = useState(0)
+  const [backRot,  setBackRot]  = useState(0)
   const [editingRowId, setEditingRowId] = useState<string | null>(null)
   const [editDraft, setEditDraft] = useState<Partial<InvoiceItem>>({})
   const [amplopDesignSize, setAmplopDesignSize] = useState<AmplopDesignSize>('sedang')
@@ -380,6 +389,20 @@ export default function CustomDesignClient({
   }
 
   const handleSVGPointerUp = () => setDragState(null)
+
+  const activeRot = activeSide === 'front' ? frontRot : backRot
+  const setActiveRot = (deg: number) => {
+    // Dinormalkan ke 0–359 supaya angka yang tampil tidak menumpuk (mis. 720°).
+    const norm = ((Math.round(deg) % 360) + 360) % 360
+    if (activeSide === 'front') setFrontRot(norm)
+    else setBackRot(norm)
+  }
+  const rotateBy = (delta: number) => setActiveRot(activeRot + delta)
+  const resetDesign = () => {
+    setActiveRot(0)
+    if (activeSide === 'front') setFrontPos({ x: 0, y: 0 })
+    else setBackPos({ x: 0, y: 0 })
+  }
 
   const isAmplop     = productType === 'amplop-packaging'
   const isTotebag    = productType === 'totebag'
@@ -900,6 +923,7 @@ export default function CustomDesignClient({
                 side={activeSide}
                 productType={productType}
                 designPos={activePos}
+                designRot={activeRot}
                 isDragging={dragState !== null}
                 onDesignPointerDown={handleDesignPointerDown}
                 onSVGPointerMove={handleSVGPointerMove}
@@ -910,7 +934,49 @@ export default function CustomDesignClient({
               />
             </div>
             {activeDesign
-              ? <p className="custom-mockup-hint" style={{ opacity: 0.6 }}>Drag desain untuk atur posisi</p>
+              ? (
+                <>
+                  <div className="custom-rotate-bar">
+                    <button type="button" className="custom-rotate-btn" onClick={() => rotateBy(-90)}
+                      title="Putar 90° berlawanan jarum jam" aria-label="Putar kiri 90 derajat">
+                      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden>
+                        <path d="M2.5 5.5h5.2A4.3 4.3 0 1 1 3.4 9.8" stroke="currentColor" strokeWidth="1.5"
+                          strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M2.5 2.6v2.9h2.9" stroke="currentColor" strokeWidth="1.5"
+                          strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+
+                    <input
+                      type="range" min={0} max={359} step={1}
+                      value={activeRot}
+                      onChange={e => setActiveRot(Number(e.target.value))}
+                      className="custom-rotate-range"
+                      aria-label="Sudut rotasi desain"
+                    />
+                    <span className="custom-rotate-value">{activeRot}°</span>
+
+                    <button type="button" className="custom-rotate-btn" onClick={() => rotateBy(90)}
+                      title="Putar 90° searah jarum jam" aria-label="Putar kanan 90 derajat">
+                      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden>
+                        <path d="M13.5 5.5H8.3A4.3 4.3 0 1 0 12.6 9.8" stroke="currentColor" strokeWidth="1.5"
+                          strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M13.5 2.6v2.9h-2.9" stroke="currentColor" strokeWidth="1.5"
+                          strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+
+                    <button type="button" className="custom-rotate-reset" onClick={resetDesign}
+                      disabled={activeRot === 0 && activePos.x === 0 && activePos.y === 0}
+                      title="Kembalikan posisi & rotasi">
+                      Reset
+                    </button>
+                  </div>
+                  <p className="custom-mockup-hint" style={{ opacity: 0.6 }}>
+                    Drag desain untuk atur posisi, putar dengan tombol di atas
+                  </p>
+                </>
+              )
               : <p className="custom-mockup-hint">Upload desain {activeSide === 'front' ? 'depan' : 'belakang'} untuk preview</p>
             }
             <div className="custom-info-pills">

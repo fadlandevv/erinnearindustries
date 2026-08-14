@@ -6488,3 +6488,88 @@ details[open] .reseller-faq-q::after { content: '−'; }
 [data-theme="dark"] .errpage-title { color: #f0ede8; }
 [data-theme="dark"] .errpage-desc { color: #888; }
 [data-theme="dark"] .errpage-digest { color: #555; }
+
+
+/* ===== ROTASI DESAIN (halaman custom) ===== */
+.custom-rotate-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.custom-rotate-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid #e5e5e5;
+  border-radius: 9px;
+  background: #fff;
+  color: #555;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.custom-rotate-btn:hover { background: #f6f6f6; border-color: #ccc; color: #0d0d0d; }
+.custom-rotate-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 130px;
+  height: 4px;
+  border-radius: 999px;
+  background: #e5e5e5;
+  outline: none;
+  cursor: pointer;
+}
+.custom-rotate-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #0d0d0d;
+  cursor: pointer;
+  border: none;
+}
+.custom-rotate-range::-moz-range-thumb {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: #0d0d0d; cursor: pointer; border: none;
+}
+.custom-rotate-value {
+  min-width: 38px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.custom-rotate-reset {
+  padding: 6px 12px;
+  border: 1.5px solid #e5e5e5;
+  border-radius: 9px;
+  background: transparent;
+  color: #777;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.custom-rotate-reset:hover:not(:disabled) { background: #f6f6f6; color: #0d0d0d; border-color: #ccc; }
+.custom-rotate-reset:disabled { opacity: 0.4; cursor: not-allowed; }
+
+@media (max-width: 420px) {
+  .custom-rotate-range { width: 90px; }
+}
+
+[data-theme="dark"] .custom-rotate-btn { background: #141414; border-color: #2a2a2a; color: #aaa; }
+[data-theme="dark"] .custom-rotate-btn:hover { background: #1e1e1e; border-color: #3a3a3a; color: #f0ede8; }
+[data-theme="dark"] .custom-rotate-range { background: #2a2a2a; }
+[data-theme="dark"] .custom-rotate-range::-webkit-slider-thumb { background: #f47c2f; }
+[data-theme="dark"] .custom-rotate-range::-moz-range-thumb { background: #f47c2f; }
+[data-theme="dark"] .custom-rotate-value { color: #aaa; }
+[data-theme="dark"] .custom-rotate-reset { border-color: #2a2a2a; color: #888; }
+[data-theme="dark"] .custom-rotate-reset:hover:not(:disabled) { background: #1e1e1e; color: #f0ede8; border-color: #3a3a3a; }
