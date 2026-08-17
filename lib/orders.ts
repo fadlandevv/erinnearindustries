@@ -1,5 +1,8 @@
 import { db } from './db'
 
+/** Penempatan desain custom pada mockup: geseran x/y + rotasi derajat. */
+export type DesignPlacement = { x: number; y: number; rot: number }
+
 export type OrderItem = {
   productId: string
   title: string
@@ -10,6 +13,9 @@ export type OrderItem = {
   bg: string
   customDesignDepan?: string
   customDesignBelakang?: string
+  /** Orientasi & posisi desain sebagaimana diatur pelanggan di halaman custom. */
+  placementDepan?: DesignPlacement
+  placementBelakang?: DesignPlacement
 }
 
 export type OrderCustomer = {

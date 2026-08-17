@@ -600,12 +600,28 @@ export async function createCheckoutOrder(
 ): Promise<{ orderId: string; snapToken: string } | { error: string }> {
   try {
     const cartJSON = formData.get('cart') as string
+    type Placement = { x: number; y: number; rot: number }
     const rawItems = JSON.parse(cartJSON) as Array<{
       product: { id: string; title: string; price: string; bg: string }
       size: string
       quantity: number
-      customSpec?: { depanUrl?: string; belakangUrl?: string }
+      customSpec?: {
+        depanUrl?: string
+        belakangUrl?: string
+        depanPlacement?: Placement
+        belakangPlacement?: Placement
+      }
     }>
+
+    /** Angka dari client tidak dipercaya mentah — dibatasi ke rentang yang masuk akal. */
+    const sanitizePlacement = (p?: Placement) => {
+      if (!p) return undefined
+      const num = (v: unknown, max: number) => {
+        const n = Number(v)
+        return Number.isFinite(n) ? Math.max(-max, Math.min(max, Math.round(n * 100) / 100)) : 0
+      }
+      return { x: num(p.x, 400), y: num(p.y, 400), rot: ((Math.round(num(p.rot, 3600)) % 360) + 360) % 360 }
+    }
     if (!rawItems.length) return { error: 'Keranjang kosong' }
 
     const items: OrderItem[] = []
@@ -614,9 +630,13 @@ export async function createCheckoutOrder(
       if (!Number.isFinite(quantity) || quantity < 1 || quantity > MAX_QTY_PER_ITEM) {
         return { error: `Jumlah pesanan untuk "${i.product?.title ?? 'produk'}" tidak valid.` }
       }
+      const depanPlacement    = sanitizePlacement(i.customSpec?.depanPlacement)
+      const belakangPlacement = sanitizePlacement(i.customSpec?.belakangPlacement)
       const design = {
         ...(i.customSpec?.depanUrl    ? { customDesignDepan:    i.customSpec.depanUrl }    : {}),
         ...(i.customSpec?.belakangUrl ? { customDesignBelakang: i.customSpec.belakangUrl } : {}),
+        ...(depanPlacement    ? { placementDepan:    depanPlacement }    : {}),
+        ...(belakangPlacement ? { placementBelakang: belakangPlacement } : {}),
       }
 
       if (isCustomItem(i.product.id)) {

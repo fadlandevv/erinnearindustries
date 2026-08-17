@@ -319,6 +319,17 @@ export default function OrdersClient({ orders, userMap, allMessages, canInvoice 
                             <div className="oh-item-info">
                               <span className="oh-item-name">{item.title}</span>
                               <span className="oh-item-meta">Size <strong>{item.size}</strong> · {item.quantity} pcs</span>
+                              {(item.placementDepan || item.placementBelakang) && (
+                                <div className="oh-placement">
+                                  {([['Depan', item.placementDepan], ['Belakang', item.placementBelakang]] as const)
+                                    .filter(([, p]) => p)
+                                    .map(([label, p]) => (
+                                      <span key={label} className="oh-placement-tag">
+                                        {label}: {p!.rot}° · geser {p!.x}/{p!.y}
+                                      </span>
+                                    ))}
+                                </div>
+                              )}
                               {(item.customDesignDepan || item.customDesignBelakang) && (
                                 <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
                                   {item.customDesignDepan && (

@@ -2772,3 +2772,18 @@
 [data-theme="dark"] .admin-confirm-desc { color: #888; }
 [data-theme="dark"] .btn-admin-danger-solid { background: #dc2626; }
 [data-theme="dark"] .btn-admin-danger-solid:hover { background: #ef4444; }
+
+
+/* Penempatan desain custom pada kartu order */
+.oh-placement { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.oh-placement-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #f5f3ef;
+  color: #777;
+  font-size: 10.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+[data-theme="dark"] .oh-placement-tag { background: #1a1a1a; color: #888; }

@@ -3,6 +3,9 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Product } from '@/lib/data'
 
+/** Penempatan desain: geseran x/y pada viewBox mockup + rotasi derajat. */
+export type DesignPlacement = { x: number; y: number; rot: number }
+
 export type CustomSpec = {
   warna: string
   warnaNama: string
@@ -15,6 +18,8 @@ export type CustomSpec = {
   catatan?: string
   depanUrl?: string
   belakangUrl?: string
+  depanPlacement?: DesignPlacement
+  belakangPlacement?: DesignPlacement
 }
 
 export type CartItem = {

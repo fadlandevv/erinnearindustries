@@ -137,6 +137,11 @@ type PriceOption = { label: string; price: number }
 type SablonOpt = PriceOption | null
 
 type DesignPos = { x: number; y: number }
+/**
+ * Penempatan desain relatif terhadap kotak area cetak: `x`/`y` dalam satuan
+ * viewBox mockup (300 lebar), `rot` dalam derajat. Semuanya 0 = posisi bawaan.
+ */
+type DesignPlacement = { x: number; y: number; rot: number }
 type DesignSize = 'logo' | 'a4' | 'a3'
 type AmplopDesignSize = 'kecil' | 'sedang' | 'besar'
 
@@ -177,6 +182,9 @@ type InvoiceItem = {
   jumlah: number
   hargaPerPcs: number
   catatan?: string
+  /** Penempatan desain di mockup, supaya produksi tahu orientasi & posisinya. */
+  depanPlacement?: DesignPlacement
+  belakangPlacement?: DesignPlacement
 }
 
 
@@ -465,6 +473,8 @@ export default function CustomDesignClient({
       belakangPreview: form.backDesign   ?? undefined,
       depanUrl:        form.frontUrl     ?? undefined,
       belakangUrl:     form.backUrl      ?? undefined,
+      depanPlacement:    form.frontDesign ? { ...frontPos, rot: frontRot } : undefined,
+      belakangPlacement: form.backDesign  ? { ...backPos,  rot: backRot  } : undefined,
       sablonDepan:    form.frontDesign  ? effDepan    : null,
       sablonBelakang: form.backDesign   ? effBelakang : null,
       jumlah:   form.jumlah,
@@ -480,6 +490,8 @@ export default function CustomDesignClient({
     setForm(f => ({ ...EMPTY_FORM, shirtColor: f.shirtColor }))
     setFrontPos({ x: 0, y: 0 })
     setBackPos({ x: 0, y: 0 })
+    setFrontRot(0)
+    setBackRot(0)
     setError('')
     setActiveSide('front')
   }
@@ -535,6 +547,8 @@ export default function CustomDesignClient({
         catatan:     item.catatan,
         depanUrl:    item.depanUrl,
         belakangUrl: item.belakangUrl,
+        depanPlacement:    item.depanPlacement,
+        belakangPlacement: item.belakangPlacement,
       })
     })
     setInvoiceItems([])
