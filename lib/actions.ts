@@ -22,6 +22,7 @@ import { savePembukuanEntry, deletePembukuanEntry, type EntryType } from './pemb
 import { createInvoice, updateInvoice, getInvoiceById, deleteInvoice as _deleteInvoice } from './invoices'
 import { INVOICE_STATUSES, type InvoiceItem, type InvoiceStatus } from './invoice-constants'
 import { logAdminAccess } from './access-log'
+import { getAdminNotifications, type AdminNotification } from './notifications'
 import { getPricingItems, upsertPricingItem, insertPricingItem, deletePricingItem } from './pricing'
 import { fetchShippingCost, fetchShippingCostByName, type ShippingOption } from './rajaongkir'
 import { FALLBACK_COURIERS } from './shipping-fallback'
@@ -1036,6 +1037,18 @@ export async function deletePembukuanAction(id: string) {
   await requireAdmin('pembukuan')
   await deletePembukuanEntry(id)
   revalidatePath('/admin/pembukuan')
+}
+
+// ── Notifikasi admin ──────────────────────────────────────────────────────
+
+/**
+ * Dipanggil berkala oleh panel notifikasi. Permission dibaca dari sesi di
+ * server — client tidak boleh menentukan sendiri apa yang boleh dilihatnya.
+ */
+export async function getAdminNotificationsAction(): Promise<AdminNotification[]> {
+  const session = await getCurrentAdmin()
+  if (!session) return []
+  return getAdminNotifications(session.role?.permissions ?? [], session.role?.locked ?? false)
 }
 
 // ── Invoice ───────────────────────────────────────────────────────────────

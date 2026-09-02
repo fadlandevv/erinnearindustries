@@ -4,6 +4,7 @@ import { getCurrentAdmin } from '@/lib/auth'
 import AdminSidebar from '@/components/AdminSidebar'
 import { AdminToastProvider } from '@/context/AdminToastContext'
 import AdminFlash from '@/components/AdminFlash'
+import AdminNotifications from '@/components/AdminNotifications'
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await getCurrentAdmin()
@@ -18,6 +19,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       <div className="admin-layout-wrapper">
         <AdminSidebar permissions={permissions} adminName={admin.username} roleName={role?.name ?? ''} isSuperAdmin={role?.locked ?? false} />
         <div className="admin-content">
+          <AdminNotifications />
           <div className="admin-main">{children}</div>
         </div>
       </div>
