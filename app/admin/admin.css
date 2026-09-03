@@ -522,6 +522,9 @@
   background: #f5f4f1;
   margin: -32px -40px 14px;
   padding: 32px 40px 14px;
+  /* Header ini sticky — bayangan memisahkannya dari konten yang lewat di
+     bawahnya. Blur besar dengan spread negatif supaya tetap halus, bukan garis. */
+  box-shadow: 0 6px 16px -10px rgba(0, 0, 0, 0.28);
 }
 /* Judul mendorong sisanya ke kanan; tombol notifikasi selalu paling akhir.
    Dipakai menggantikan justify-content agar urutan tetap benar walau jumlah
@@ -1431,7 +1434,7 @@
 [data-theme="dark"] .admin-sidebar { border-right: 1px solid #1e1e1e; }
 
 /* Page header */
-[data-theme="dark"] .admin-page-header { background: #0b0b0b; }
+[data-theme="dark"] .admin-page-header { background: #0b0b0b; box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.75); }
 [data-theme="dark"] .admin-page-title { color: #f0ede8; }
 [data-theme="dark"] .admin-page-subtitle { color: #888; }
 
