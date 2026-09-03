@@ -521,7 +521,9 @@
   z-index: 20;
   background: #f5f4f1;
   margin: -32px -40px 14px;
-  padding: 32px 40px 14px;
+  /* Padding kanan menyisakan tempat untuk tombol notifikasi yang melayang di
+     atasnya (40px lebar + jarak), supaya tombol aksi halaman tidak tertimpa. */
+  padding: 32px 92px 14px 40px;
 }
 .admin-page-title {
   font-size: 24px;
@@ -2790,7 +2792,10 @@
 
 
 /* ===== PANEL NOTIFIKASI ADMIN ===== */
-.adm-notif { position: fixed; top: 22px; right: 28px; z-index: 60; }
+/* Disejajarkan dengan baris aksi .admin-page-header (konten header mulai di
+   y=32px, tombolnya ~38px) supaya terbaca sebagai bagian dari header, bukan
+   elemen melayang. Header diberi padding-kanan agar tombolnya tidak tertimpa. */
+.adm-notif { position: fixed; top: 31px; right: 40px; z-index: 30; }
 .adm-notif-btn {
   position: relative;
   display: flex;
@@ -2901,9 +2906,14 @@
 }
 
 @media (max-width: 768px) {
-  /* Header mobile admin sudah memakai pojok kanan atas — turunkan tombolnya. */
-  .adm-notif { top: 68px; right: 16px; }
-  .adm-notif-panel { width: calc(100vw - 32px); right: 0; }
+  /* Bilah hitam mobile memakai pojok kanan atas, jadi lonceng turun ke bawahnya
+     dan header tidak lagi perlu menyisakan ruang di kanan. */
+  .adm-notif { top: 64px; right: 20px; }
+  .adm-notif-panel { width: calc(100vw - 40px); right: 0; }
+}
+@media (max-width: 480px) {
+  .adm-notif { top: 60px; right: 16px; }
+  .adm-notif-panel { width: calc(100vw - 32px); }
 }
 
 [data-theme="dark"] .adm-notif-btn { background: #141414; border-color: #2a2a2a; color: #aaa; }
