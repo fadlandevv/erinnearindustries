@@ -515,7 +515,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: 10px;
   position: sticky;
   top: 0;
   z-index: 20;
@@ -530,7 +530,7 @@
    Dipakai menggantikan justify-content agar urutan tetap benar walau jumlah
    elemen di header berbeda-beda antar halaman. */
 .admin-page-header > :first-child { margin-right: auto; }
-.admin-page-header > .adm-notif { margin-left: 10px; }
+.admin-page-header > .adm-notif { margin-left: 0; }
 .admin-page-title {
   font-size: 24px;
   font-weight: 700;
