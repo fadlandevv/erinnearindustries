@@ -1,5 +1,7 @@
 'use client'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { getAdminNotificationsAction } from '@/lib/actions'
 import type { AdminNotification, NotifKind } from '@/lib/notifications'
@@ -53,10 +55,28 @@ export default function AdminNotifications() {
   const [filter, setFilter] = useState<'all' | NotifKind>('all')
   const [seenAt, setSeenAt] = useState<string>('')
   const panelRef = useRef<HTMLDivElement>(null)
+  const pathname = usePathname()
+  // Setiap halaman merender .admin-page-header sendiri (28 halaman), jadi alih-
+  // alih menyunting semuanya, tombol ini dititipkan ke elemen header lewat
+  // portal — hasilnya benar-benar anak header, bukan elemen melayang.
+  const [host, setHost] = useState<HTMLElement | null>(null)
 
   useEffect(() => {
     try { setSeenAt(localStorage.getItem(SEEN_KEY) ?? '') } catch { /* mode privat */ }
   }, [])
+
+  // Header dirender ulang tiap pindah halaman, jadi targetnya dicari lagi.
+  useEffect(() => {
+    let raf = 0
+    const find = () => {
+      const el = document.querySelector<HTMLElement>('.admin-page-header')
+      setHost(el)
+      // Header bisa belum ada di frame pertama setelah navigasi.
+      if (!el) raf = requestAnimationFrame(find)
+    }
+    find()
+    return () => cancelAnimationFrame(raf)
+  }, [pathname])
 
   const load = useCallback(() => {
     getAdminNotificationsAction().then(setItems).catch(() => { /* jaringan putus, coba lagi nanti */ })
@@ -105,7 +125,11 @@ export default function AdminNotifications() {
     contact: items.filter(n => n.kind === 'contact').length,
   }
 
-  return (
+  // Tanpa header di halaman itu, tombolnya tidak dirender sama sekali —
+  // lebih baik absen daripada mengambang di tempat acak.
+  if (!host) return null
+
+  return createPortal(
     <div ref={panelRef} className="adm-notif">
       <button
         type="button"
@@ -179,6 +203,7 @@ export default function AdminNotifications() {
           </div>
         </div>
       )}
-    </div>
+    </div>,
+    host,
   )
 }

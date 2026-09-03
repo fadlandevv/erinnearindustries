@@ -521,10 +521,13 @@
   z-index: 20;
   background: #f5f4f1;
   margin: -32px -40px 14px;
-  /* Padding kanan menyisakan tempat untuk tombol notifikasi yang melayang di
-     atasnya (40px lebar + jarak), supaya tombol aksi halaman tidak tertimpa. */
-  padding: 32px 92px 14px 40px;
+  padding: 32px 40px 14px;
 }
+/* Judul mendorong sisanya ke kanan; tombol notifikasi selalu paling akhir.
+   Dipakai menggantikan justify-content agar urutan tetap benar walau jumlah
+   elemen di header berbeda-beda antar halaman. */
+.admin-page-header > :first-child { margin-right: auto; }
+.admin-page-header > .adm-notif { margin-left: 10px; }
 .admin-page-title {
   font-size: 24px;
   font-weight: 700;
@@ -2792,10 +2795,9 @@
 
 
 /* ===== PANEL NOTIFIKASI ADMIN ===== */
-/* Disejajarkan dengan baris aksi .admin-page-header (konten header mulai di
-   y=32px, tombolnya ~38px) supaya terbaca sebagai bagian dari header, bukan
-   elemen melayang. Header diberi padding-kanan agar tombolnya tidak tertimpa. */
-.adm-notif { position: fixed; top: 31px; right: 40px; z-index: 30; }
+/* Dititipkan ke dalam .admin-page-header lewat portal, jadi ikut aliran header
+   seperti tombol aksi lain — panel dropdown-nya yang absolute, bukan tombolnya. */
+.adm-notif { position: relative; flex-shrink: 0; align-self: flex-start; }
 .adm-notif-btn {
   position: relative;
   display: flex;
@@ -2906,14 +2908,15 @@
 }
 
 @media (max-width: 768px) {
-  /* Bilah hitam mobile memakai pojok kanan atas, jadi lonceng turun ke bawahnya
-     dan header tidak lagi perlu menyisakan ruang di kanan. */
-  .adm-notif { top: 64px; right: 20px; }
-  .adm-notif-panel { width: calc(100vw - 40px); right: 0; }
+  /* Header menumpuk vertikal di layar kecil; lonceng disejajarkan dengan judul
+     di baris pertama, bukan ikut turun ke bawah tombol aksi. */
+  .admin-page-header { position: relative; }
+  .admin-page-header > .adm-notif { position: absolute; top: 20px; right: 20px; margin-left: 0; }
+  .adm-notif-panel { width: calc(100vw - 48px); }
 }
 @media (max-width: 480px) {
-  .adm-notif { top: 60px; right: 16px; }
-  .adm-notif-panel { width: calc(100vw - 32px); }
+  .admin-page-header > .adm-notif { top: 16px; right: 16px; }
+  .adm-notif-panel { width: calc(100vw - 40px); }
 }
 
 [data-theme="dark"] .adm-notif-btn { background: #141414; border-color: #2a2a2a; color: #aaa; }
