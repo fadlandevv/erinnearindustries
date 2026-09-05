@@ -2981,12 +2981,35 @@
 }
 .cmo-tab--active .cmo-tab-count { background: rgba(255,255,255,0.2); }
 
-/* Designer memakai style halaman custom publik; di sini jarak vertikalnya
-   dirapatkan supaya tidak menyisakan ruang kosong di dalam kartu CMS. */
+/* Designer memakai style halaman custom publik. Di sini lebarnya diikat ke
+   area konten CMS — grid aslinya (450px + 520px) butuh ~1020px, lebih lebar
+   dari ruang yang tersisa di sebelah sidebar pada layar 1280px. */
 .cmo-designer .custom-section { padding: 8px 0 24px; }
-.cmo-designer .custom-inner   { padding: 0; }
+.cmo-designer .custom-inner {
+  padding: 0;
+  max-width: none;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  gap: 28px;
+}
 .cmo-designer .invoice-section { padding: 0 0 8px; }
 .cmo-designer .invoice-inner   { padding: 0; max-width: none; }
+
+/* Di bawah ini dua kolom jadi terlalu sempit. Ditumpuk, sekaligus melepas
+   trik kolom form absolut dari globals.css — tanpa itu tingginya jadi nol. */
+@media (max-width: 1200px) {
+  .cmo-designer .custom-inner {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+  .cmo-designer .custom-controls-col { position: static; min-height: 0; }
+  .cmo-designer .custom-controls {
+    position: static;
+    inset: auto;
+    overflow: visible;
+  }
+  .cmo-designer .custom-mockup { position: static; order: -1; }
+  .cmo-designer .custom-shirt-wrap { max-width: 320px; }
+}
 
 .cmo-panel { margin-top: 20px; }
 

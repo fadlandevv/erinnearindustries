@@ -7,7 +7,7 @@
 */
 
 import type { PriceOption } from './custom-defaults'
-import type { DesignPlacement } from './mockup'
+import type { AmplopDesignSize, DesignPlacement } from './mockup'
 
 export type SablonOpt = PriceOption | null
 
@@ -34,6 +34,11 @@ export type CustomOrderRow = {
   /** Penempatan desain di mockup, supaya produksi tahu orientasi & posisinya. */
   depanPlacement?: DesignPlacement
   belakangPlacement?: DesignPlacement
+  /**
+   * Ukuran cetak amplop yang dipilih saat baris dibuat. Disimpan karena area
+   * cetaknya berbeda-beda, dan mockup perlu dirender ulang kalau baris diedit.
+   */
+  amplopDesignSize?: AmplopDesignSize
   /** Mockup hasil render — data URL selama di browser, URL storage setelah diunggah. */
   mockupDepan?: string
   mockupBelakang?: string

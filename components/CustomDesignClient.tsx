@@ -458,6 +458,7 @@ export default function CustomDesignClient({
     const item: InvoiceItem = {
       rowId:    generateId(4),
       productType,
+      ...(isAmplop ? { amplopDesignSize } : {}),
       ...(mockupDepan    ? { mockupDepan }    : {}),
       ...(mockupBelakang ? { mockupBelakang } : {}),
       warna:    form.shirtColor,
@@ -508,17 +509,57 @@ export default function CustomDesignClient({
     })
   }
 
+  /**
+   * Merender ulang mockup satu sisi dari data baris — dipakai saat baris diedit,
+   * karena mengganti jenis sablon ikut mengubah ukuran area cetaknya.
+   */
+  const renderRowMockup = (
+    row: InvoiceItem, side: Side,
+    src: string | undefined, placement: DesignPlacement | undefined, sablon: SablonOpt,
+  ): Promise<string | null> => {
+    if (!src) return Promise.resolve(null)
+    return composeMockupImage({
+      productType: row.productType, side, designSrc: src,
+      pos: placement, rot: placement?.rot ?? 0,
+      designSize: sablonToDesignSize(sablon?.label),
+      amplopDesignSize: row.amplopDesignSize,
+    })
+  }
+
   const startEdit = (item: InvoiceItem) => {
     setEditingRowId(item.rowId)
     setEditDraft({ warna: item.warna, warnaNama: item.warnaNama, size: item.size, jumlah: item.jumlah, sablonDepan: item.sablonDepan, sablonBelakang: item.sablonBelakang })
   }
 
-  const saveEdit = (item: InvoiceItem) => {
+  const saveEdit = async (item: InvoiceItem) => {
     const { depan: effD, belakang: effB } = resolveEffective(editDraft.sablonDepan ?? null, editDraft.sablonBelakang ?? null)
     const basePcs = item.hargaPerPcs - (item.sablonDepan?.price ?? 0) - (item.sablonBelakang?.price ?? 0)
     const newHarga = basePcs + (effD?.price ?? 0) + (effB?.price ?? 0)
+
+    // Mockup adalah cerminan spek baris, bukan foto sekali jepret: begitu
+    // sablonnya diganti, area cetaknya berubah dan gambarnya ikut dirender ulang.
+    let mockupDepan    = item.mockupDepan
+    let mockupBelakang = item.mockupBelakang
+    if (isAdmin) {
+      setAdding(true)
+      try {
+        const [d, b] = await Promise.all([
+          item.depan
+            ? renderRowMockup(item, 'front', item.depanPreview ?? item.depanUrl, item.depanPlacement, effD)
+            : Promise.resolve(null),
+          item.belakang
+            ? renderRowMockup(item, 'back', item.belakangPreview ?? item.belakangUrl, item.belakangPlacement, effB)
+            : Promise.resolve(null),
+        ])
+        if (d) mockupDepan    = d
+        if (b) mockupBelakang = b
+      } finally {
+        setAdding(false)
+      }
+    }
+
     setInvoiceItems(prev => prev.map(i => i.rowId === item.rowId
-      ? { ...i, ...editDraft, sablonDepan: effD, sablonBelakang: effB, warnaNama: (colorOptions ?? SHIRT_COLORS).find(c => c.value === editDraft.warna)?.label ?? editDraft.warnaNama ?? i.warnaNama, hargaPerPcs: newHarga }
+      ? { ...i, ...editDraft, sablonDepan: effD, sablonBelakang: effB, warnaNama: (colorOptions ?? SHIRT_COLORS).find(c => c.value === editDraft.warna)?.label ?? editDraft.warnaNama ?? i.warnaNama, hargaPerPcs: newHarga, mockupDepan, mockupBelakang }
       : i
     ))
     setEditingRowId(null)
@@ -1165,7 +1206,9 @@ export default function CustomDesignClient({
                                 )}
                               </div>
                               <div className="invoice-edit-actions">
-                                <button type="button" className="invoice-edit-save" onClick={() => saveEdit(item)}>Simpan</button>
+                                <button type="button" className="invoice-edit-save" onClick={() => saveEdit(item)} disabled={adding}>
+                                  {adding ? 'Menyimpan…' : 'Simpan'}
+                                </button>
                                 <button type="button" className="invoice-edit-cancel" onClick={() => setEditingRowId(null)}>Batal</button>
                               </div>
                             </div>
