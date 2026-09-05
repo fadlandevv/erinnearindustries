@@ -2942,3 +2942,100 @@
 [data-theme="dark"] .adm-notif-icon--chat    { background: rgba(21,128,61,0.16); color: #4ade80; }
 [data-theme="dark"] .adm-notif-icon--contact { background: rgba(180,83,9,0.18); color: #fbbf24; }
 [data-theme="dark"] .adm-notif-empty { color: #666; }
+
+/* ── Order Manual (custom order) ─────────────────────────────── */
+.cmo-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.cmo-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0.55rem 0.95rem;
+  border: 1px solid #e5e0d8;
+  border-radius: 10px;
+  background: #fff;
+  color: #6b6257;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.cmo-tab:hover { border-color: #d6cec2; color: #2b2622; }
+.cmo-tab--active {
+  background: #2b2622;
+  border-color: #2b2622;
+  color: #fff;
+}
+.cmo-tab-count {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: rgba(0,0,0,0.08);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-align: center;
+}
+.cmo-tab--active .cmo-tab-count { background: rgba(255,255,255,0.2); }
+
+/* Designer memakai style halaman custom publik; di sini jarak vertikalnya
+   dirapatkan supaya tidak menyisakan ruang kosong di dalam kartu CMS. */
+.cmo-designer .custom-section { padding: 8px 0 24px; }
+.cmo-designer .custom-inner   { padding: 0; }
+.cmo-designer .invoice-section { padding: 0 0 8px; }
+.cmo-designer .invoice-inner   { padding: 0; max-width: none; }
+
+.cmo-panel { margin-top: 20px; }
+
+.cmo-mockups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+.cmo-mockup {
+  margin: 0;
+  border: 1px solid #eee7dc;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+.cmo-mockup img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  background: #faf8f4;
+}
+.cmo-mockup figcaption {
+  padding: 6px 8px;
+  font-size: 0.6875rem;
+  color: #8a8177;
+  border-top: 1px solid #f0ebe2;
+}
+
+.cmo-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 0 4px;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid #eee7dc;
+  border-radius: 10px;
+  background: #faf8f4;
+  font-size: 0.8125rem;
+  color: #6b6257;
+}
+.cmo-summary strong { font-size: 1rem; color: #2b2622; }
+
+[data-theme="dark"] .cmo-tab { background: #141414; border-color: #2a2a2a; color: #999; }
+[data-theme="dark"] .cmo-tab:hover { border-color: #3a3a3a; color: #f0ede8; }
+[data-theme="dark"] .cmo-tab--active { background: #f47c2f; border-color: #f47c2f; color: #0d0d0d; }
+[data-theme="dark"] .cmo-mockup { background: #141414; border-color: #242424; }
+[data-theme="dark"] .cmo-mockup img { background: #0f0f0f; }
+[data-theme="dark"] .cmo-mockup figcaption { color: #888; border-top-color: #1e1e1e; }
+[data-theme="dark"] .cmo-summary { background: #141414; border-color: #242424; color: #999; }
+[data-theme="dark"] .cmo-summary strong { color: #f0ede8; }

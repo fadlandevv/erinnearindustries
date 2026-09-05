@@ -26,6 +26,7 @@ import { getAdminNotifications, type AdminNotification } from './notifications'
 import { getPricingItems, upsertPricingItem, insertPricingItem, deletePricingItem } from './pricing'
 import { fetchShippingCost, fetchShippingCostByName, type ShippingOption } from './rajaongkir'
 import { FALLBACK_COURIERS } from './shipping-fallback'
+import { customRowTitle, type CustomOrderRow } from './custom-order'
 import { generateId } from './utils'
 import { db } from './db'
 import { getOrderMessages, getMessagesByOrderIds, sendOrderMessage, markMessagesRead, type OrderMessage } from './order-messages'
@@ -558,6 +559,18 @@ export async function uploadDesignFileAction(
 
 const MAX_QTY_PER_ITEM = 1000
 
+type Placement = { x: number; y: number; rot: number }
+
+/** Angka dari client tidak dipercaya mentah — dibatasi ke rentang yang masuk akal. */
+function sanitizePlacement(p?: Placement) {
+  if (!p) return undefined
+  const num = (v: unknown, max: number) => {
+    const n = Number(v)
+    return Number.isFinite(n) ? Math.max(-max, Math.min(max, Math.round(n * 100) / 100)) : 0
+  }
+  return { x: num(p.x, 400), y: num(p.y, 400), rot: ((Math.round(num(p.rot, 3600)) % 360) + 360) % 360 }
+}
+
 /*
   Harga TIDAK BOLEH dipercaya dari keranjang milik browser.
 
@@ -601,7 +614,6 @@ export async function createCheckoutOrder(
 ): Promise<{ orderId: string; snapToken: string } | { error: string }> {
   try {
     const cartJSON = formData.get('cart') as string
-    type Placement = { x: number; y: number; rot: number }
     const rawItems = JSON.parse(cartJSON) as Array<{
       product: { id: string; title: string; price: string; bg: string }
       size: string
@@ -614,15 +626,6 @@ export async function createCheckoutOrder(
       }
     }>
 
-    /** Angka dari client tidak dipercaya mentah — dibatasi ke rentang yang masuk akal. */
-    const sanitizePlacement = (p?: Placement) => {
-      if (!p) return undefined
-      const num = (v: unknown, max: number) => {
-        const n = Number(v)
-        return Number.isFinite(n) ? Math.max(-max, Math.min(max, Math.round(n * 100) / 100)) : 0
-      }
-      return { x: num(p.x, 400), y: num(p.y, 400), rot: ((Math.round(num(p.rot, 3600)) % 360) + 360) % 360 }
-    }
     if (!rawItems.length) return { error: 'Keranjang kosong' }
 
     const items: OrderItem[] = []
@@ -702,6 +705,134 @@ export async function createCheckoutOrder(
   } catch (e) {
     console.error(e)
     return { error: 'Gagal memproses pesanan. Coba lagi.' }
+  }
+}
+
+// ── Admin: order manual dari halaman custom ───────────────────
+
+const MAX_MOCKUP_BYTES = 4 * 1024 * 1024
+
+/**
+ * Menyimpan mockup hasil render browser (data URL JPEG) ke storage.
+ *
+ * Dipanggil satu gambar per permintaan, bukan sekaligus satu order — batas
+ * ukuran body Server Action (1 MB bawaan Next.js) gampang terlampaui kalau
+ * belasan mockup dikirim dalam satu payload.
+ */
+export async function uploadMockupImageAction(
+  dataUrl: string,
+): Promise<{ url?: string; error?: string }> {
+  const g = await guardAdmin('custom_order')
+  if (g.error) return { error: g.error }
+
+  const match = /^data:image\/(jpeg|png);base64,([A-Za-z0-9+/=]+)$/.exec(dataUrl ?? '')
+  if (!match) return { error: 'Format mockup tidak dikenali.' }
+
+  const [, kind, b64] = match
+  const buf = Buffer.from(b64, 'base64')
+  if (buf.length === 0) return { error: 'Mockup kosong.' }
+  if (buf.length > MAX_MOCKUP_BYTES) return { error: 'Mockup terlalu besar.' }
+
+  const ext = kind === 'png' ? 'png' : 'jpg'
+  const path = `mockups/${Date.now()}-${generateId(8)}.${ext}`
+  const { error } = await db.storage.from('images').upload(path, buf, {
+    upsert: false, contentType: `image/${kind}`,
+  })
+  if (error) return { error: error.message }
+  const { data: { publicUrl } } = db.storage.from('images').getPublicUrl(path)
+  return { url: publicUrl }
+}
+
+const MAX_UNIT_PRICE = 50_000_000
+
+/**
+ * Membuat order dari halaman order manual admin, tanpa lewat Midtrans —
+ * `snapToken` sengaja kosong, sama seperti order titipan reseller.
+ *
+ * Harga di sini memang dipercaya dari form: yang mengisinya admin yang sudah
+ * lolos guard, bukan pembeli anonim. Karena itu jalur ini tidak boleh dipakai
+ * untuk pembayaran otomatis — lihat catatan di createCheckoutOrder.
+ */
+export async function createManualOrderAction(
+  _prev: { ok?: boolean; error?: string; orderId?: string } | null,
+  formData: FormData,
+): Promise<{ ok?: boolean; error?: string; orderId?: string }> {
+  const { session, error: authError } = await guardAdmin('custom_order')
+  if (authError || !session) return { error: authError ?? 'Unauthorized' }
+
+  try {
+    const rows = JSON.parse((formData.get('itemsJson') as string) || '[]') as CustomOrderRow[]
+    if (!rows.length) return { error: 'Belum ada item. Tambahkan minimal satu desain.' }
+
+    const name = ((formData.get('name') as string) ?? '').trim()
+    if (!name) return { error: 'Nama customer wajib diisi.' }
+
+    const status = formData.get('status') === 'paid' ? 'paid' : 'pending'
+    const orderId = generateId(6)
+    const formatIDR = (n: number) =>
+      new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n)
+
+    const items: OrderItem[] = []
+    for (const row of rows) {
+      const quantity  = Math.floor(Number(row.jumlah))
+      const unitPrice = Math.round(Number(row.hargaPerPcs))
+      const title     = customRowTitle(row)
+      if (!Number.isFinite(quantity) || quantity < 1 || quantity > MAX_QTY_PER_ITEM) {
+        return { error: `Jumlah untuk "${title}" tidak valid.` }
+      }
+      if (!Number.isFinite(unitPrice) || unitPrice < 0 || unitPrice > MAX_UNIT_PRICE) {
+        return { error: `Harga untuk "${title}" tidak valid.` }
+      }
+
+      const depanPlacement    = sanitizePlacement(row.depanPlacement)
+      const belakangPlacement = sanitizePlacement(row.belakangPlacement)
+      items.push({
+        productId: `custom-manual-${row.rowId}`,
+        title,
+        price: formatIDR(unitPrice),
+        unitPrice,
+        size: row.size ?? '',
+        quantity,
+        bg: row.warna || '#f5f0e8',
+        ...(row.depanUrl       ? { customDesignDepan:    row.depanUrl }       : {}),
+        ...(row.belakangUrl    ? { customDesignBelakang: row.belakangUrl }    : {}),
+        ...(depanPlacement     ? { placementDepan:       depanPlacement }     : {}),
+        ...(belakangPlacement  ? { placementBelakang:    belakangPlacement }  : {}),
+        ...(row.mockupDepan    ? { mockupDepan:          row.mockupDepan }    : {}),
+        ...(row.mockupBelakang ? { mockupBelakang:       row.mockupBelakang } : {}),
+      })
+    }
+
+    const totalPrice = items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0)
+    if (totalPrice <= 0) return { error: 'Total pesanan tidak valid.' }
+
+    const catatanAdmin = ((formData.get('notes') as string) ?? '').trim()
+    await saveOrder({
+      id: orderId,
+      createdAt: new Date().toISOString(),
+      status,
+      customer: {
+        name,
+        // Boleh kosong: pelanggan walk-in sering tidak punya email, dan alamat
+        // palsu hanya akan mengotori invoice serta daftar pelanggan.
+        email:      ((formData.get('email') as string) ?? '').trim(),
+        phone:      ((formData.get('phone') as string) ?? '').trim(),
+        address:    ((formData.get('address') as string) ?? '').trim(),
+        city:       ((formData.get('city') as string) ?? '').trim(),
+        postalCode: ((formData.get('postalCode') as string) ?? '').trim(),
+        notes: [`Order manual oleh ${session.admin.username}`, catatanAdmin].filter(Boolean).join(' — '),
+      },
+      items,
+      totalPrice,
+      snapToken: '',
+    })
+
+    revalidatePath('/admin/orders')
+    revalidatePath('/admin')
+    return { ok: true, orderId }
+  } catch (e) {
+    console.error(e)
+    return { error: e instanceof Error ? e.message : 'Gagal menyimpan order manual.' }
   }
 }
 

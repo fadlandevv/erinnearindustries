@@ -330,6 +330,20 @@ export default function OrdersClient({ orders, userMap, allMessages, canInvoice 
                                     ))}
                                 </div>
                               )}
+                              {(item.mockupDepan || item.mockupBelakang) && (
+                                <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
+                                  {([['Mockup depan', item.mockupDepan], ['Mockup belakang', item.mockupBelakang]] as const)
+                                    .filter(([, src]) => src)
+                                    .map(([label, src]) => (
+                                      <a key={label} href={src!} target="_blank" rel="noopener noreferrer"
+                                        style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', color: '#555', border: '1px solid #e5e5e5', borderRadius: 6, padding: '2px 7px', background: '#fafafa', textDecoration: 'none' }}>
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img src={src!} alt={label} style={{ width: 28, height: 28, objectFit: 'cover', borderRadius: 4 }} />
+                                        {label} ↗
+                                      </a>
+                                    ))}
+                                </div>
+                              )}
                               {(item.customDesignDepan || item.customDesignBelakang) && (
                                 <div style={{ display: 'flex', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
                                   {item.customDesignDepan && (

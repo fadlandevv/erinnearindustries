@@ -16,6 +16,12 @@ export type OrderItem = {
   /** Orientasi & posisi desain sebagaimana diatur pelanggan di halaman custom. */
   placementDepan?: DesignPlacement
   placementBelakang?: DesignPlacement
+  /**
+   * Mockup jadi (desain sudah menempel di foto produk), dirender saat admin
+   * menyusun order manual. Hanya ada pada order yang dibuat lewat CMS.
+   */
+  mockupDepan?: string
+  mockupBelakang?: string
 }
 
 export type OrderCustomer = {

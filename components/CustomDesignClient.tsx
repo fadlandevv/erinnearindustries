@@ -1,11 +1,14 @@
 'use client'
 import React, { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { useCart } from '@/context/CartContext'
+import { useCartOptional } from '@/context/CartContext'
 import { generateId } from '@/lib/utils'
 import { uploadDesignFileAction } from '@/lib/actions'
-
-type Side = 'front' | 'back'
+import {
+  mockupConfig, mockupHeight, resolveDesignArea, sablonToDesignSize, composeMockupImage,
+  type Side, type DesignPos, type DesignPlacement, type DesignSize, type AmplopDesignSize,
+} from '@/lib/mockup'
+import type { CustomOrderRow, SablonOpt } from '@/lib/custom-order'
 
 const CDD_CHEVRON = (
   <svg className="cdd-chevron" width="11" height="7" viewBox="0 0 12 8" fill="none">
@@ -134,58 +137,9 @@ const SIZES = ['S', 'M', 'L', 'XL', 'XXL']
 const LOGO_COMBO_PRICE = 10000 // fallback; overridden by productConfig.logo_combo_price
 
 type PriceOption = { label: string; price: number }
-type SablonOpt = PriceOption | null
 
-type DesignPos = { x: number; y: number }
-/**
- * Penempatan desain relatif terhadap kotak area cetak: `x`/`y` dalam satuan
- * viewBox mockup (300 lebar), `rot` dalam derajat. Semuanya 0 = posisi bawaan.
- */
-type DesignPlacement = { x: number; y: number; rot: number }
-type DesignSize = 'logo' | 'a4' | 'a3'
-type AmplopDesignSize = 'kecil' | 'sedang' | 'besar'
-
-const DESIGN_SIZES: Record<DesignSize, { x: number; y: number; w: number; h: number }> = {
-  logo: { x: 126, y: 82,  w: 48,  h: 48  },
-  a4:   { x: 97,  y: 70,  w: 105, h: 130 },
-  a3:   { x: 85,  y: 50,  w: 130, h: 195 },
-}
-
-const AMPLOP_DESIGN_SIZES: Record<AmplopDesignSize, { x: number; y: number; w: number; h: number }> = {
-  kecil:  { x: 110, y: 155, w: 80,  h: 100 },
-  sedang: { x:  75, y: 115, w: 150, h: 185 },
-  besar:  { x:   2, y:   8, w: 296, h: 360 },
-}
-
-function sablonToDesignSize(label?: string): DesignSize | undefined {
-  if (!label) return undefined
-  const l = label.toLowerCase()
-  if (l.includes('logo')) return 'logo'
-  if (l.includes('a3'))   return 'a3'
-  return 'a4'
-}
-
-type InvoiceItem = {
-  rowId: string
-  warna: string
-  warnaNama: string
-  size: string
-  bahan: string
-  depan: boolean
-  belakang: boolean
-  depanPreview?: string
-  belakangPreview?: string
-  depanUrl?: string
-  belakangUrl?: string
-  sablonDepan: SablonOpt
-  sablonBelakang: SablonOpt
-  jumlah: number
-  hargaPerPcs: number
-  catatan?: string
-  /** Penempatan desain di mockup, supaya produksi tahu orientasi & posisinya. */
-  depanPlacement?: DesignPlacement
-  belakangPlacement?: DesignPlacement
-}
+/** Satu baris tabel invoice; bentuknya dipakai bersama halaman order manual admin. */
+type InvoiceItem = CustomOrderRow
 
 
 function clientToSVG(svg: SVGSVGElement, clientX: number, clientY: number): DesignPos {
@@ -212,20 +166,8 @@ function ProductMockupSVG({ color, design, side, productType, designPos, designR
   designSize?: DesignSize
   amplopDesignSize?: AmplopDesignSize
 }) {
-  const PHOTO_MOCKUPS: Record<string, { front: string; back: string; vb: string; da: { x: number; y: number; w: number; h: number } }> = {
-    tshirt:            { front: '/mockups/tshirt.png',               back: '/mockups/tshirt-back.png',           vb: '0 0 300 300', da: { x: 90, y: 90,  w: 120, h: 120 } },
-    totebag:           { front: '/mockups/totebag.png',              back: '/mockups/totebag.png',               vb: '0 0 300 300', da: { x: 85, y: 110, w: 130, h: 130 } },
-    'coach-jacket':    { front: '/mockups/coachjacket.png',          back: '/mockups/coachjacket-belakang.png',  vb: '0 0 300 300', da: { x: 90, y: 100, w: 120, h: 120 } },
-    hoodie:            { front: '/mockups/hoodiedepan.png',          back: '/mockups/hoodiebelakang.png',        vb: '0 0 300 300', da: { x: 90, y: 118, w: 120, h: 110 } },
-    jersey:            { front: '/mockups/jerseydepan.png',          back: '/mockups/jerseybelakang.png',        vb: '0 0 300 300', da: { x: 90, y: 90,  w: 120, h: 120 } },
-    'amplop-packaging':{ front: '/mockups/amplop-packaging.png',     back: '/mockups/amplop-packaging-back.png', vb: '0 0 300 375', da: { x: 75, y: 115, w: 150, h: 185 } },
-  }
-  const photoCfg = PHOTO_MOCKUPS[productType] ?? PHOTO_MOCKUPS.tshirt
-  const da = productType === 'amplop-packaging' && amplopDesignSize
-    ? AMPLOP_DESIGN_SIZES[amplopDesignSize]
-    : designSize
-      ? DESIGN_SIZES[designSize]
-      : photoCfg.da
+  const photoCfg = mockupConfig(productType)
+  const da = resolveDesignArea(productType, designSize, amplopDesignSize)
   const ox = designPos?.x ?? 0
   const oy = designPos?.y ?? 0
   // Diputar pada titik tengah desain supaya tidak melayang keluar area saat dirotasi.
@@ -245,7 +187,7 @@ function ProductMockupSVG({ color, design, side, productType, designPos, designR
     >
       <image
         href={side === 'front' ? photoCfg.front : photoCfg.back}
-        x="0" y="0" width="300" height={photoCfg.vb.split(' ')[3]}
+        x="0" y="0" width="300" height={mockupHeight(productType)}
         preserveAspectRatio="xMidYMid meet"
       />
 
@@ -313,6 +255,9 @@ export default function CustomDesignClient({
   colorOptions,
   sizeOptions,
   productConfig = {},
+  mode = 'public',
+  items,
+  onItemsChange,
 }: {
   bahanOptions:   PriceOption[]
   sablonOptions:  PriceOption[]
@@ -320,8 +265,19 @@ export default function CustomDesignClient({
   colorOptions?:  { label: string; value: string }[]
   sizeOptions?:   PriceOption[]
   productConfig?: Record<string, number>
+  /**
+   * 'public' — alur pembeli: hero, batas minimum order, tombol ke keranjang.
+   * 'admin'  — order manual: tanpa hero & keranjang, mockup ikut dirender jadi
+   *            gambar, dan daftar itemnya dipegang komponen induk.
+   */
+  mode?: 'public' | 'admin'
+  /** Daftar item terkendali. Bila diisi, state internal tidak dipakai. */
+  items?: InvoiceItem[]
+  onItemsChange?: React.Dispatch<React.SetStateAction<InvoiceItem[]>>
 }) {
-  const { addCustomItem, openCart } = useCart()
+  const isAdmin = mode === 'admin'
+  // Dashboard admin tidak punya CartProvider — di sana keranjang memang tak terpakai.
+  const cart = useCartOptional()
 
   const [form, setForm] = useState({ ...EMPTY_FORM, jumlah: productType === 'amplop-packaging' ? 100 : productType === 'totebag' ? 24 : EMPTY_FORM.jumlah })
   const [activeSide, setActiveSide]   = useState<Side>('front')
@@ -343,7 +299,11 @@ export default function CustomDesignClient({
   const [totebagPenutup, setTotebagPenutup] = useState<'Tanpa Penutup' | 'Sleting' | 'Velcro'>('Tanpa Penutup')
 
   const [invoiceId]    = useState(() => generateId(6))
-  const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([])
+  const [internalItems, setInternalItems] = useState<InvoiceItem[]>([])
+  const invoiceItems    = items ?? internalItems
+  const setInvoiceItems = onItemsChange ?? setInternalItems
+  /** Render mockup jadi gambar butuh waktu — tombol tambah dikunci selama itu. */
+  const [adding, setAdding] = useState(false)
 
   const frontRef = useRef<HTMLInputElement>(null)
   const backRef  = useRef<HTMLInputElement>(null)
@@ -452,17 +412,54 @@ export default function CustomDesignClient({
         (effDepan    ? effDepan.price    : 0) +
         (effBelakang ? effBelakang.price : 0)
 
-  const handleAddToInvoice = () => {
+  const handleAddToInvoice = async () => {
     if (!noWarnaNoBaju && !form.selectedSize)      { setError('Pilih ukuran.'); return }
     if (!noWarnaNoBaju && !finalBahan)             { setError('Pilih atau isi jenis bahan.'); return }
     if (!form.frontDesign && !form.backDesign)     { setError('Upload minimal satu desain.'); return }
     if (form.jumlah < 1)                           { setError('Jumlah minimal 1 pcs.'); return }
+    // URL desain baru terisi setelah upload selesai; menambah item lebih cepat
+    // dari itu akan menyimpan baris tanpa file desainnya.
+    if (uploadingFront || uploadingBack)           { setError('Tunggu upload desain selesai.'); return }
+    if (adding) return
 
     const colors = colorOptions ?? SHIRT_COLORS
     const warnaNama = colors.find(c => c.value === form.shirtColor)?.label ?? form.shirtColor
 
+    // Mockup hanya dibekukan jadi gambar untuk order manual — pembeli di web
+    // tidak membutuhkannya, dan merendernya cuma memboroskan memori browser.
+    let mockupDepan: string | null = null
+    let mockupBelakang: string | null = null
+    if (isAdmin) {
+      setAdding(true)
+      try {
+        ;[mockupDepan, mockupBelakang] = await Promise.all([
+          form.frontDesign
+            ? composeMockupImage({
+                productType, side: 'front', designSrc: form.frontDesign,
+                pos: frontPos, rot: frontRot,
+                designSize: sablonToDesignSize(form.sablonDepan?.label),
+                amplopDesignSize: isAmplop ? amplopDesignSize : undefined,
+              })
+            : Promise.resolve(null),
+          form.backDesign
+            ? composeMockupImage({
+                productType, side: 'back', designSrc: form.backDesign,
+                pos: backPos, rot: backRot,
+                designSize: sablonToDesignSize(form.sablonBelakang?.label),
+                amplopDesignSize: isAmplop ? amplopDesignSize : undefined,
+              })
+            : Promise.resolve(null),
+        ])
+      } finally {
+        setAdding(false)
+      }
+    }
+
     const item: InvoiceItem = {
       rowId:    generateId(4),
+      productType,
+      ...(mockupDepan    ? { mockupDepan }    : {}),
+      ...(mockupBelakang ? { mockupBelakang } : {}),
       warna:    form.shirtColor,
       warnaNama,
       size:     form.selectedSize ?? '',
@@ -530,12 +527,13 @@ export default function CustomDesignClient({
   const grandTotal  = invoiceItems.reduce((s, i) => s + i.hargaPerPcs * i.jumlah, 0)
   const grandQty    = invoiceItems.reduce((s, i) => s + i.jumlah, 0)
   const MIN_QTY     = 24
-  const belowMinQty = grandQty < MIN_QTY
+  // Admin boleh membuat order berapa pun — minimum ini aturan untuk pembeli.
+  const belowMinQty = !isAdmin && grandQty < MIN_QTY
 
   const handleCheckout = () => {
-    if (invoiceItems.length === 0) return
+    if (invoiceItems.length === 0 || !cart) return
     invoiceItems.forEach(item => {
-      addCustomItem({
+      cart.addCustomItem({
         warna:       item.warna,
         warnaNama:   item.warnaNama,
         bahan:       item.bahan,
@@ -552,7 +550,7 @@ export default function CustomDesignClient({
       })
     })
     setInvoiceItems([])
-    openCart()
+    cart.openCart()
   }
 
   const activeTabName = PRODUCT_TABS.find(t => t.id === productType)?.name ?? 'Produk'
@@ -566,29 +564,31 @@ export default function CustomDesignClient({
 
   return (
     <div>
-      {/* ── Hero ── */}
-      <div className="custom-hero custom-hero--detail">
-        {/* Judul ikut di dalam row supaya kedua panah center terhadap judul */}
-        <div className="custom-hero-row">
-          <Link href={backHref} className="custom-hero-nav" aria-label={backLabel} title={backLabel}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>
-            </svg>
-          </Link>
-          <h1 className="custom-hero-title">Custom {activeTabName}</h1>
-          {nextProduct ? (
-            <Link href={`/custom/${nextProduct.id}`} className="custom-hero-nav" aria-label={`Lanjut ke ${nextProduct.name}`} title={`Lanjut ke ${nextProduct.name}`}>
+      {/* ── Hero — hanya alur pembeli ── */}
+      {!isAdmin && (
+        <div className="custom-hero custom-hero--detail">
+          {/* Judul ikut di dalam row supaya kedua panah center terhadap judul */}
+          <div className="custom-hero-row">
+            <Link href={backHref} className="custom-hero-nav" aria-label={backLabel} title={backLabel}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                <path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>
               </svg>
             </Link>
-          ) : (
-            /* produk terakhir: panah disembunyikan, tapi ruangnya ditahan
-               supaya judul tetap center halaman */
-            <span className="custom-hero-nav custom-hero-nav--empty" aria-hidden="true" />
-          )}
+            <h1 className="custom-hero-title">Custom {activeTabName}</h1>
+            {nextProduct ? (
+              <Link href={`/custom/${nextProduct.id}`} className="custom-hero-nav" aria-label={`Lanjut ke ${nextProduct.name}`} title={`Lanjut ke ${nextProduct.name}`}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                </svg>
+              </Link>
+            ) : (
+              /* produk terakhir: panah disembunyikan, tapi ruangnya ditahan
+                 supaya judul tetap center halaman */
+              <span className="custom-hero-nav custom-hero-nav--empty" aria-hidden="true" />
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── Form + Mockup ── */}
       <section className="custom-section">
@@ -910,8 +910,8 @@ export default function CustomDesignClient({
             {error && <p className="custom-error">{error}</p>}
 
             <button type="button" className="btn-dark custom-order-btn"
-              onClick={handleAddToInvoice}>
-              + Tambah ke Invoice
+              onClick={handleAddToInvoice} disabled={adding}>
+              {adding ? 'Menyiapkan mockup…' : '+ Tambah ke Invoice'}
             </button>
           </div>
           </div>
@@ -1194,17 +1194,19 @@ export default function CustomDesignClient({
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="invoice-actions">
-              <button type="button" className="btn-outline invoice-add-more"
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-                + Tambah Item Lagi
-              </button>
-              <button type="button" className="btn-dark invoice-checkout-btn"
-                onClick={handleCheckout} disabled={belowMinQty}>
-                Masuk ke Keranjang →
-              </button>
-            </div>
+            {/* Actions — admin memakai panel order manual di bawah tabel */}
+            {!isAdmin && (
+              <div className="invoice-actions">
+                <button type="button" className="btn-outline invoice-add-more"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                  + Tambah Item Lagi
+                </button>
+                <button type="button" className="btn-dark invoice-checkout-btn"
+                  onClick={handleCheckout} disabled={belowMinQty}>
+                  Masuk ke Keranjang →
+                </button>
+              </div>
+            )}
 
           </div>
         </section>

@@ -144,3 +144,12 @@ export function useCart() {
   if (!ctx) throw new Error('useCart must be inside CartProvider')
   return ctx
 }
+
+/**
+ * Versi yang boleh gagal: mengembalikan `null` di luar CartProvider.
+ * Dipakai komponen yang hidup di dua tempat — halaman publik (punya keranjang)
+ * dan dashboard admin (tidak punya, dan tidak boleh crash karenanya).
+ */
+export function useCartOptional() {
+  return useContext(CartContext)
+}

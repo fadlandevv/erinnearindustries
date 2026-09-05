@@ -31,6 +31,7 @@ To kill: `pkill -f "next dev"` or `kill $(cat /tmp/nextjs-dev.pid)`
 - Admin: http://localhost:3000/admin
 - Custom order page: http://localhost:3000/custom
 - Admin orders: http://localhost:3000/admin/orders
+- Order manual (CMS): http://localhost:3000/admin/custom-order
 - Pembukuan: http://localhost:3000/admin/pembukuan
 
 ## Tech Stack
@@ -52,6 +53,7 @@ Folders:
 - `products/{id}/` — product photos
 - `gallery/`, `showcase/` — CMS images  
 - `custom-designs/` — uploaded customer design files
+- `mockups/` — mockup jadi (desain + foto produk) dari order manual admin
 
 ## Key Conventions
 

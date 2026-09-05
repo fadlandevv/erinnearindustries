@@ -31,6 +31,7 @@ const NAV_GROUPS: NavGroup[] = [
     icon: '✦',
     items: [
       { label: 'Custom Products', href: '/admin/custom-products', icon: '◧', permission: 'custom_products' },
+      { label: 'Order Manual', href: '/admin/custom-order', icon: '✎', permission: 'custom_order' },
     ],
   },
   {
